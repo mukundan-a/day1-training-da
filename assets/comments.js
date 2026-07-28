@@ -24,12 +24,15 @@
   const NAME  = 'day1wf.name';
   const SCHEMA = 'day1-wireframe-notes/3';
 
+  /* The stored keys stay as they are so the Firestore rules need no change.
+     Only the labels the team reads have moved. */
   const TYPES = [
-    { k: 'concept', label: 'Concept' },
-    { k: 'flow',    label: 'Flow & state' },
-    { k: 'screen',  label: 'Screen' },
-    { k: 'copy',    label: 'Copy' }
+    { k: 'concept', label: 'Underlying Day 1 step' },
+    { k: 'screen',  label: 'Training app design' },
+    { k: 'copy',    label: 'Actual text I see' },
+    { k: 'flow',    label: 'Other' }
   ];
+  const NO_CATEGORY = 'flow';   // what an unanswered category falls back to
 
   const Notes = {
     items: [], mode: false, who: '', filter: 'all', showResolved: true,
@@ -158,15 +161,18 @@
 
     openComposer(anchorKey, view, x, y) {
       this.closePop();
-      this.draft = { type: 'concept' };
+      this.draft = { type: null };
 
       const el = document.createElement('div');
       el.className = 'pop'; el.id = 'pop';
       el.innerHTML = `
-        <div class="pop__types">
-          ${TYPES.map(t => `<button data-type="${t.k}" aria-pressed="${t.k === 'concept'}">${t.label}</button>`).join('')}
-        </div>
         <textarea placeholder="What do you want to say about this screen?"></textarea>
+        <div class="pop__cat">
+          <span class="pop__q">Which category is your comment about? <em>Optional</em></span>
+          <div class="pop__types">
+            ${TYPES.map(t => `<button data-type="${t.k}" aria-pressed="false">${t.label}</button>`).join('')}
+          </div>
+        </div>
         <div class="pop__row">
           <span class="pop__hint">${esc(this.who || 'anonymous')}</span>
           <button class="btn-quiet" data-cancel>Cancel</button>
@@ -176,8 +182,10 @@
       this.place(el, anchorKey, x, y);
 
       $$('[data-type]', el).forEach(b => b.onclick = () => {
-        $$('[data-type]', el).forEach(x2 => x2.setAttribute('aria-pressed', String(x2 === b)));
-        this.draft.type = b.dataset.type;
+        const already = b.getAttribute('aria-pressed') === 'true';
+        $$('[data-type]', el).forEach(x2 => x2.setAttribute('aria-pressed', 'false'));
+        if (!already) { b.setAttribute('aria-pressed', 'true'); this.draft.type = b.dataset.type; }
+        else this.draft.type = null;
       });
 
       const ta = $('textarea', el);
@@ -185,7 +193,7 @@
 
       const save = async () => {
         const text = ta.value.trim();
-        const type = this.draft ? this.draft.type : 'concept';
+        const type = (this.draft && this.draft.type) || NO_CATEGORY;
         this.closePop();
         if (!text) return;
         await this.add({ screen: anchorKey, anchor: anchorKey, view, x, y, type, text });

@@ -250,6 +250,7 @@
 
       return `
         <div class="walk">
+          ${this.tracker()}
           <div class="walk__head">
             <div>
               <div class="walk__eyebrow">
@@ -286,6 +287,26 @@
             <button class="nav-btn" data-go="1" ${last ? 'disabled' : ''}>Next${A_R}</button>
           </div>
         </div>`;
+    },
+
+    /* a thin map of every stage and frame, so you always know where you are */
+    tracker() {
+      const cur = this.cur();
+      return `<nav class="trk" aria-label="Progress">
+        ${STAGES.map(st => {
+          const items = SCREENS.filter(x => x.stage === st.n);
+          const here = st.n === cur.stage;
+          return `<div class="trk__stage ${here ? 'is-here' : ''}" style="flex:${items.length}">
+            <button class="trk__name" data-jump="${items[0].id}">${esc(st.name)}</button>
+            <span class="trk__ticks">${items.map(x => {
+              const gi = SCREENS.indexOf(x);
+              const open = global.Notes.openOn(x.id);
+              return `<button class="trk__tick ${gi === this.i ? 'now' : gi < this.i ? 'done' : ''} ${open ? 'noted' : ''}"
+                data-jump="${x.id}" title="${esc(x.label)}"></button>`;
+            }).join('')}</span>
+          </div>`;
+        }).join('')}
+      </nav>`;
     },
 
     screen(s) {
@@ -566,6 +587,11 @@
         <p>There is no written copy anywhere. Every email, message, definition and annotation is
            replaced by a description of what it will need to say, in the column to the right.
            Choreography lives there too, tagged Beat.</p>
+
+        <h3>Comment categories</h3>
+        <p>Optional. Underlying Day 1 step is about the process itself; Training app design is about
+           how the screen works; Actual text I see is about the words. Anything uncategorised lands
+           in Other.</p>
 
         <h3>Keys</h3>
         <p><span class="kbd">←</span> <span class="kbd">→</span> move &nbsp;

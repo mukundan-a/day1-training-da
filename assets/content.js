@@ -82,10 +82,10 @@
     ${r.body.map(x => `<tr><td>${x[0]}</td><td>${list(x[1])}</td></tr>`).join('')}</tbody></table>`;
 
   const scqCard = (who, own, qw) => `
-    <div class="card ${own ? 'card--yours' : ''}" style="min-height:0;justify-content:flex-start;gap:0">
+    <div class="card ${own ? 'card--yours' : ''}" style="min-height:0;justify-content:space-between;gap:0">
       <span class="tag ${own ? 'tag--maroon' : ''}" style="margin-bottom:10px">${who}</span>
       ${[['S', 'Situation'], ['C', 'Complication'], ['Q', 'Question']].map(([k, n], i) => `
-        <div style="display:flex;flex-direction:column;gap:6px;padding:11px 0;${i ? 'border-top:1px solid var(--rule-soft);' : ''}">
+        <div style="display:flex;flex-direction:column;gap:8px;padding:14px 0;flex:1;justify-content:center;${i ? 'border-top:1px solid var(--rule-soft);' : ''}">
           <span style="font-size:8.5px;font-weight:700;letter-spacing:.09em;color:var(--mute-2)">${k} · ${n.toUpperCase()}</span>
           ${k === 'Q'
             ? `<span class="q-row" style="display:flex;flex-direction:column;gap:4px">${W.bars([[qw, 'strong'], [(parseInt(qw) - 26) + '%', 'strong']])}</span>`

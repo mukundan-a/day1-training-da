@@ -142,8 +142,8 @@
     home() {
       const open = global.Notes.all().filter(n => !n.resolved).length;
       return `<div class="home pinhost"><div id="pins"></div>
-        <h1 class="home__title">Day 1 training — proposed design</h1>
-        <p class="home__lede">Hi there! You can choose to engage with this wireframe in one of 4 ways below.</p>
+        <p class="home__eyebrow">Day 1 training — proposed design</p>
+        <h1 class="home__lede">Hi there! You can choose to engage with this wireframe in one of 4 ways below.</h1>
 
         <div class="home__grid">
           ${[['recap', 'Recap', 'The codified Day 1 — stage by stage, in one table.'],

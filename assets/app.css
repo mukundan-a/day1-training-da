@@ -737,8 +737,14 @@ input, textarea { font: inherit; color: inherit; }
    ========================================================================= */
 
 .home { max-width: 1060px; margin: 0 auto; padding: var(--s7) var(--s4) var(--s8); }
-.home__title { font-family: var(--font-display); font-size: 34px; font-weight: 400; color: var(--ink-strong); margin: 0 0 6px; }
-.home__lede { font-size: 15px; color: var(--mute); margin: 0 0 var(--s6); }
+.home__eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--mute-2); margin: 0 0 var(--s3);
+}
+.home__lede {
+  font-family: var(--font-display); font-size: 33px; line-height: 1.25; font-weight: 700;
+  color: var(--maroon); margin: 0 0 var(--s6); max-width: 26ch; text-wrap: balance;
+}
 
 .home__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s3); margin-bottom: var(--s7); }
 .home__card {
@@ -994,7 +1000,7 @@ input, textarea { font: inherit; color: inherit; }
 }
 @media (max-width: 620px) {
   .home__grid { grid-template-columns: 1fr; }
-  .home__title { font-size: 22px; }
+  .home__lede { font-size: 23px; max-width: none; }
 }
 
 .sb__side { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }

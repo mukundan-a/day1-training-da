@@ -156,7 +156,7 @@
               ${inStage.map((x, k) => {
                 const gi = SCREENS.indexOf(x);
                 const notes = global.Notes.forScreen(x.id).length;
-                return `<button data-jump="${x.id}" title="${esc(x.intent)}"
+                return `<button data-jump="${x.id}" title="${esc(x.label || x.intent)}"
                   class="${gi < this.i ? 'done' : ''} ${k === posInStage ? 'here' : ''} ${notes ? 'has-notes' : ''}"></button>`;
               }).join('')}
             </div>
@@ -239,8 +239,8 @@
       return `<div class="map">
         <div class="map__intro">
           <div>
-            <h1 class="intent" style="font-size:24px">${SCREENS.length} screens, six groups.</h1>
-            <p>Pink marks carry comment counts. Maroon dots mark screens with an open decision — ${dec} of them.</p>
+            <h1 class="intent" style="font-size:22px">All ${SCREENS.length} screens, grouped into six parts.</h1>
+            <p>Every screen in the walkthrough, in order. A pink number is the count of comments left on that screen. A maroon dot means the screen has a decision still open — there are ${dec} of them.</p>
           </div>
           <button class="btn-out" data-sheet="decisions">Open decisions</button>
         </div>
@@ -285,7 +285,7 @@
           <div class="thumb__foot"></div>
         </div>
         <span class="thumb__verb">${s.verb}</span>
-        <span class="thumb__cap">${esc(s.intent)}</span>
+        <span class="thumb__cap">${esc(s.label || s.intent)}</span>
       </button>`;
     },
 
@@ -317,33 +317,33 @@
 
     legendSheet() {
       return `<h2>How to read this</h2>
-        <p>Every screen states one intent and does one thing. The label above each screen is a claim you can disagree with — that is the level of feedback this is for.</p>
+        <p>Every screen does one thing. The description above each screen says plainly what you will see and what you will do there, so you can respond to whether that is the right thing to be happening at that point.</p>
 
         <h3>Interaction</h3>
         <dl class="legend">
-          ${[['Read', 'Nothing to do. Absorb and move on.'],
-             ['Watch', 'An animated beat. No input.'],
-             ['Explore', 'Free movement. Nothing to complete.'],
-             ['Do', 'You produce something the app carries forward.'],
-             ['Decide', 'You choose. Nothing persists.']].map(([d, t]) =>
+          ${[['Read', 'There is nothing to do on this screen. You read it and move on.'],
+             ['Watch', 'Something animates on screen. You watch it and give no input.'],
+             ['Explore', 'You can move around freely. There is nothing to complete and nothing is locked.'],
+             ['Do', 'You produce something, and the app carries it forward to a later screen.'],
+             ['Decide', 'You make a choice. Nothing you choose here is carried forward.']].map(([d, t]) =>
             `<div class="legend__row"><dt>${d}</dt><dd>${t}</dd></div>`).join('')}
         </dl>
 
         <h3>Colour</h3>
         <dl class="legend">
           <div class="legend__row"><dt><span class="swatch" style="background:var(--maroon)"></span></dt>
-            <dd>The one live thing on a screen. If you see two, the screen is doing too much.</dd></div>
+            <dd>Marks the one thing on a screen you can act on. If you see two maroon marks, the screen is doing too much.</dd></div>
           <div class="legend__row"><dt><span class="swatch" style="background:var(--pink)"></span></dt>
-            <dd>Reviewer comments. Nothing else.</dd></div>
+            <dd>Reviewer comments, and nothing else.</dd></div>
           <div class="legend__row"><dt><span class="swatch" style="background:#FBEA9B"></span></dt>
-            <dd>Used once, on the real Day 1 slide, because the highlight is the artefact.</dd></div>
+            <dd>Used once only, on the real Day 1 slide, because the yellow highlight is part of the artefact itself.</dd></div>
         </dl>
 
         <h3>Copy</h3>
-        <p>There is none. Every message, email and annotation is a spec of what the copy must do. Structural lists — checklists, agendas, folder names — are kept.</p>
+        <p>There is no written copy anywhere. Every email, message, definition and annotation is replaced by a description of what that copy will need to say, in the column to the right of the screen. Structural lists — checklist items, agendas, folder names — are kept as they are.</p>
 
         <h3>Carried forward</h3>
-        <p>The row at the bottom-left of each screen shows what the app is holding. It turns maroon on the screen that uses it. What you type in Day 0 comes back in the kick-off.</p>
+        <p>The row at the bottom-left of every screen shows what the app is currently holding for you. It turns maroon on the screen that uses it. What you type in Day 0 really does come back in the kick-off.</p>
 
         <h3>Keys</h3>
         <p><span class="kbd">←</span> <span class="kbd">→</span> move &nbsp; <span class="kbd">m</span> map &nbsp;
@@ -353,7 +353,7 @@
     decisionSheet() {
       const items = SCREENS.filter(s => s.decision);
       return `<h2>Open decisions</h2>
-        <p>Carried over from the build notes and content notes in the storyboard. Nothing here is resolved.</p>
+        <p>These come from the build notes and content notes in the storyboard deck. None of them are resolved, and each one links to the screen it affects.</p>
         <div>${items.map(s => `<div class="decisions__item">
           <b>${esc(STAGES[s.stage].name)}</b>
           <p>${esc(s.decision)}</p>
@@ -440,7 +440,7 @@
         box.innerHTML = card('Yours', true, has ? mine : null) + card('H', false, null) + card('T', false, null);
         if (!has) {
           box.insertAdjacentHTML('afterend',
-            `<p class="s-note" style="margin:8px 0 0">Nothing carried through — the Day 0 exercise was skipped. With persistence, your own words load here.</p>`);
+            `<p class="s-note" style="margin:8px 0 0">Nothing has carried through, because the Day 0 exercise was skipped. If you go back and write an SCQ there, your own words load into the first card here.</p>`);
         }
       },
 
@@ -475,10 +475,10 @@
       /* four objections, face down */
       s2f4b(el) {
         const replies = [
-          'We are deciding what to test first, not deciding the answer today.',
-          'A claim specific enough to be wrong beats a summary that cannot be.',
-          'Your view will be rough, and rough is the expected standard on Day 1.',
-          'We write it where everyone can see it, then spend four weeks trying to break it.'
+          'The PM answers that the team is deciding what to test first, not deciding the answer today. The alternative is starting Monday with a blank page.',
+          'The Partner answers that finding out quickly is a good week’s work, and that a claim specific enough to be wrong is more useful than a summary that cannot be.',
+          'The SPM answers that you know the proposal and the brief, which is roughly what everyone in the room knows today, and that rough is the expected standard on Day 1.',
+          'The Partner answers that the team writes the claim down where everyone can see it and then spends four weeks trying to break it, which makes it easier to attack rather than harder.'
         ];
         $$('[data-card]', el).forEach(b => b.onclick = () => {
           $$('[data-card]', el).forEach(x => x.classList.toggle('turned', x === b));
@@ -510,10 +510,10 @@
       /* the hunch that held, and the finding nobody predicted */
       s2f4d(el) {
         const pairs = [
-          ['Later value-chain stages are under-explored.',
-           'Processing, packaging, retail, consumption and waste — 80% of fossil fuel use in food systems.'],
-          ['Not on the Day 1 slide anywhere.',
-           'Concentration of corporate power, and $164bn into petrochemicals to lock dependence in.']
+          ['The team guessed on Day 1 that the later stages of the value chain were under-explored.',
+           'Four weeks of research found that processing, packaging, retail, consumption and waste account for about 80 per cent of fossil fuel use in food systems. The hunch held.'],
+          ['This argument was not on the Day 1 slide anywhere.',
+           'The published report devoted a whole section to the concentration of corporate power in food and energy systems. It came out of the interviews.']
         ];
         const draw = i => {
           $('[data-pl]', el).innerHTML = `<div class="copy copy--inline"><span class="copy__spec">${esc(pairs[i][0])}</span></div>`;
@@ -653,7 +653,7 @@
               <span style="font-size:9px;color:var(--mute-2)">${f}</span>
               ${i === 0 && has ? `<span style="font-size:11px;color:var(--ink)">Your answer</span>` : W.bar('72%', 'faint')}
             </div>`).join('')}
-            ${i > 0 ? `<div class="copy copy--inline" style="margin-top:2px"><span class="copy__spec" style="font-size:11px">Context the form could not ask for.</span></div>` : ''}
+            ${i > 0 ? `<div class="copy copy--inline" style="margin-top:2px"><span class="copy__spec" style="font-size:11px">The spoken context behind this person’s answers, which the form could not ask for.</span></div>` : ''}
           </div>`).join('');
         if (has) $$('.carry__item', el)[2].classList.add('used');
       },

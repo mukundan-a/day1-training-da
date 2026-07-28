@@ -85,12 +85,13 @@
 
   {
     id: 's0a', stage: 0, kind: 'splash', verb: 'READ', action: 'Start',
-    intent: 'Expectations first: what this is, what it is not, and that nothing here is assessed.',
+    label: "The opening screen",
+    intent: "The first screen of the training. It says what the experience is, roughly how long it takes, that you can stop and come back to it, and that nothing here is assessed.",
     body: () => `
       <div style="display:flex;flex-direction:column;height:100%">
         <div style="margin-bottom:auto">
           <h1 class="s-h1">Day 1</h1>
-          ${copy('Copy', 'Welcome. What the experience is, roughly how long, resumable at your own pace.')}
+          ${copy('Copy', 'Welcome text explaining what the experience is, roughly how long it takes, and that you can leave it and pick it up again later.')}
         </div>
         <div class="s-cols" style="align-items:start">
           <div>${eyebrow('What this is')}${list([
@@ -109,21 +110,23 @@
 
   {
     id: 's0b', stage: 0, kind: 'argument', verb: 'READ', action: 'Next',
-    intent: 'Four reasons the first day carries more weight than any other.',
+    label: "Why the first day matters",
+    intent: "A short argument for why the first day of a project carries more weight than any other. Four numbered reasons, which you read and move past.",
     body: () => `
       <h2 class="s-h2">Day 1 is the highest-leverage day of the project</h2>
       <div style="margin-top:20px">${claims([
         'It sets the tone. How the first day runs shapes how the next ten weeks run.',
         'It brings the firm’s expertise into the room early, and gives you access to it.',
-        'It makes us faster. A hypothesis tells you what to test and what to ignore.',
+        'It makes the team faster. A hypothesis on Day 1 tells you what to test and what to ignore, so week one is not spent reading.',
         'It gives everyone the same start, whatever the project and whoever the team.'
       ])}</div>
-      ${anno('Day 1 is not literally one day. However varied, this is the start you are entitled to.')}`
+      ${anno('Day 1 does not have to be a single day. It can spread across several. However it runs, this is the start you should expect to get.')}`
   },
 
   {
     id: 's0c', stage: 0, kind: 'map', verb: 'READ', action: 'Begin',
-    intent: 'The shape of the next half hour, before you enter it.',
+    label: "A map of the five stages ahead",
+    intent: "A map of the five stages you are about to go through, with an estimate of how long each one takes. None of them are open yet — this screen exists only to show you the shape of what is coming.",
     decision: 'Stage map in the deck repeats one description across Core team KO, PD alignment and Week 1. Durations here are reconciled from each stage intro; the map itself still reads “X mins”.',
     body: () => `<h2 class="s-h2">Five stages</h2>${map5(-1)}`
   },
@@ -132,16 +135,18 @@
 
   {
     id: 's1map', stage: 1, kind: 'map', verb: 'READ', action: 'Begin',
-    intent: 'Where you are, and what is still closed.',
+    label: "Day 0 opens, four stages still closed",
+    intent: "The map returns, with Day 0 now open and the other four stages still closed. A version of this screen sits between every stage, so you always know how far along you are.",
     body: () => map5(0)
   },
 
   {
     id: 's1intro', stage: 1, kind: 'intro', verb: 'READ', action: 'Begin',
-    intent: 'Everything between being staffed and walking into the kick-off prepared.',
+    label: "What Day 0 covers",
+    intent: "An introduction to Day 0, which is everything between being staffed on the project and walking into the kick-off prepared. It lists what you will do in this stage and what you should be able to do by the end of it.",
     body: () => `
       <h2 class="s-h2">Day 0</h2>
-      ${copy('Copy', 'Own time, across a few days. About an hour of actual work.')}
+      ${copy('Copy', 'A line saying that Day 0 happens in your own time across a few days, and adds up to about an hour of actual work.')}
       ${objectives([
         'Get staffed, and read what came before you',
         'Explore how a project folder is set up',
@@ -156,10 +161,10 @@
 
   {
     id: 's1f1', stage: 1, kind: 'sim', verb: 'READ', action: 'Next',
-    intent: 'Nothing is expected of you yet, and that is the message.',
-    notes: () => copy('Email 1', 'The staffing note: project, client, dates, team, proposal attached.')
-      + copy('Email 2', 'From the PM. Welcome; one action — scan the proposal; setup is hers.')
-      + anno('You read and do nothing. The first thing a new joiner needs to know is that nothing heavy is expected yet.'),
+    label: "The staffing note arrives in your inbox",
+    intent: "You arrive at an inbox where nothing has happened yet. The staffing note is already open, and a second email from the PM arrives while you are reading it. You do nothing on this screen except read, which is deliberate: nothing heavy is expected of you before the kick-off.",
+    notes: () => copy('Email 1', 'The staffing note. It names the project, the client, the start and end dates and who else is on the team, with the proposal attached.')
+      + copy('Email 2', 'An email from the PM welcoming the team and naming one action: scan the proposal. She takes the setup work onto herself.'),
     body: () => `<div style="display:flex;height:100%">${W.outlook({
           rows: [
             { from: '58%', lines: ['92%', '70%'], live: true },
@@ -173,9 +178,10 @@
 
   {
     id: 's1f2', stage: 1, kind: 'sim', verb: 'EXPLORE', action: 'Next',
-    intent: 'Recognition, not completion. Nothing is locked and nothing has to be found.',
-    notes: () => copy('Teams', 'PM confirms setup is done, invites additions.')
-      + anno('Two folders are drawn out gently. Every folder opens, in any order.'),
+    label: "You click around the project folder",
+    intent: "The project folder opens as a tree you can click around in any order. Nothing is locked and nothing has to be hunted for. Two folders carry a small mark, because the next two screens happen inside them.",
+    notes: () => copy('Teams', 'A message from the PM confirming she has set the folder up, and inviting anyone to add what is missing.')
+      + anno('When you are staffed for real, this structure should already look familiar rather than being one more new thing to work out.'),
     body: () => `<div style="display:flex;height:100%">${W.sharepoint({
           tree: [
             { n: '3. YYMM Project Name' },
@@ -194,9 +200,10 @@
 
   {
     id: 's1f2b', stage: 1, kind: 'sim', verb: 'WATCH', action: 'Next',
-    intent: 'Skimming, not studying. The pace is the teaching.',
-    notes: () => copy('Beat', 'Proposal and a past qual deck open and scroll fast. A few seconds.')
-      + anno('Telling someone to read something is weaker than showing it happen.'),
+    label: "Two documents open and are skimmed",
+    intent: "A few seconds of animation rather than something you do. Two documents — the proposal and a past qual deck — open and scroll past quickly, to show that the expected pace here is skimming rather than studying.",
+    notes: () => copy('Beat', 'The proposal and a past qual deck open and scroll past quickly, over a few seconds.')
+      + anno('The previous screen told you to read the proposal. This one shows it being read, because showing the pace works better than describing it.'),
     body: () => `<div style="display:flex;height:100%">${W.powerpoint({
           thumbs: 11, at: 2,
           slide: `<div data-scan="1" style="display:flex;flex-direction:column;gap:7px;height:100%">
@@ -208,10 +215,11 @@
   {
     id: 's1f3', stage: 1, kind: 'sim', verb: 'DO', action: 'Next',
     carry: { write: ['facts'] },
-    intent: 'The first senior input lands before the meeting, not inside it.',
-    notes: () => copy('Teams', 'Partner posts the brief: context, client notes, key tensions.')
-      + copy('Callout', 'Partners generate these from a standard skill. Yours is coming.')
-      + anno('Key tensions is the section a proposal never contains, because a proposal is written to win work.'),
+    label: "You pin facts from the context brief",
+    intent: "The Partner posts the context brief a day or two before the kick-off. You scroll through its three sections and pin facts as you go, which sends them to the team fact pack. Whatever you pin is carried with you through the rest of the walkthrough.",
+    notes: () => copy('Teams', 'A message from the Partner posting the brief, listing its three parts: sector and project context, client notes, and key tensions.')
+      + copy('Callout', 'A note explaining that Partners generate these briefs from a standard skill, and that you will receive one on your project.')
+      + anno('The third section, key tensions, is the part a proposal never contains, because a proposal is written to win the work.'),
     body: () => `<div style="display:flex;height:100%">${W.powerpoint({
           thumbs: 9, at: 2,
           slide: `<div style="display:flex;flex-direction:column;gap:9px;height:100%">
@@ -230,9 +238,10 @@
 
   {
     id: 's1f4', stage: 1, kind: 'sim', verb: 'DECIDE', action: 'Accept task',
-    intent: 'Everyone drafts separately, including the person asking.',
-    notes: () => copy('Teams', 'Everyone writes their own SCQ and problem statement before the meeting.')
-      + anno('Not the right answer, and not assigned to one person. Accepting opens a focused exercise.'),
+    label: "The PM asks everyone to draft an SCQ",
+    intent: "A notification from the PM arrives while you are still reading the brief. She asks everyone, herself included, to write their own SCQ and problem statement before the meeting. Accepting the task takes you into the exercise on the next screen.",
+    notes: () => copy('Teams', 'A message from the PM asking everyone to write their own SCQ and their own reading of the problem statement before the meeting.')
+      + anno('The PM is not asking for the right answer, and she is not assigning it to one person. Everyone drafts their own version, including her.'),
     body: () => `<div style="display:flex;height:100%;position:relative">${W.powerpoint({
           thumbs: 9, at: 2,
           slide: `<div style="display:flex;flex-direction:column;gap:7px;opacity:.5">
@@ -245,7 +254,8 @@
     id: 's1f5', stage: 1, kind: 'exercise', verb: 'DO', action: 'Check',
     carry: { write: ['scq'] },
     decision: 'Load-bearing. The SCQ must persist — it returns in the full-team kick-off, and that continuity is what makes the next stage land.',
-    intent: 'You iterate against a bar. Iterating is the expected behaviour, not a sign of struggling.',
+    label: "You write your own SCQ and check it",
+    intent: "You write your own SCQ across three fields, and a problem statement below them. Pressing Check returns a score on each, and you keep revising and checking until you clear the bar. What you write here is saved, and it comes back in the kick-off.",
     body: () => `
       <div class="ex">
         <div class="ex__cols">
@@ -268,19 +278,21 @@
 
   {
     id: 's1f6a', stage: 1, kind: 'argument', verb: 'READ', action: 'Next',
-    intent: 'Three framings in the room instead of one, because you drafted alone.',
+    label: "Why Day 0 mattered",
+    intent: "A closing screen for Day 0. It sets out, in three points, why the preparation you have just done was worth doing.",
     body: () => `
       <h2 class="s-h2">Why Day 0 mattered</h2>
       <div style="margin-top:18px">${claims([
-        'Context already in people’s heads is what lets the kick-off do deep thinking.',
+        'The kick-off can only do deep thinking if the context is already in people’s heads. Every hour of context-setting done now is an hour the meeting does not spend on it.',
         'Your rough SCQ is what makes the kick-off have three framings in it instead of one.',
-        'Most of Day 0 is finding what the firm already has, not making something new.'
+        'Most of Day 0 is finding material the firm already has, rather than making something new. The proposal team has some, and past quals have adjacent work.'
       ])}</div>`
   },
 
   {
     id: 's1check', stage: 1, kind: 'check', verb: 'READ', action: 'Next',
-    intent: 'Who owes what before Day 1 has even started.',
+    label: "What each role owes before Day 1",
+    intent: "A checklist of what each role should have done before Day 1 starts. The second tab shows what should exist by the time Day 0 is over.",
     body: () => ({
       tabs: [
         { label: 'Process · has this happened?', html: roles({ head: 'Checklist items', body: [
@@ -302,16 +314,18 @@
 
   {
     id: 's2map', stage: 2, kind: 'map', verb: 'READ', action: 'Begin',
-    intent: 'One stage closed, four open.',
+    label: "Day 0 complete, the kick-off opens",
+    intent: "The map again. Day 0 is now marked complete, and the full-team kick-off is open.",
     body: () => map5(1)
   },
 
   {
     id: 's2intro', stage: 2, kind: 'intro', verb: 'READ', action: 'Begin',
-    intent: 'Two hours minimum, and always before the client sees anything.',
+    label: "What the full-team kick-off covers",
+    intent: "An introduction to the full-team kick-off: the first time the whole team is in a room, at least two hours long, and always held before any client kick-off. It lists what you will do here and what you should be able to do afterwards.",
     body: () => `
       <h2 class="s-h2">Full-team kick-off, with the content jam</h2>
-      ${copy('Copy', 'First time the whole team is in a room. Where the thinking starts.')}
+      ${copy('Copy', 'A line explaining that this is the first time the whole team is in a room, and that it is where the project’s thinking starts.')}
       ${objectives([
         'See your SCQ next to your colleagues’ and find they do not match',
         'Find the words in a problem statement nobody has defined',
@@ -326,10 +340,11 @@
 
   {
     id: 's2f1', stage: 2, kind: 'sim', verb: 'WATCH', action: 'Next',
-    intent: 'You see the shape of two hours before any of it starts.',
-    notes: () => copy('Beat', 'Calendar invite dissolves into the meeting. Agenda writes itself in, one line at a time.')
-      + copy('Opening', 'Everyone read the brief, so no hour on context. Start with where each of us landed.')
-      + anno('Two hours minimum, splittable across two sittings, always before any client kick-off.'),
+    label: "The meeting opens and the agenda appears",
+    intent: "A calendar invite dissolves into the meeting, and the agenda writes itself in one line at a time. You only watch, so that you can see the shape of the next two hours before any of it begins.",
+    notes: () => copy('Beat', 'The calendar invite dissolves into the meeting, and the agenda then writes itself in one line at a time.')
+      + copy('Opening', 'The PM’s opening line: everyone has read the brief, so no hour will be spent on context, and the meeting starts with where each person landed.')
+      + anno('The meeting runs for at least two hours. It can be split across two sittings, and it always happens before any client kick-off.'),
     body: () => `<div style="display:flex;height:100%">${W.teamsMeeting({
           tiles: [{ id: 'A' }, { id: 'T' }, { id: 'H' }, { id: 'You', you: true }],
           side: { title: 'Agenda', items: ['Agree the problem', 'Build the starting answer', 'Agree the deliverable'] },
@@ -341,17 +356,19 @@
     id: 's2f2', stage: 2, kind: 'exercise', verb: 'READ', action: 'Next',
     carry: { read: ['scq'] },
     decision: 'Depends on the Day 0 input persisting. Without it this still works with three pre-written cards, but loses most of its force.',
-    intent: 'Three competent people wrote three different questions.',
+    label: "Your SCQ, next to two colleagues’",
+    intent: "Your own SCQ from Day 0 loads first, marked as yours. Two colleagues’ versions then appear beside it, and you see that all three are different — most sharply in the question. This is the screen that pays off having drafted separately.",
     body: () => `
       <div class="ex">
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;flex:1;min-height:0" data-scqcards></div>
-        ${anno('All three are defensible, and the Q differs in each. Had everyone waited to hear the Partner first, this meeting would have one idea in it instead of three.')}
+        ${anno('All three SCQs are defensible, and the question is different in each one. If everyone had waited to hear the Partner’s version first, this meeting would have one idea in it instead of three.')}
       </div>`
   },
 
   {
     id: 's2f3', stage: 2, kind: 'exercise', verb: 'DECIDE', action: 'Next',
-    intent: 'The sentence looks agreed. Four words in it are not defined.',
+    label: "You find four undefined words",
+    intent: "One agreed problem statement, centred and large. Four ordinary-looking words in it have never actually been defined. You click to find them, and each one opens the question hiding inside it. You have to find all four before moving on.",
     body: () => `
       <div class="ex" style="justify-content:center;gap:26px">
         <div class="hunt" data-hunt>
@@ -360,31 +377,33 @@
           <mark data-w="2">scale</mark>, and what would make that
           <mark data-w="3">viable</mark>?
         </div>
-        <div style="text-align:center">${copy('Prompt', 'This looks agreed. Four things in it are not defined. Find them.')}</div>
+        <div style="text-align:center">${copy('Prompt', 'A prompt saying the sentence looks agreed, that four things in it are not yet defined, and asking you to find them.')}</div>
         ${anno('Two of the four were resolvable by the team. Two went to the client as questions that week.')}
       </div>`
   },
 
   {
     id: 's2f4a', stage: 2, kind: 'exercise', verb: 'READ', action: 'What is a hypothesis?',
-    intent: 'The claim sits alone, and the pause is deliberate.',
+    label: "The Partner states the hypothesis",
+    intent: "The Partner states the hypothesis as a flat claim, alone on the screen with nothing else on it. The screen holds there a beat longer than is comfortable, and then offers you a definition of what a hypothesis is.",
     body: () => `
       <div class="ex" style="justify-content:center;align-items:center;text-align:center">
         <div style="max-width:44ch">
-          ${copy('Claim', 'The L1 hypothesis, stated flat, with no hedging.')}
+          ${copy('Claim', 'The top-level hypothesis, stated flat as a claim, with no hedging.')}
         </div>
         <div data-defn style="max-width:56ch;margin-top:26px;display:none">
-          ${copy('Definition panel', 'Best answer to the client’s question, written before the research. Specific enough that evidence can prove it wrong.')}
+          ${copy('Definition panel', 'A definition of a hypothesis: the team’s best answer to the client’s question, written down before the research is done, and specific enough that evidence could prove it wrong.')}
         </div>
       </div>`
   },
 
   {
     id: 's2f4b', stage: 2, kind: 'exercise', verb: 'DECIDE', action: 'Next',
-    intent: 'You pick the doubt you actually have, rather than being told which one you have.',
+    label: "You turn over the objection you have",
+    intent: "Four cards lie face down, each carrying an objection someone might genuinely be thinking at this point. You turn over whichever ones apply to you, and each one opens a reply from a different member of the team.",
     body: () => `
       <div class="ex">
-        ${copy('Prompt', 'Most people have one of these in their head. Turn over the ones you are thinking.')}
+        ${copy('Prompt', 'A prompt saying most people have at least one of these objections in their head, and inviting you to turn over the ones you are thinking.')}
         <div class="cards" data-cards>
           ${[
             ['Sequencing', 'Answered by the PM'],
@@ -398,18 +417,19 @@
             </button>`).join('')}
         </div>
         <div data-reply style="flex:1;min-height:0;border:1px solid var(--rule);border-radius:3px;padding:14px;display:flex;align-items:center">
-          <span class="s-note">Turn a card.</span>
+          <span class="s-note">Turn over a card to see how that objection gets answered.</span>
         </div>
       </div>`
   },
 
   {
     id: 's2f4c', stage: 2, kind: 'exercise', verb: 'DECIDE', action: 'Apply hypothesis',
-    intent: 'Every topic is worth studying. You have four weeks and three people.',
+    label: "The hypothesis narrows the research field",
+    intent: "The whole research field appears as a wide grid of topics, every one of them worth studying and far more than three people could cover in four weeks. Applying the hypothesis fades most of them out and leaves a shortlist.",
     body: () => `
       <div class="ex">
         <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px">
-          ${copy('Constraint bar', '4 weeks. 3 people. 28 conversations, if you choose well.')}
+          ${copy('Constraint bar', 'A constraint line reading: four weeks, three people, and 28 conversations if you choose well.')}
         </div>
         <div data-field style="flex:1;min-height:0;display:grid;grid-template-columns:repeat(8,1fr);gap:6px;align-content:start"></div>
         ${anno('The hypothesis is not what the team believed. It is what the team decided to spend four weeks testing.')}
@@ -418,7 +438,8 @@
 
   {
     id: 's2f4d', stage: 2, kind: 'exercise', verb: 'EXPLORE', action: 'Next',
-    intent: 'It tells you where to point the research. It does not tell you what you will find.',
+    label: "One hunch held; one finding was a surprise",
+    intent: "Two pairings you toggle between. The first shows a Day 1 hunch that four weeks of research went on to confirm. The second shows the strongest argument in the final report, which was not on the Day 1 slide at all.",
     body: () => `
       <div class="ex">
         <div class="tabs" data-pair>
@@ -440,7 +461,8 @@
   {
     id: 's2f5', stage: 2, kind: 'exercise', verb: 'DO', action: 'Check',
     carry: { write: ['tree'] },
-    intent: 'For this claim to be true, what would have to be true?',
+    label: "You build three branches from the claim",
+    intent: "You drag candidate sub-claims into three branch slots beneath a fixed top-level claim. Some of the candidates are decoys, and Check tells you which ones and why. You keep revising until all three branches hold.",
     body: () => `
       <div class="ex">
         <div class="tree">
@@ -470,11 +492,12 @@
   {
     id: 's2f6', stage: 2, kind: 'sim', verb: 'READ', action: 'Next',
     decision: 'The real slide is in the previous Dalberg template. Show it as it was, or re-render in the current one?',
-    intent: 'A real Day 1 ends unfinished. This one still has a placeholder in it.',
+    label: "The real Day 1 slide, left as it was",
+    intent: "The real slide from the end of Day 1 on this project, shown exactly as it was left. Two things on it are marked: a sentence in the tensions section that does not parse, and a yellow placeholder nobody had filled in. Neither was tidied up, because the meeting ended before the thinking was finished.",
     notes: () => eyebrow('Real artefact')
-      + copy('Annotation 1', 'A sentence in tensions that does not parse.')
-      + copy('Annotation 2', 'A yellow placeholder they had not filled.')
-      + anno('Nobody cleaned it up, because it was not finished and was not supposed to be. The team stopped because the meeting ended, not because the thinking did.'),
+      + copy('Annotation 1', 'An annotation pointing at a sentence in the tensions section that does not parse.')
+      + copy('Annotation 2', 'An annotation pointing at a yellow placeholder the team had not filled in.')
+      + anno('This is the most useful artefact in the archive, because it shows what the end of a real Day 1 actually looks like, which is nothing like the polished version that circulates later.'),
     body: () => `<div style="display:flex;height:100%">${W.powerpoint({
           thumbs: 12, at: 3,
           slide: `<div class="real" style="display:flex;flex-direction:column;gap:6px;height:100%;overflow:hidden">
@@ -499,9 +522,10 @@
 
   {
     id: 's2f7', stage: 2, kind: 'sim', verb: 'WATCH', action: 'Next',
-    intent: 'The cheapest decision on the agenda, and the most expensive one to defer.',
-    notes: () => copy('Exchange', 'Three or four messages agreeing what the deliverable is and who reads it.')
-      + anno('Deliberately anticlimactic. The brevity is the teaching. Two minutes here saves a rebuild in week three.'),
+    label: "The team agrees the deliverable format",
+    intent: "A short Teams exchange, three or four messages long, in which the team agrees what the deliverable is and who reads it. It is deliberately brief, and the brevity is the teaching.",
+    notes: () => copy('Exchange', 'Three or four messages in which the team agrees what the deliverable is and who its primary reader will be.')
+      + anno('This is deliberately anticlimactic after the previous screen, and the brevity is the point. Two minutes spent here saves a rebuild in week three.'),
     body: () => `<div style="display:flex;height:100%">${W.teamsChat({
           messages: [
             { from: '34%', lines: ['72%'] },
@@ -517,20 +541,22 @@
 
   {
     id: 's2f8a', stage: 2, kind: 'argument', verb: 'READ', action: 'Next',
-    intent: 'The reframe that changed the whole project happened in this room.',
+    label: "Why the full-team kick-off mattered",
+    intent: "A closing screen for the full-team kick-off. It sets out in three points why the session was worth two hours.",
     body: () => `
       <h2 class="s-h2">Why the full-team kick-off mattered</h2>
       <div style="margin-top:18px">${claims([
-        'The proposal was about emissions. The published report was about coordination. The reframe happened here.',
+        'The proposal was written about fossil fuel in agriculture, which is an emissions problem. The published report was about the food-energy nexus and collaboration, which is a coordination problem. That reframe happened in this room.',
         'A hypothesis lets a three-person team choose 28 conversations out of hundreds.',
-        'Most senior attention, least work committed. Changing the argument costs an afternoon today, a fortnight in week six.'
+        'This is the moment with the most senior attention on the project and the least work already committed. Changing the argument costs an afternoon today. In week six it costs a fortnight.'
       ])}</div>
-      ${anno('Your recap: which branches you placed first, which decoys you picked up, and how many passes it took.')}`
+      ${anno('You get a recap here: which branches you placed first, which decoys you picked up and put back, and how many passes it took to clear the bar.')}`
   },
 
   {
     id: 's2check', stage: 2, kind: 'check', verb: 'READ', action: 'Next',
-    intent: 'What each role owes the kick-off, and what exists when it ends.',
+    label: "What each role owes the kick-off",
+    intent: "A checklist of what each role should have done during the kick-off. The second tab shows what should exist by the time it ends.",
     body: () => ({
       tabs: [
         { label: 'Process · has this happened?', html: roles({ head: 'Checklist items', body: [
@@ -552,16 +578,18 @@
 
   {
     id: 's3map', stage: 3, kind: 'map', verb: 'READ', action: 'Begin',
-    intent: 'Two closed. The afternoon session is next.',
+    label: "Two complete, the afternoon session opens",
+    intent: "The map again. Two stages are complete, and the afternoon session is now open.",
     body: () => map5(2)
   },
 
   {
     id: 's3intro', stage: 3, kind: 'intro', verb: 'READ', action: 'Begin',
-    intent: 'The one session of Day 1 that belongs entirely to the team.',
+    label: "What the core team kick-off covers",
+    intent: "An introduction to the core team kick-off: a smaller session later the same day, run by the PM, with the Partner not in the room. It lists what you will do here and what you should be able to do afterwards.",
     body: () => `
       <h2 class="s-h2">Core team kick-off</h2>
-      ${copy('Copy', 'Smaller session, later the same day. PM runs it, Partner is not in it.')}
+      ${copy('Copy', 'A line explaining that this is a smaller session later the same day, run by the PM, with the Partner not in the room.')}
       ${objectives([
         'Fill in your working preferences before the session',
         'Watch the hypothesis tree become a dot-dash storyline',
@@ -576,10 +604,11 @@
 
   {
     id: 's3f1', stage: 3, kind: 'sim', verb: 'READ', action: 'Fill in preferences',
-    intent: 'You are reacting to a draft, not building from nothing.',
-    notes: () => copy('Email', 'Kick-off deck attached. Fill the preferences form before we meet.')
-      + copy('Also', 'First pass at storyline and workplan done. Both rough, both meant to be argued with.')
-      + anno('Collected in writing on purpose. In a live conversation the first person to speak sets the range and everyone adjusts towards it.'),
+    label: "The PM emails the deck and a form",
+    intent: "An email from the PM arrives straight after the morning session. It attaches the kick-off deck and asks you to fill in a short preferences form before the afternoon. She also says her storyline and workplan drafts are rough and meant to be argued with.",
+    notes: () => copy('Email', 'An email attaching the core team kick-off deck and asking you to fill in the preferences form before the session.')
+      + copy('Also', 'The rest of the same email, saying she has taken a first pass at the storyline and the workplan, and that both are rough and meant to be argued with.')
+      + anno('The preferences are collected in writing on purpose. In a live conversation, the first person to speak sets the range and everyone else adjusts towards it.'),
     body: () => `<div style="display:flex;height:100%">${W.outlook({
           rows: [
             { from: '46%', lines: ['88%', '62%'], live: true },
@@ -594,16 +623,18 @@
     id: 's3f2', stage: 3, kind: 'sim', verb: 'DO', action: 'Submit',
     carry: { write: ['prefs'] },
     decision: 'Second persistence requirement. Answers must return in Frame 7. Question set and wording come from the core team kick-off deck, still to be uploaded.',
-    intent: 'Answer for yourself, not for the version of yourself a new team wants.',
-    notes: () => copy('Prompt', 'Answer for yourself. Everyone’s answers come up on screen, including yours.')
-      + anno('About five minutes. No scoring, no right answer.'),
+    label: "You fill in your working preferences",
+    intent: "You fill in a short form about your working hours, how you like to receive feedback, and what meeting cadence suits you. There is no scoring and no right answer. Your answers are saved, and the whole team sees them later in this stage.",
+    notes: () => copy('Prompt', 'A prompt asking you to answer for yourself rather than for the version of yourself a new team might want, and noting that everyone’s answers go up on screen, including yours.')
+      + anno('The form takes about five minutes. There is no scoring and no right answer.'),
     body: () => `<div style="display:flex;height:100%" data-prefs></div>`
   },
 
   {
     id: 's3f3', stage: 3, kind: 'sim', verb: 'READ', action: 'Next',
-    intent: 'The room is smaller, and the absence is explained rather than left to wonder about.',
-    notes: () => copy('Opening', 'Partner is not in this one. The hypothesis is ours to work with now.')
+    label: "A smaller meeting, without the Partner",
+    intent: "The team reconvenes in a visibly smaller meeting, with the Partner’s tile empty. The PM explains the absence rather than leaving you to wonder about it, and sets out the three things she wants by the end of the session.",
+    notes: () => copy('Opening', 'The PM’s opening: the Partner is not in this session, and the hypothesis is now the team’s to work with.')
       + anno('The deck reuses the morning’s three-item agenda here, which contradicts the three outcomes the PM names in the same frame. Shown as the PM states them.'),
     body: () => `<div style="display:flex;height:100%">${W.teamsMeeting({
           tiles: [{ id: 'A', absent: true }, { id: 'T' }, { id: 'H' }, { id: 'You', you: true }],
@@ -615,10 +646,11 @@
   {
     id: 's3f4', stage: 3, kind: 'exercise', verb: 'EXPLORE', action: 'Next',
     carry: { read: ['tree'] },
-    intent: 'The storyline is not a new document. It is the tree, rotated.',
+    label: "You drag the tree into a storyline",
+    intent: "A slider you drag between two views. Dragging one way rotates the morning’s hypothesis tree into a dot-dash storyline; dragging back reverses it. You are not building anything here — you are checking where the PM’s draft came from.",
     body: () => `
       <div class="ex">
-        ${copy('Definition panel', 'Dashes are sections. Dots are the claims each section must make.')}
+        ${copy('Definition panel', 'A definition of a dot-dash storyline: the dashes are the sections, and the dots are the claims each section has to make for the argument to hold.')}
         <div style="flex:1;min-height:0;display:flex;gap:18px;align-items:stretch">
           <div style="flex:1;min-width:0;border:1px solid var(--rule);border-radius:3px;padding:12px;display:flex;flex-direction:column;gap:8px">
             ${eyebrow('Tree')}<div data-scrubL style="flex:1"></div>
@@ -637,9 +669,10 @@
 
   {
     id: 's3f5', stage: 3, kind: 'sim', verb: 'DECIDE', action: 'Next',
-    intent: 'The gaps are real gaps, not a test.',
-    notes: () => copy('Copy', 'The gaps are real gaps, not a test. Say it now, not three weeks in.')
-      + anno('Suggestions are added to the plan, not marked right or wrong.'),
+    label: "You flag experience against the research plan",
+    intent: "The PM’s first-cut research plan, shown as a grid with some rows filled in and some deliberately left empty. Two controls on each row let you flag relevant experience or suggest a source. The empty rows are real gaps, not a test.",
+    notes: () => copy('Copy', 'A line from the PM saying the gaps in the plan are real gaps rather than a test, and asking people to speak up now rather than three weeks in.')
+      + anno('Anything you suggest is added to the plan. It is not marked right or wrong.'),
     body: () => `<div style="display:flex;height:100%">${W.excel({
           controls: true,
           rows: ['head', ['68%', '54%', '72%'], ['52%', '70%', '48%'], 'empty', ['60%', '44%', '66%'], 'empty', 'empty']
@@ -648,7 +681,8 @@
 
   {
     id: 's3f5r', stage: 3, kind: 'argument', verb: 'READ', action: 'Next',
-    intent: 'The interview list was built against criteria, not against who the team happened to know.',
+    label: "How the real interview list was built",
+    intent: "After you have contributed, the screen shows how the interview list on this project was actually built: 28 people chosen against three stated criteria, rather than by who the team happened to know.",
     body: () => `
       <h2 class="s-h2">28 interviews, three parameters</h2>
       <div style="margin-top:18px">${claims([
@@ -661,7 +695,8 @@
 
   {
     id: 's3f6', stage: 3, kind: 'exercise', verb: 'EXPLORE', action: 'Next',
-    intent: 'The sequence held. The durations did not.',
+    label: "Planned workplan against what happened",
+    intent: "A timeline of the workplan, with a toggle between what was planned and what actually happened. The order of the phases held. The durations did not.",
     body: () => `
       <div class="ex">
         <div class="tabs" data-plan>
@@ -681,40 +716,44 @@
   {
     id: 's3f7', stage: 3, kind: 'exercise', verb: 'DO', action: 'Add context',
     carry: { read: ['prefs'] },
-    intent: 'The form gets you the spread. The conversation gets you the meaning.',
+    label: "Everyone’s preferences go up at once",
+    intent: "Everyone’s submitted preferences appear on screen at the same time, yours among them. Each person then talks through their own answers, adding the context a form cannot ask for, and you are prompted to add yours.",
     body: () => `
       <div class="ex">
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;flex:1;min-height:0" data-prefcards></div>
-        ${anno('Everyone’s stated hours were reasonable, and none of them told you what was behind them.')}
+        ${anno('Everyone’s stated hours were reasonable, and none of them told you what was actually behind them. The form gets the spread; the conversation gets the meaning.')}
       </div>`
   },
 
   {
     id: 's3f8', stage: 3, kind: 'exercise', verb: 'DO', action: 'Agree',
-    intent: 'A norm nobody could ever be found to have broken is not doing any work.',
+    label: "The team agrees its working norms",
+    intent: "The team works down a mostly empty norms template, agreeing a specific version of each line. Where people’s submitted preferences conflict, the conflict is visible on screen, and you take part in resolving it rather than watching it get resolved.",
     body: () => `
       <div class="ex">
-        ${copy('Prompt', 'The template has categories. We need the specific version for this team.')}
+        ${copy('Prompt', 'A prompt saying the template only supplies categories, and that what is needed is the specific version for this team on this project.')}
         <div style="flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;overflow:auto" data-norms></div>
-        ${anno('Where the submitted preferences conflict, the conflict is visible on screen and you help resolve it rather than watching it get resolved.')}
+        ${anno('Norms named on Day 1 are norms you can point to in week four. Norms that were never named do not exist, and the person who suffers most from that is usually the most junior person on the team.')}
       </div>`
   },
 
   {
     id: 's3f9a', stage: 3, kind: 'argument', verb: 'READ', action: 'Next',
-    intent: 'A plan the team built is a plan the team owns.',
+    label: "Why the core team kick-off mattered",
+    intent: "A closing screen for the core team kick-off. It sets out in three points why this session belongs to the team.",
     body: () => `
       <h2 class="s-h2">Why the core team kick-off mattered</h2>
       <div style="margin-top:18px">${claims([
         'The storyline is the skeleton of the final deliverable, not a document invented later.',
         'Norms named on Day 1 are norms you can point to in week four. The alternative is everyone guessing, and the most junior person guessing hardest.',
-        'This is the one session that belongs to the team. It works better without the Partner in it.'
+        'This is the one session of Day 1 that belongs entirely to the team. It works better without the Partner in it, because a plan the team built is a plan the team owns.'
       ])}</div>`
   },
 
   {
     id: 's3check', stage: 3, kind: 'check', verb: 'READ', action: 'Next',
-    intent: 'What the afternoon owes, and what exists when it ends.',
+    label: "What each role owes the afternoon",
+    intent: "A checklist of what each role should have done during the afternoon session. The second tab shows what should exist by the time it ends.",
     body: () => ({
       tabs: [
         { label: 'Process · has this happened?', html: roles({ head: 'Checklist items', body: [
@@ -736,16 +775,18 @@
 
   {
     id: 's4map', stage: 4, kind: 'map', verb: 'READ', action: 'Begin',
-    intent: 'Three closed. The next one happens without you.',
+    label: "Three complete; the next is without you",
+    intent: "The map again. Three stages are complete, and the next one happens without you in the room.",
     body: () => map5(3)
   },
 
   {
     id: 's4intro', stage: 4, kind: 'intro', verb: 'READ', action: 'Begin',
-    intent: 'The only stage you are not in the room for.',
+    label: "What PD alignment covers",
+    intent: "An introduction to PD alignment. The two Partners meet at the end of the day to agree how they will run the project between them. You are not in this meeting, but the note that comes out of it is written for you.",
     body: () => `
       <h2 class="s-h2">PD alignment on responsibilities</h2>
-      ${copy('Copy', 'The PDs meet at the end of the day. The note that comes out is for you.')}
+      ${copy('Copy', 'A line explaining that the two Partners meet at the end of the day, and that the note they produce is written for you.')}
       ${objectives([
         'Tell the PDs what you need from the split before they meet',
         'Read the note they send afterwards',
@@ -758,9 +799,10 @@
 
   {
     id: 's4f1', stage: 4, kind: 'sim', verb: 'DECIDE', action: 'Reply or skip',
-    intent: 'You are asked before the meeting, not told after it.',
-    notes: () => copy('Calendar', 'End-of-day block, greyed out, two Partners only.')
-      + copy('Teams', 'Anything you need built into the split? Say it now.')
+    label: "You are asked before the meeting happens",
+    intent: "A calendar block at the end of the day shows a meeting with only the two Partners in it. Before it happens, one of them messages the team asking whether anyone needs anything built into the split. You can reply or skip — either is fine.",
+    notes: () => copy('Calendar', 'A greyed-out calendar block at the end of the day, showing only the two Partners as participants.')
+      + copy('Teams', 'A message from one Partner asking whether anyone needs anything built into the split before the two of them meet.')
       + anno('Added to Day 1 because of the 2025 Pulse survey: people could not tell when their PD would be involved, and feedback arrived too late to act on.'),
     body: () => `<div style="display:flex;height:100%;position:relative">${W.outlook({
           rows: [
@@ -775,9 +817,10 @@
 
   {
     id: 's4f2', stage: 4, kind: 'sim', verb: 'READ', action: 'Next',
-    intent: 'Five lines, short enough to read without scrolling.',
-    notes: () => copy('Note', 'How the two Partners split the project, so nobody is guessing.')
-      + anno('The only artefact of this stage, and the only part of it the team ever sees.'),
+    label: "The responsibilities note arrives",
+    intent: "The note arrives in the team channel. It is five lines long, short enough to read without scrolling, and it is the only thing this stage produces.",
+    notes: () => copy('Note', 'The responsibilities note, setting out how the two Partners are splitting the project so that nobody has to guess.')
+      + anno('This note is the only thing the stage produces, and the only part of the meeting the team ever sees.'),
     body: () => `<div style="display:flex;height:100%">${W.teamsChat({
           messages: [{ from: '32%', lines: ['92%'], live: true }],
           attached: `<div style="margin:10px;border:1px solid var(--rule);border-radius:3px;padding:12px;display:flex;flex-direction:column;gap:8px">
@@ -795,7 +838,8 @@
 
   {
     id: 's4f2b', stage: 4, kind: 'exercise', verb: 'EXPLORE', action: 'Next',
-    intent: 'Two senior people, and they are not interchangeable.',
+    label: "What each line means for your week",
+    intent: "Each line of the note set against what it actually changes about your week. You click through them one at a time.",
     body: () => `
       <div class="ex">
         <div style="display:grid;grid-template-columns:150px 1fr;gap:0;flex:1;min-height:0;align-content:start">
@@ -813,20 +857,22 @@
 
   {
     id: 's4f3a', stage: 4, kind: 'argument', verb: 'READ', action: 'Next',
-    intent: 'Twenty minutes between two people, written down, prevents a fortnight of guessing.',
+    label: "Why PD alignment mattered",
+    intent: "A closing screen for PD alignment. It explains why the stage was added and what twenty minutes of agreement prevents.",
     body: () => `
       <h2 class="s-h2">Why PD alignment mattered</h2>
       <div style="margin-top:18px">${claims([
-        '2025 Pulse: people could not tell when their PD would be involved.',
-        '2025 Pulse: feedback arrived at the end of the project, too late to act on.',
-        'Both point at the same gap — nobody had written down how the PDs would show up.'
+        'The 2025 Pulse survey found that people could not tell when their PD would be involved in the work.',
+        'It also found that feedback arrived at the end of the project, when it was too late to act on.',
+        'Both findings point at the same gap: nobody had written down how the PDs would show up, so everyone was guessing.'
       ])}</div>
       ${anno('The note is the clearest statement you will get of what to expect from the most senior people on your project.')}`
   },
 
   {
     id: 's4check', stage: 4, kind: 'check', verb: 'READ', action: 'Next',
-    intent: 'Twenty minutes of agreement, and what it has to produce.',
+    label: "What the split has to produce",
+    intent: "A checklist of what the Partners and the team should have done. The second tab shows what should exist afterwards.",
     body: () => ({
       tabs: [
         { label: 'Process · has this happened?', html: roles({ head: 'Checklist items', body: [
@@ -847,16 +893,18 @@
 
   {
     id: 's5map', stage: 5, kind: 'map', verb: 'READ', action: 'Begin',
-    intent: 'Four closed. The last one is a preview, not a stage.',
+    label: "Four complete; a preview remains",
+    intent: "The map one last time. Four stages are complete, and what remains is a preview rather than a stage.",
     body: () => map5(4)
   },
 
   {
     id: 's5intro', stage: 5, kind: 'intro', verb: 'READ', action: 'Begin',
-    intent: 'Not part of Day 1, and not what we are standardising.',
+    label: "What the Week 1 preview covers",
+    intent: "An introduction to the Week 1 preview. This is not part of Day 1 and is not what is being standardised. It is here so you can see where the things you made today end up.",
     body: () => `
       <h2 class="s-h2">Week 1</h2>
-      ${copy('Copy', 'Included so you can see where today’s outputs end up.')}
+      ${copy('Copy', 'A line explaining that Week 1 is included only so you can see where the things you made today end up.')}
       ${objectives([
         'Watch the four Day 1 artefacts expand across the first week',
         'See what happens when evidence contradicts a claim'
@@ -868,7 +916,8 @@
   {
     id: 's5f1', stage: 5, kind: 'exercise', verb: 'WATCH', action: 'Next',
     carry: { read: ['tree', 'facts'] },
-    intent: 'By Friday the tree has already changed. That is it working, not failing.',
+    label: "The artefacts grow; one branch turns red",
+    intent: "An animation running Monday to Friday. The four Day 1 artefacts fill out across the week, and one branch of the hypothesis tree turns red as evidence comes back that does not support it. You can replay it.",
     body: () => `
       <div class="ex">
         <div style="display:flex;justify-content:space-between;align-items:center">
@@ -885,8 +934,9 @@
 
   {
     id: 's5f2', stage: 5, kind: 'sim', verb: 'READ', action: 'Next',
-    intent: 'A structural comment now moves a heading. In week four it rewrites ten slides.',
-    notes: () => copy('Copy', 'Comments land on argument and structure, because there is no prose yet.')
+    label: "The empty deck is reviewed early",
+    intent: "A first review lands on the deck while it is still empty. The comments are about argument and structure, because there is no prose yet, and the review markers match the responsibilities note exactly.",
+    notes: () => copy('Copy', 'A line explaining that the comments land on argument and structure, because there is no prose in the deck yet.')
       + anno('Review markers match the responsibilities note exactly. This is the first time you see that note being kept.'),
     body: () => `<div style="display:flex;height:100%">${W.powerpoint({
           thumbs: 10, at: 2,
@@ -903,7 +953,8 @@
 
   {
     id: 's5f3', stage: 5, kind: 'argument', verb: 'READ', action: 'Next',
-    intent: 'Getting it wrong early is cheap. Getting it wrong late is not.',
+    label: "Why the preview was worth showing",
+    intent: "A closing screen for the preview. It explains why an early, cheap review is the thing Day 1 makes possible.",
     body: () => `
       <h2 class="s-h2">Why Week 1 was worth showing</h2>
       <div style="margin-top:18px">${claims([
@@ -911,7 +962,7 @@
         'Reviewing a ghost deck costs an afternoon. Reviewing a full deck costs a fortnight.',
         'Day 1 is what makes the early review possible, because it produces something reviewable.'
       ])}</div>
-      ${anno('No checklists for this stage.')}`
+      ${anno('This stage has no checklists, because it is a preview rather than a part of Day 1.')}`
   },
 
   /* ------------------------------- CLOSE -------------------------------- */
@@ -919,7 +970,8 @@
   {
     id: 'fin1', stage: 6, kind: 'vault', verb: 'EXPLORE', action: 'Next',
     carry: { read: ['scq', 'tree', 'prefs', 'facts'] },
-    intent: 'Everything you made, and everything that stays available.',
+    label: "Everything you made, and what stays",
+    intent: "The final summary, in three tabs: every artefact Day 1 produced, the templates and checklists that stay available to you afterwards, and a record of what you personally contributed on the way through.",
     body: () => `
       <div class="tabs" data-vault>
         <button aria-selected="true" data-v="0">Artefact trail</button>
@@ -931,24 +983,26 @@
 
   {
     id: 'fin2', stage: 6, kind: 'argument', verb: 'READ', action: 'Next',
-    intent: 'Not right, but specific enough to be tested.',
+    label: "What happened to the real hypothesis",
+    intent: "A last look at the real hypothesis from this project. Four of its five claims made it into the published report, one did not survive the interviews, and the report’s strongest argument was never on the Day 1 slide at all.",
     body: () => `
       <h2 class="s-h2">One last look at the real hypothesis</h2>
       <div style="margin-top:18px">${claims([
-        'Five claims, written before the evidence existed, with a placeholder still in the recommendations.',
-        'Four of the five made it into the published report. One did not survive the interviews.',
+        'The team committed to five claims, written before any evidence existed, with a placeholder still sitting in the recommendations.',
+        'Four of those five claims made it into the published report. One did not survive the interviews.',
         'The strongest argument in the final report was not on the Day 1 slide at all.'
       ])}</div>
-      ${anno('That is what a good Day 1 looks like. Clear enough that four weeks of research knew where to point.')}`
+      ${anno('That is what a good Day 1 looks like: not right, but specific enough to be tested, and clear enough that four weeks of research knew where to point.')}`
   },
 
   {
     id: 'fin3', stage: 6, kind: 'splash', verb: 'READ', action: 'Close',
-    intent: 'Complete, and returnable at any time.',
+    label: "The training is complete",
+    intent: "The closing screen. It confirms the training is finished and that everything stays available if you want to come back to it.",
     body: () => `
       <div style="display:flex;flex-direction:column;height:100%;justify-content:center;align-items:center;text-align:center;gap:14px">
         <h1 class="s-h1" style="margin:0">Day 1 complete</h1>
-        ${copy('Copy', 'Everything stays available here and on the Hub. Come back any time.')}
+        ${copy('Copy', 'A line confirming that everything stays available here and on the Hub, and that you can come back to it at any time.')}
       </div>`
   }
 

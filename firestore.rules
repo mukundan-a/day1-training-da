@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /* ---- review comments ---- */
+    match /boards/{boardId}/comments/{commentId} {
+
+      function valid(d) {
+        return d.screen is string && d.screen.size() < 40
+            && d.x is number && d.x >= 0 && d.x <= 100
+            && d.y is number && d.y >= 0 && d.y <= 100
+            && d.type in ['concept','flow','screen','copy']
+            && d.text is string && d.text.size() > 0 && d.text.size() < 4000
+            && d.who is string && d.who.size() < 80
+            && d.resolved is bool
+            && d.uid == request.auth.uid;
+      }
+
+      allow read:   if request.auth != null;
+      allow create: if request.auth != null && valid(request.resource.data);
+
+      // anyone can reply or mark resolved; nobody can rewrite someone else's comment
+      allow update: if request.auth != null
+                    && request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['resolved','resolvedBy','resolvedAt','replies'])
+                    && request.resource.data.replies.size() < 200;
+
+      // only the author can delete their own
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+
+    /* ---- direct edits to the wording ----
+       Deliberately open to anyone signed in: the whole point is that a change
+       one person makes is what everyone sees. Nothing here tracks history, which
+       is why the app warns before letting anyone in. ---- */
+    match /boards/{boardId}/edits/{editId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+                   && request.resource.data.path is string
+                   && request.resource.data.path.size() < 120
+                   && request.resource.data.text is string
+                   && request.resource.data.text.size() > 0
+                   && request.resource.data.text.size() < 4000
+                   && request.resource.data.who is string
+                   && request.resource.data.who.size() < 80;
+      allow delete: if request.auth != null;
+    }
+  }
+}

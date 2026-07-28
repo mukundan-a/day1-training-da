@@ -44,6 +44,7 @@ const Live = {
 
       const db = store.getFirestore(app);
       this._col = store.collection(db, 'boards', BOARD, 'comments');
+      this._edits = store.collection(db, 'boards', BOARD, 'edits');
       this._fns = store;
       this.ok = true;
       return true;
@@ -102,6 +103,28 @@ const Live = {
     return s.deleteDoc(s.doc(this._col, id));
   },
 
+  /* --- direct edits to the wording --------------------------------- */
+
+  watchEdits(cb) {
+    if (!this.ok) return () => {};
+    const s = this._fns;
+    return s.onSnapshot(this._edits,
+      snap => cb(snap.docs.map(d => d.data())),
+      err => cb(null, err));
+  },
+
+  async setEdit(path, text, who) {
+    const s = this._fns;
+    return s.setDoc(s.doc(this._edits, key(path)), {
+      path, text, who: who || 'anonymous', at: new Date().toISOString()
+    });
+  },
+
+  async clearEdit(path) {
+    const s = this._fns;
+    return s.deleteDoc(s.doc(this._edits, key(path)));
+  },
+
   /* one-shot import: push a whole exported file onto the shared board */
   async addMany(notes) {
     let n = 0;
@@ -109,6 +132,9 @@ const Live = {
     return n;
   }
 };
+
+/* a Firestore document id cannot contain a slash */
+function key(path) { return String(path).replace(/[\/\.#\[\]]/g, '~'); }
 
 window.Live = Live;
 Live.init().then(ok => {

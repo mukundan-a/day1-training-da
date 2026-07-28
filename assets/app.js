@@ -18,6 +18,11 @@
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+  const T  = (path, fb) => global.Edits.t(path, fb);
+  const EA = path => global.Edits.attr(path);
+  const ED = (path, fb, tag, cls) =>
+    `<${tag || 'span'} class="ed ${cls || ''}" ${EA(path)}>${esc(T(path, fb))}</${tag || 'span'}>`;
+
   const A_L = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>';
   const A_R = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg>';
 
@@ -87,6 +92,8 @@
       const root = $('#root');
       document.body.classList.toggle('commenting-mode', global.Notes.mode);
       if (!global.Notes.mode) { const cb = $('#cmtbar'); if (cb) cb.remove(); }
+      if (!global.Edits.mode) { const eb = $('#edbar'); if (eb) eb.remove(); }
+      document.body.classList.toggle('editing-mode', global.Edits.mode);
 
       if (this.view === 'walk')       { root.innerHTML = this.walk();  this.wireWalk(); }
       else if (this.view === 'home')  { root.innerHTML = this.home();  this.wireLinks(); }
@@ -97,6 +104,8 @@
       this.wireTop();
       if (this.view !== 'walk') global.Notes.mount();
       if (global.Notes.mode) this.reminder();
+      global.Edits.mount($('#root'));
+      if (global.Edits.mode) this.editBar();
     },
 
     topbar() {
@@ -118,6 +127,9 @@
           <button class="tool tool--cmt" data-cmt aria-pressed="${global.Notes.mode}">${W.glyph('pin')}Comment</button>
           <button class="tool" data-sheet="export">Export</button>
           <button class="tool" data-sheet="legend" title="Legend and shortcuts">?</button>
+          <button class="tool tool--ed" data-edmode aria-pressed="${global.Edits.mode}" title="Direct edit">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11.5 2.5l2 2L6 12l-2.5.5L4 10z"/></svg></button>
           <svg class="notch" viewBox="0 0 26 13" fill="none" aria-hidden="true">
             <path d="M0 13h8.7V8.7h8.6V4.3H26V0" stroke="currentColor" stroke-width="2.4"/></svg>
         </div>`;
@@ -126,6 +138,7 @@
     wireTop() {
       $$('[data-view]').forEach(b => b.onclick = () => this.setView(b.dataset.view));
       const c = $('[data-cmt]'); if (c) c.onclick = () => global.Notes.toggleMode();
+      const em = $('[data-edmode]'); if (em) em.onclick = () => global.Edits.toggleMode();
       $$('[data-sheet]').forEach(b => b.onclick = () => this.sheet(b.dataset.sheet));
     },
 
@@ -142,8 +155,8 @@
     home() {
       const open = global.Notes.all().filter(n => !n.resolved).length;
       return `<div class="home pinhost"><div id="pins"></div>
-        <p class="home__eyebrow">Day 1 training — proposed design</p>
-        <h1 class="home__lede">Hi there! You can choose to engage with this wireframe in one of 4 ways below.</h1>
+        ${ED('home.eyebrow', 'Day 1 training — proposed design', 'p', 'home__eyebrow')}
+        ${ED('home.lede', 'Hi there! You can choose to engage with this wireframe in one of 4 ways below.', 'h1', 'home__lede')}
 
         <div class="home__grid">
           ${[['recap', 'Recap', 'The codified Day 1 — stage by stage, in one table.'],
@@ -152,15 +165,15 @@
              ['notes', 'Notes', 'Your notes, collated.']].map(([k, name, text]) => `
             <button class="home__card" data-view="${k}" data-anchor="home-${k}">
               <span class="home__mini">${this.homeMini(k)}</span>
-              <span class="home__name">${name}</span>
-              <span class="home__text">${text}</span>
+              <span class="home__name ed" ${EA('home.' + k + '.name')}>${esc(T('home.' + k + '.name', name))}</span>
+              <span class="home__text ed" ${EA('home.' + k + '.text')}>${esc(T('home.' + k + '.text', text))}</span>
             </button>`).join('')}
         </div>
 
         <div class="home__cmt" data-anchor="home-comment">
           <div class="home__cmtcopy">
-            <h2>You can add comments anywhere!</h2>
-            <p>Just click on “Comment” tab above to turn your cursor into a pin you can drop anywhere.</p>
+            ${ED('home.cmt.h', 'You can add comments anywhere!', 'h2')}
+            ${ED('home.cmt.p', 'Just click on “Comment” tab above to turn your cursor into a pin you can drop anywhere.', 'p')}
             <p class="home__cmtsub">Everyone’s comments are shared as they are written. You can reply to
                anyone’s, and mark one resolved once it is dealt with — it stays visible.
                ${open ? `<b>${open} open right now.</b>` : ''}</p>
@@ -192,9 +205,8 @@
     recap() {
       return `<div class="recap pinhost"><div id="pins"></div>
         <div class="recap__head">
-          <h1>What does a codified “day 1” consist of?</h1>
-          <p>The agreed table, kept as written. Small flags mark the few places where the
-             walkthrough differs from it.</p>
+          ${ED('recap.h', 'What does a codified “day 1” consist of?', 'h1')}
+          ${ED('recap.p', 'The agreed table, kept as written. Small flags mark the few places where the walkthrough differs from it.', 'p')}
         </div>
 
         <div class="recap__scroll">
@@ -218,8 +230,8 @@
 
         <div class="recap__diffs" data-anchor="recap-diffs">
           <h3>Where the walkthrough differs</h3>
-          <ol>${RECAP.flatMap(r => (r.flags || []).map(f =>
-            `<li><b>${esc(r.stage)} · ${esc(r.activity)}</b>${esc(f)}</li>`)).join('')}</ol>
+          <ol>${RECAP.flatMap((r, ri) => (r.flags || []).map((f, fi) =>
+            `<li><b>${esc(r.stage)} · ${esc(r.activity)}</b><span class="ed" ${EA('recap.' + ri + '.flag.' + fi)}>${esc(T('recap.' + ri + '.flag.' + fi, f))}</span></li>`)).join('')}</ol>
         </div>
 
         <p class="recap__link">Link to notion with compiled resources + detailed steps per stage:
@@ -259,8 +271,9 @@
                 <button class="verb" data-sheet="legend" title="What the five interaction types mean">${s.verb}</button>
                 ${open ? `<span class="sep">·</span><button class="openflag" data-view="notes">${open} open comment${open > 1 ? 's' : ''}</button>` : ''}
               </div>
-              <h1 class="summary">${esc(s.summary)}</h1>
-              ${(s.beats && s.beats.length) ? `<ul class="beats">${s.beats.map(b => `<li>${esc(b)}</li>`).join('')}</ul>` : ''}
+              <h1 class="summary ed" ${EA(s.id + '.summary')}>${esc(T(s.id + '.summary', s.summary))}</h1>
+              ${(s.beats && s.beats.length) ? `<ul class="beats">${s.beats.map((b, k) =>
+                `<li class="ed" ${EA(s.id + '.beat.' + k)}>${esc(T(s.id + '.beat.' + k, b))}</li>`).join('')}</ul>` : ''}
             </div>
           </div>
 
@@ -271,7 +284,14 @@
               <button class="edge edge--r" data-go="1" ${last ? 'disabled' : ''} aria-label="Next">${last ? '' : A_R}</button>
               <div id="pins"></div>
             </div>
-            <aside class="specs">${s.notes ? s.notes() : ''}</aside>
+            <aside class="specs">${(s.notes || []).map(([tag, spec], k) => {
+              const path = s.id + '.note.' + k;
+              return tag === 'Note'
+                ? `<div class="anno"><span class="anno__tag">Note</span>
+                     <span class="anno__body ed" ${EA(path)}>${esc(T(path, spec))}</span></div>`
+                : `<div class="copy"><span class="copy__tag">${esc(tag)}</span>
+                     <span class="copy__spec ed" ${EA(path)}>${esc(T(path, spec))}</span></div>`;
+            }).join('')}</aside>
           </div>
 
           <div class="walk__foot">
@@ -376,7 +396,7 @@
           <span class="track__n">${st.n === 0 ? '—' : st.n}</span>
           <span>
             <span class="track__name">${esc(st.name)}</span>
-            <p class="track__sub">${esc(st.short)}</p>
+            <p class="track__sub ed" ${EA('stage.' + st.n + '.short')}>${esc(T('stage.' + st.n + '.short', st.short))}</p>
           </span>
           <span class="track__meta">
             <span><b>${items.length}</b> screens</span>
@@ -409,13 +429,13 @@
         <div class="sb__head" data-anchor="sbhead-${st.n}">
           <div>
             <h1 class="sb__title">${esc(st.name)}</h1>
-            <p class="sb__about">${esc(st.about)}</p>
+            <p class="sb__about ed" ${EA('stage.' + st.n + '.about')}>${esc(T('stage.' + st.n + '.about', st.about))}</p>
           </div>
           <div class="io">
             <div class="io__panel"><h4>What the user puts in</h4>
-              <ul>${st.inputs.map(i => `<li>${esc(i)}</li>`).join('')}</ul></div>
+              <ul>${st.inputs.map((i, k) => `<li class="ed" ${EA('stage.' + st.n + '.in.' + k)}>${esc(T('stage.' + st.n + '.in.' + k, i))}</li>`).join('')}</ul></div>
             <div class="io__panel io__panel--out"><h4>What comes out</h4>
-              <ul>${st.outputs.map(i => `<li>${esc(i)}</li>`).join('')}</ul></div>
+              <ul>${st.outputs.map((i, k) => `<li class="ed" ${EA('stage.' + st.n + '.out.' + k)}>${esc(T('stage.' + st.n + '.out.' + k, i))}</li>`).join('')}</ul></div>
           </div>
         </div>
 
@@ -428,7 +448,7 @@
             return `<button class="sb__step" data-jump="${s.id}" data-anchor="sbstep-${s.id}">
               <span class="sb__n">${k + 1}</span>
               <span class="sb__thumb">${this.mini(s)}</span>
-              <span class="sb__desc">${esc(s.summary)}</span>
+              <span class="sb__desc ed" ${EA(s.id + '.summary')}>${esc(T(s.id + '.summary', s.summary))}</span>
               <span class="sb__side">
                 <span class="sb__verb" title="What the five interaction types mean">${s.verb}</span>
                 ${open ? `<span class="sb__pin">${open}</span>` : ''}
@@ -532,6 +552,18 @@
 
     closeSheet() { const s = $('#sheetwrap'); if (s) s.remove(); },
 
+    editBar() {
+      const old = $('#edbar'); if (old) old.remove();
+      const n = global.Edits.count();
+      const el = document.createElement('div');
+      el.id = 'edbar'; el.className = 'cmtbar cmtbar--ed';
+      el.innerHTML = `<span>Direct edit is on — click any dotted text to change it for everyone.</span>
+        ${n ? `<b class="cmtbar__who">${n} edited</b>` : ''}
+        <button data-edoff>Turn off</button>`;
+      document.body.appendChild(el);
+      $('[data-edoff]', el).onclick = () => global.Edits.toggleMode();
+    },
+
     reminder() {
       const old = $('#cmtbar'); if (old) old.remove();
       const named = !!global.Notes.who;
@@ -600,6 +632,8 @@
   };
 
   global.App = App;
-  document.addEventListener('DOMContentLoaded', () => { global.Notes.init(); App.init(); });
+  document.addEventListener('DOMContentLoaded', () => {
+    global.Notes.init(); global.Edits.init(); App.init();
+  });
 
 })(window);

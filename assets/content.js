@@ -23,9 +23,6 @@
 
   const W = global.WIN;
 
-  const copy = (tag, spec) =>
-    `<div class="copy"><span class="copy__tag">${tag}</span><span class="copy__spec">${spec}</span></div>`;
-  const anno = spec => `<div class="anno"><span class="anno__tag">Note</span><span class="anno__body">${spec}</span></div>`;
   const list = items => `<ul class="s-list">${items.map(i => `<li>${i}</li>`).join('')}</ul>`;
   const claims = items => `<ol class="claims">${items.map((c, i) =>
     `<li><span class="n">${i + 1}</span><p>${c}</p></li>`).join('')}</ol>`;
@@ -109,7 +106,9 @@
       'Makes clear this is a benchmark to observe, not an exercise to pass.',
       'Says it can be left and picked up again, so nobody feels locked in.'
     ],
-    notes: () => copy('Copy', 'Welcome text: what the experience is, roughly how long, and that it is resumable.'),
+    notes: [
+      ['Copy', 'Welcome text: what the experience is, roughly how long, and that it is resumable.']
+    ],
     body: () => `
       <div class="stack">
         <div><h1 class="s-display">Day 1</h1></div>
@@ -136,7 +135,9 @@
       'Four reasons, each one a claim they could argue with.',
       'Establishes that the first day shapes the ten weeks after it.'
     ],
-    notes: () => anno('Day 1 does not have to be a single day. It can spread across several. However it runs, this is the start the learner should expect to get.'),
+    notes: [
+      ['Note', 'Day 1 does not have to be a single day. It can spread across several. However it runs, this is the start the learner should expect to get.']
+    ],
     body: () => `
       <div class="stack">
         <h2 class="s-h1">Day 1 is the highest-leverage day of the project</h2>
@@ -176,7 +177,9 @@
       'Sets the expectation of about an hour of work spread over a few days.',
       'Names the outputs they own before the kick-off: an SCQ and a problem statement.'
     ],
-    notes: () => copy('Copy', 'A line saying Day 0 happens in the learner’s own time across a few days, and adds up to about an hour of real work.'),
+    notes: [
+      ['Copy', 'A line saying Day 0 happens in the learner’s own time across a few days, and adds up to about an hour of real work.']
+    ],
     body: () => `
       <div class="stack">
         <div><h2 class="s-h1">Day 0</h2><p class="s-cap" style="margin:0">Between being staffed and walking into the kick-off prepared.</p></div>
@@ -201,9 +204,11 @@
       'A second email from the PM takes the setup work off the team.',
       'Nothing heavy is demanded, which is the reassurance a new joiner needs.'
     ],
-    notes: () => copy('Email 1', 'The staffing note. Names the project, the client, the start and end dates and who else is on the team, with the proposal attached.')
-      + copy('Email 2', 'From the PM. Welcomes the team and names one action — scan the proposal. She takes the setup onto herself.')
-      + copy('Beat', 'The staffing note is open on arrival. The PM’s email drops in below it a few seconds later.'),
+    notes: [
+      ['Email 1', 'The staffing note. Names the project, the client, the start and end dates and who else is on the team, with the proposal attached.'],
+      ['Email 2', 'From the PM. Welcomes the team and names one action — scan the proposal. She takes the setup onto herself.'],
+      ['Beat', 'The staffing note is open on arrival. The PM’s email drops in below it a few seconds later.']
+    ],
     anim: anim(5200, [
       { at: 200,  do: el => cls(el, '.ol-msg', 'is-live', 0) },
       { at: 1600, do: el => { const r = $$('.ol-msg', el)[1]; if (r) { r.style.animation = 'none'; void r.offsetWidth; r.style.animation = 'arrive .42s both'; } } },
@@ -229,9 +234,11 @@
       'Every folder is open — this is about recognition, not hunting for something.',
       'Two folders are drawn out because the next two screens happen in them.'
     ],
-    notes: () => copy('Teams', 'A message from the PM confirming she has set the folder up, and inviting anyone to add what is missing.')
-      + copy('Beat', 'The two folders that matter take the highlight in turn, gently.')
-      + anno('When the learner is staffed for real, this structure should already look familiar rather than being one more new thing to work out.'),
+    notes: [
+      ['Teams', 'A message from the PM confirming she has set the folder up, and inviting anyone to add what is missing.'],
+      ['Beat', 'The two folders that matter take the highlight in turn, gently.'],
+      ['Note', 'When the learner is staffed for real, this structure should already look familiar rather than being one more new thing to work out.']
+    ],
     anim: anim(6000, [
       { at: 400,  do: el => cls(el, '.sp-node', 'is-flagged', 3) },
       { at: 2200, do: el => cls(el, '.sp-node', 'is-flagged', 6) },
@@ -259,8 +266,10 @@
     label: 'The documents get skimmed',
     summary: 'Acting on the PM’s one ask, user watches the proposal and a past qual deck being skimmed rather than studied.',
     beats: ['Models the pace: fast, and looking for what already exists.'],
-    notes: () => copy('Beat', 'Two documents open and scroll past quickly, over a few seconds.')
-      + anno('The previous screen told the learner to read the proposal. This one shows it being read, because showing the pace works better than describing it.'),
+    notes: [
+      ['Beat', 'Two documents open and scroll past quickly, over a few seconds.'],
+      ['Note', 'The previous screen told the learner to read the proposal. This one shows it being read, because showing the pace works better than describing it.']
+    ],
     anim: anim(4000, [
       { at: 0,    do: el => { const s = $('.pp-scan', el); if (s) s.style.transform = 'translateY(0)'; } },
       { at: 300,  do: el => { const s = $('.pp-scan', el); if (s) s.style.transform = 'translateY(-46%)'; } },
@@ -287,9 +296,11 @@
       'Anything pinned is carried forward and visible to everyone.'
     ],
     carry: { write: ['facts'] },
-    notes: () => copy('Teams', 'A message from the Partner posting the brief, listing its three parts: sector and project context, client notes, and key tensions.')
-      + copy('Callout', 'A note explaining Partners generate these briefs from a standard skill, and that the learner will get one.')
-      + copy('Beat', 'A pin control sits beside each fact and lights as it is pinned.'),
+    notes: [
+      ['Teams', 'A message from the Partner posting the brief, listing its three parts: sector and project context, client notes, and key tensions.'],
+      ['Callout', 'A note explaining Partners generate these briefs from a standard skill, and that the learner will get one.'],
+      ['Beat', 'A pin control sits beside each fact and lights as it is pinned.']
+    ],
     anim: anim(5400, [
       { at: 600,  do: el => cls(el, '.pinrow', 'on', 0) },
       { at: 2000, do: el => cls(el, '.pinrow', 'on', 1) },
@@ -321,8 +332,10 @@
       'The task arrives while they are still reading, so it lands in context.',
       'Framed as everyone drafting separately, not one person being assigned it.'
     ],
-    notes: () => copy('Teams', 'A message from the PM asking everyone to write their own SCQ and their own reading of the problem statement before the meeting.')
-      + copy('Beat', 'A desktop notification slides in over the brief, carrying an accept control.'),
+    notes: [
+      ['Teams', 'A message from the PM asking everyone to write their own SCQ and their own reading of the problem statement before the meeting.'],
+      ['Beat', 'A desktop notification slides in over the brief, carrying an accept control.']
+    ],
     anim: anim(5000, [
       { at: 900, do: el => { const t = $('.w-toast', el); if (t) { t.style.animation = 'none'; void t.offsetWidth; t.style.animation = 'toastin .42s both'; } } }
     ]),
@@ -343,10 +356,12 @@
       'What they write is kept and comes back in the kick-off.'
     ],
     carry: { write: ['scq'] },
-    notes: () => copy('Prompt', 'The task from the PM repeated here as context for what the learner is now doing.')
-      + copy('Coach', 'Names the weak line and asks one question that would fix it. Never a grade on its own.')
-      + copy('Beat', 'Two passes: the coach flags the complication, the learner revises, the coach confirms and moves to the question.')
-      + anno('Iteration is how quality gets driven everywhere else at the firm. The coach is there to be argued with on the second or third pass, not obeyed on the first.'),
+    notes: [
+      ['Prompt', 'The task from the PM repeated here as context for what the learner is now doing.'],
+      ['Coach', 'Names the weak line and asks one question that would fix it. Never a grade on its own.'],
+      ['Beat', 'Two passes: the coach flags the complication, the learner revises, the coach confirms and moves to the question.'],
+      ['Note', 'Iteration is how quality gets driven everywhere else at the firm. The coach is there to be argued with on the second or third pass, not obeyed on the first.']
+    ],
     anim: anim(11000, [
       { at: 300,  do: el => $$('.scq-fill', el).forEach((n, i) => setTimeout(() => n.style.width = n.dataset.w, i * 200)) },
       { at: 2600, do: el => coach(el, 'c', 'Points at the complication: it restates the situation rather than saying what has changed.', 1) },
@@ -439,7 +454,9 @@
     label: 'What the kick-off covers',
     summary: 'User learns this is the first time the whole team is together, that it runs at least two hours, and that it always happens before the client sees anything.',
     beats: ['Names the four things they will personally do in the session.'],
-    notes: () => copy('Copy', 'A line explaining this is the first time the whole team is in a room, and that it is where the project’s thinking starts.'),
+    notes: [
+      ['Copy', 'A line explaining this is the first time the whole team is in a room, and that it is where the project’s thinking starts.']
+    ],
     body: () => `
       <div class="stack">
         <div><h2 class="s-h1">Full-team kick-off</h2><p class="s-cap" style="margin:0">Two hours minimum. Always before any client kick-off.</p></div>
@@ -463,9 +480,11 @@
       'A three-item agenda, so the session has a visible spine.',
       'The PM opens by saying context is already done, which pays off Day 0 immediately.'
     ],
-    notes: () => copy('Opening', 'Everyone has read the brief, so no hour is spent on context. The meeting starts with where each person landed.')
-      + copy('Beat', 'The calendar invite dissolves into the meeting; the agenda writes itself in one line at a time.')
-      + anno('The meeting runs at least two hours, can split across two sittings, and always happens before any client kick-off.'),
+    notes: [
+      ['Opening', 'Everyone has read the brief, so no hour is spent on context. The meeting starts with where each person landed.'],
+      ['Beat', 'The calendar invite dissolves into the meeting; the agenda writes itself in one line at a time.'],
+      ['Note', 'The meeting runs at least two hours, can split across two sittings, and always happens before any client kick-off.']
+    ],
     anim: anim(5600, [
       { at: 500,  do: el => $$('.tm-panel__row', el).forEach((n, i) => n.classList.toggle('in', i === 0)) },
       { at: 1300, do: el => $$('.tm-panel__row', el).forEach((n, i) => n.classList.toggle('in', i <= 1)) },
@@ -491,9 +510,11 @@
       'The point lands on its own: drafting alone first is what put three ideas in the room.'
     ],
     carry: { read: ['scq'] },
-    notes: () => copy('Cards', 'Each card carries one person’s situation, complication and question, in their own words.')
-      + copy('Beat', 'The learner’s card loads first; the other two arrive beside it, then the diverging Q rows take a highlight.')
-      + anno('All three SCQs are defensible, and the question is different in each one. If everyone had waited to hear the Partner’s version first, this meeting would have one idea in it instead of three.'),
+    notes: [
+      ['Cards', 'Each card carries one person’s situation, complication and question, in their own words.'],
+      ['Beat', 'The learner’s card loads first; the other two arrive beside it, then the diverging Q rows take a highlight.'],
+      ['Note', 'All three SCQs are defensible, and the question is different in each one. If everyone had waited to hear the Partner’s version first, this meeting would have one idea in it instead of three.']
+    ],
     anim: anim(5800, [
       { at: 400,  do: el => $$('.card', el).forEach((n, i) => n.classList.toggle('in', i === 0)) },
       { at: 1200, do: el => $$('.card', el).forEach((n, i) => n.classList.toggle('in', i <= 1)) },
@@ -525,9 +546,11 @@
       'Each word opens the question hiding inside it.',
       'Half are resolvable in the room; half go to the client that week.'
     ],
-    notes: () => copy('Prompt', 'Says the sentence looks agreed, that four things in it are not defined, and asks the learner to find them.')
-      + copy('Beat', 'The four phrases resolve one at a time, with a counter of how many are found.')
-      + anno('Two of the four were resolvable by the team. Two went to the client as questions that week.'),
+    notes: [
+      ['Prompt', 'Says the sentence looks agreed, that four things in it are not defined, and asks the learner to find them.'],
+      ['Beat', 'The four phrases resolve one at a time, with a counter of how many are found.'],
+      ['Note', 'Two of the four were resolvable by the team. Two went to the client as questions that week.']
+    ],
     anim: anim(6800, [
       { at: 900,  do: el => $$('.hw', el).forEach((n, i) => n.classList.toggle('found', i === 0)) },
       { at: 2100, do: el => $$('.hw', el).forEach((n, i) => n.classList.toggle('found', i <= 1)) },
@@ -559,9 +582,11 @@
       'The claim sits alone first, with nothing to soften it.',
       'Branch stubs then sprout from it, showing where the next exercise goes.'
     ],
-    notes: () => copy('Claim', 'The top-level hypothesis, stated flat as a claim, with no hedging.')
-      + copy('Definition', 'Best answer to the client’s question, written before the research, specific enough that evidence can prove it wrong.')
-      + copy('Beat', 'The frame holds on the claim a beat longer than is comfortable, then the definition offers itself and the branch stubs appear.'),
+    notes: [
+      ['Claim', 'The top-level hypothesis, stated flat as a claim, with no hedging.'],
+      ['Definition', 'Best answer to the client’s question, written before the research, specific enough that evidence can prove it wrong.'],
+      ['Beat', 'The frame holds on the claim a beat longer than is comfortable, then the definition offers itself and the branch stubs appear.']
+    ],
     anim: anim(8000, [
       { at: 400,  do: el => { const c = $('.tnode--l1', el); if (c) c.classList.add('in'); } },
       { at: 3200, do: el => { const d = $('.defn-box', el); if (d) d.classList.add('in'); } },
@@ -595,8 +620,10 @@
       'Four objections, phrased the way someone would really think them.',
       'The replies come from different people, because the honest answers differ in kind.'
     ],
-    notes: () => copy('Prompt', 'Says most people have at least one of these in their head, and invites the learner to turn over the ones they are thinking.')
-      + copy('Beat', 'Cards start face down. Turning one opens a reply panel beneath it.'),
+    notes: [
+      ['Prompt', 'Says most people have at least one of these in their head, and invites the learner to turn over the ones they are thinking.'],
+      ['Beat', 'Cards start face down. Turning one opens a reply panel beneath it.']
+    ],
     anim: anim(9200, [
       { at: 600,  do: el => flip(el, 0) }, { at: 2700, do: el => flip(el, 1) },
       { at: 4800, do: el => flip(el, 2) }, { at: 6900, do: el => flip(el, 3) },
@@ -626,9 +653,11 @@
       'Applying the claims fades out everything that would not test one.',
       'What is left is small enough to attach names and calls to.'
     ],
-    notes: () => copy('Constraint', 'Four weeks, three people, 28 conversations if you choose well.')
-      + copy('Beat', 'The full field renders first. Applying the hypothesis fades back everything that tests nothing.')
-      + anno('The hypothesis is not what the team believed. It is what the team decided to spend four weeks testing.'),
+    notes: [
+      ['Constraint', 'Four weeks, three people, 28 conversations if you choose well.'],
+      ['Beat', 'The full field renders first. Applying the hypothesis fades back everything that tests nothing.'],
+      ['Note', 'The hypothesis is not what the team believed. It is what the team decided to spend four weeks testing.']
+    ],
     anim: anim(6600, [
       { at: 1200, do: el => $$('.topic', el).forEach(n => n.classList.add('faded')) },
       { at: 1500, do: el => $$('.topic.keep', el).forEach(n => { n.classList.remove('faded'); n.classList.add('kept'); }) },
@@ -659,9 +688,11 @@
       'Two pairings, shown one after the other.',
       'The second matters more, because it keeps the hypothesis honest.'
     ],
-    notes: () => copy('Pair 1', 'The Day 1 guess about later value-chain stages, against the figure four weeks of research produced. The hunch held.')
-      + copy('Pair 2', 'The strongest argument in the published report, which was not on the Day 1 slide at all. It came out of the interviews.')
-      + copy('Beat', 'A toggle moves between the two pairings, left claim to right finding.'),
+    notes: [
+      ['Pair 1', 'The Day 1 guess about later value-chain stages, against the figure four weeks of research produced. The hunch held.'],
+      ['Pair 2', 'The strongest argument in the published report, which was not on the Day 1 slide at all. It came out of the interviews.'],
+      ['Beat', 'A toggle moves between the two pairings, left claim to right finding.']
+    ],
     anim: anim(8000, [{ at: 200, do: el => pair(el, 0) }, { at: 4000, do: el => pair(el, 1) }]),
     body: () => `
       <div class="stack">
@@ -686,10 +717,12 @@
       'The bank holds decoys. The coach names which one and why, rather than marking it wrong.'
     ],
     carry: { write: ['tree'] },
-    notes: () => copy('Prompt', 'The question that drives every hypothesis tree: for this claim to be true, what would have to be true?')
-      + copy('Controls', 'Per branch: edit the wording, drill down a level, remove. Plus add branch on the row itself.')
-      + copy('Coach', 'Names the decoy and what is wrong with it, then confirms when the three branches hold.')
-      + copy('Beat', 'Two branches land, a decoy is placed and withdrawn, a fourth is added and one is drilled to L3.'),
+    notes: [
+      ['Prompt', 'The question that drives every hypothesis tree: for this claim to be true, what would have to be true?'],
+      ['Controls', 'Per branch: edit the wording, drill down a level, remove. Plus add branch on the row itself.'],
+      ['Coach', 'Names the decoy and what is wrong with it, then confirms when the three branches hold.'],
+      ['Beat', 'Two branches land, a decoy is placed and withdrawn, a fourth is added and one is drilled to L3.']
+    ],
     anim: anim(13000, [
       { at: 600,  do: el => tdrop(el, 0, 0) },
       { at: 1900, do: el => tdrop(el, 1, 3) },
@@ -758,9 +791,11 @@
       'Two flaws are called out rather than quietly fixed.',
       'The team stopped because the meeting ended, not because the thinking was done.'
     ],
-    notes: () => copy('Annotation 1', 'Points at a sentence in the tensions section that does not parse.')
-      + copy('Annotation 2', 'Points at a yellow placeholder the team had not filled in.')
-      + anno('This is the most useful artefact in the archive, because it shows what the end of a real Day 1 actually looks like, which is nothing like the polished version that circulates later.'),
+    notes: [
+      ['Annotation 1', 'Points at a sentence in the tensions section that does not parse.'],
+      ['Annotation 2', 'Points at a yellow placeholder the team had not filled in.'],
+      ['Note', 'This is the most useful artefact in the archive, because it shows what the end of a real Day 1 actually looks like, which is nothing like the polished version that circulates later.']
+    ],
     anim: anim(7000, [
       { at: 1400, do: el => { const f = $$('.flaw', el)[0]; if (f) f.classList.add('ring'); } },
       { at: 3600, do: el => { $$('.flaw', el).forEach(n => n.classList.remove('ring')); const f = $$('.flaw', el)[1]; if (f) f.classList.add('ring'); } },
@@ -797,9 +832,11 @@
       'Deliberately anticlimactic after the hypothesis work.',
       'A deck and a report are different arguments, not the same one in different clothes.'
     ],
-    notes: () => copy('Exchange', 'Three or four messages in which the team agrees what the deliverable is and who its primary reader will be.')
-      + copy('Beat', 'The messages resolve into a single agreed format card below them.')
-      + anno('Two minutes spent here saves a rebuild in week three.'),
+    notes: [
+      ['Exchange', 'Three or four messages in which the team agrees what the deliverable is and who its primary reader will be.'],
+      ['Beat', 'The messages resolve into a single agreed format card below them.'],
+      ['Note', 'Two minutes spent here saves a rebuild in week three.']
+    ],
     anim: anim(6400, [
       { at: 400,  do: el => $$('.tm-msg', el).forEach((n, i) => setTimeout(() => n.classList.add('in'), i * 550)) },
       { at: 3000, do: el => { const c = $('.fmt-card', el); if (c) c.classList.add('in'); } },
@@ -822,7 +859,9 @@
     label: 'Why the kick-off mattered',
     summary: 'User is shown what the two-hour kick-off produced, including the reframe that changed the project.',
     beats: ['Three claims, and a recap of what they personally did in the session.'],
-    notes: () => anno('The recap covers which branches the learner placed first, which decoys they picked up and put back, and how many passes it took.'),
+    notes: [
+      ['Note', 'The recap covers which branches the learner placed first, which decoys they picked up and put back, and how many passes it took.']
+    ],
     body: () => `
       <div class="stack">
         <h2 class="s-h1">Why the full-team kick-off mattered</h2>
@@ -869,7 +908,9 @@
     label: 'What the core team kick-off covers',
     summary: 'User learns the afternoon session is run by the PM, without the Partner, and is mostly about how the team will work together.',
     beats: ['Most of the time goes on agreeing how the team will work together.'],
-    notes: () => copy('Copy', 'A line explaining this is a smaller session later the same day, run by the PM, with the Partner not in the room.'),
+    notes: [
+      ['Copy', 'A line explaining this is a smaller session later the same day, run by the PM, with the Partner not in the room.']
+    ],
     body: () => `
       <div class="stack">
         <div><h2 class="s-h1">Core team kick-off</h2><p class="s-cap" style="margin:0">Later the same day. Smaller room. No Partner.</p></div>
@@ -893,9 +934,11 @@
       'Sets the expectation that the team is reacting to a draft, not building from nothing.',
       'The single ask takes five minutes and is deliberately made in writing.'
     ],
-    notes: () => copy('Email', 'Attaches the core team kick-off deck and asks the learner to fill in the preferences form before the session.')
-      + copy('Also', 'Says her storyline and workplan drafts are rough and meant to be argued with.')
-      + anno('Preferences are collected in writing on purpose. In a live conversation the first person to speak sets the range and everyone else adjusts towards it.'),
+    notes: [
+      ['Email', 'Attaches the core team kick-off deck and asks the learner to fill in the preferences form before the session.'],
+      ['Also', 'Says her storyline and workplan drafts are rough and meant to be argued with.'],
+      ['Note', 'Preferences are collected in writing on purpose. In a live conversation the first person to speak sets the range and everyone else adjusts towards it.']
+    ],
     anim: anim(4800, [
       { at: 400,  do: el => cls(el, '.ol-msg', 'is-live', 0) },
       { at: 4400, do: el => cls(el, '.ol-msg', 'is-live', false) }
@@ -920,8 +963,10 @@
       'Takes about five minutes, and the answers come back later in this stage.'
     ],
     carry: { write: ['prefs'] },
-    notes: () => copy('Prompt', 'Asks the learner to answer for themselves rather than for the version a new team might want, and notes that everyone’s answers go up on screen.')
-      + copy('Beat', 'Three question groups, answered in turn, with the progress bar filling.'),
+    notes: [
+      ['Prompt', 'Asks the learner to answer for themselves rather than for the version a new team might want, and notes that everyone’s answers go up on screen.'],
+      ['Beat', 'Three question groups, answered in turn, with the progress bar filling.']
+    ],
     anim: anim(7200, [
       { at: 600,  do: el => pick(el, 0, 0, 33) },
       { at: 2400, do: el => pick(el, 1, 1, 66) },
@@ -947,8 +992,10 @@
       'The absence is explained, which matters more than it sounds.',
       'The last item is flagged as the one to leave most time for.'
     ],
-    notes: () => copy('Opening', 'The Partner is not in this session, and the hypothesis is now the team’s to work with.')
-      + anno('The deck reuses the morning’s three-item agenda here, which contradicts the three outcomes the PM names in the same frame. Shown as the PM states them.'),
+    notes: [
+      ['Opening', 'The Partner is not in this session, and the hypothesis is now the team’s to work with.'],
+      ['Note', 'The deck reuses the morning’s three-item agenda here, which contradicts the three outcomes the PM names in the same frame. Shown as the PM states them.']
+    ],
     anim: anim(6000, [
       { at: 700,  do: el => cls(el, '.w-tile', 'is-speaking', 1) },
       { at: 3400, do: el => { cls(el, '.w-tile', 'is-speaking', false); const r = $$('.tm-panel__row', el)[2]; if (r) r.classList.add('hot'); } },
@@ -972,9 +1019,11 @@
       'This is the conceptual move people most consistently miss, so it repeats.'
     ],
     carry: { read: ['tree'] },
-    notes: () => copy('Definition', 'A dot-dash storyline: dashes are sections, dots are the claims each section has to make for the argument to hold.')
-      + copy('Beat', 'A scrub control runs between the two views and back, so the relationship can be watched several times.')
-      + anno('This is why the drilldown was worth two hours. The structure of the deliverable comes directly out of it, rather than being invented in week three.'),
+    notes: [
+      ['Definition', 'A dot-dash storyline: dashes are sections, dots are the claims each section has to make for the argument to hold.'],
+      ['Beat', 'A scrub control runs between the two views and back, so the relationship can be watched several times.'],
+      ['Note', 'This is why the drilldown was worth two hours. The structure of the deliverable comes directly out of it, rather than being invented in week three.']
+    ],
     anim: anim(7000, [{ at: 500, do: el => scrub(el, 100) }, { at: 3800, do: el => scrub(el, 0) }]),
     body: () => `
       <div class="stack">
@@ -1011,9 +1060,11 @@
       'The plan is visibly half-empty, and the gaps are stated to be real gaps.',
       'Flagging experience is modelled as normal for a junior person, not showing off.'
     ],
-    notes: () => copy('Copy', 'The PM saying the gaps are real gaps rather than a test, and asking people to speak up now rather than three weeks in.')
-      + copy('Beat', 'Empty rows take the highlight in turn, each offering two controls.')
-      + anno('Teams routinely find out in week three that someone had done a near-identical piece of work two projects ago. The cost of not saying it falls on the person who stayed quiet.'),
+    notes: [
+      ['Copy', 'The PM saying the gaps are real gaps rather than a test, and asking people to speak up now rather than three weeks in.'],
+      ['Beat', 'Empty rows take the highlight in turn, each offering two controls.'],
+      ['Note', 'Teams routinely find out in week three that someone had done a near-identical piece of work two projects ago. The cost of not saying it falls on the person who stayed quiet.']
+    ],
     anim: anim(6800, [
       { at: 900,  do: el => cls(el, '.xl-r--empty', 'hot', 0) },
       { at: 2600, do: el => cls(el, '.xl-r--empty', 'hot', 1) },
@@ -1052,8 +1103,10 @@
       'The project closed in September, not July.',
       'The sequence and the milestones held; the durations did not.'
     ],
-    notes: () => copy('Beat', 'A toggle overlays the actual timeline on the planned one.')
-      + anno('The workplan written on Day 1 will be wrong in its details, and writing it is still what lets you notice you are running long while there is time to act.'),
+    notes: [
+      ['Beat', 'A toggle overlays the actual timeline on the planned one.'],
+      ['Note', 'The workplan written on Day 1 will be wrong in its details, and writing it is still what lets you notice you are running long while there is time to act.']
+    ],
     anim: anim(7000, [{ at: 600, do: el => plan(el, 0) }, { at: 3600, do: el => plan(el, 1) }]),
     body: () => `
       <div class="stack">
@@ -1077,9 +1130,11 @@
       'They are prompted to add the reason behind one of their own answers.'
     ],
     carry: { read: ['prefs'] },
-    notes: () => copy('Prompt', 'Asks the learner to add the context behind one of their own answers — the part the form could not ask for.')
-      + copy('Beat', 'Each card expands in turn as that person talks through their answers.')
-      + anno('Everyone’s stated hours were reasonable, and none of them told you what was actually behind them. The writing gets you the spread; the conversation gets you the meaning.'),
+    notes: [
+      ['Prompt', 'Asks the learner to add the context behind one of their own answers — the part the form could not ask for.'],
+      ['Beat', 'Each card expands in turn as that person talks through their answers.'],
+      ['Note', 'Everyone’s stated hours were reasonable, and none of them told you what was actually behind them. The writing gets you the spread; the conversation gets you the meaning.']
+    ],
     anim: anim(8400, [
       { at: 600,  do: el => cls(el, '.pref', 'on', 0) },
       { at: 2400, do: el => cls(el, '.pref', 'on', 1) },
@@ -1111,9 +1166,11 @@
       'This is the live activity of the stage and where most of the time should go.',
       'Where submitted preferences conflict, the conflict is on screen and gets resolved with them in the room.'
     ],
-    notes: () => copy('Prompt', 'Says the template only supplies categories, and that what is needed is the specific version for this team on this project.')
-      + copy('Beat', 'Each line fills and is agreed in turn.')
-      + anno('Norms named on Day 1 are norms you can point to in week four. Norms that were never named do not exist, and the person who suffers most is usually the most junior person on the team.'),
+    notes: [
+      ['Prompt', 'Says the template only supplies categories, and that what is needed is the specific version for this team on this project.'],
+      ['Beat', 'Each line fills and is agreed in turn.'],
+      ['Note', 'Norms named on Day 1 are norms you can point to in week four. Norms that were never named do not exist, and the person who suffers most is usually the most junior person on the team.']
+    ],
     anim: anim(8000, [
       { at: 700,  do: el => $$('.norm', el).forEach((n, i) => n.classList.toggle('on', i === 0)) },
       { at: 2400, do: el => $$('.norm', el).forEach((n, i) => n.classList.toggle('on', i <= 1)) },
@@ -1188,7 +1245,9 @@
     label: 'What PD alignment covers',
     summary: 'User learns the two Partners meet without them to agree how they will run the project, and that the note they produce is written for the team.',
     beats: ['The only stage the learner is not in the room for.'],
-    notes: () => copy('Copy', 'A line explaining the two Partners meet at the end of the day, and that the note they produce is for the learner.'),
+    notes: [
+      ['Copy', 'A line explaining the two Partners meet at the end of the day, and that the note they produce is for the learner.']
+    ],
     body: () => `
       <div class="stack">
         <div><h2 class="s-h1">PD alignment on responsibilities</h2><p class="s-cap" style="margin:0">Twenty minutes between two people, at the end of the day.</p></div>
@@ -1210,9 +1269,11 @@
       'The exclusion is explained rather than glossed over.',
       'Replying is genuinely optional, and skipping costs nothing.'
     ],
-    notes: () => copy('Calendar', 'A greyed-out block at the end of the day showing only the two Partners.')
-      + copy('Teams', 'A Partner asking whether anyone needs anything built into the split before the two of them meet.')
-      + anno('This stage was added to Day 1 because of the 2025 Pulse survey: people could not tell when their PD would be involved, and feedback arrived too late to act on.'),
+    notes: [
+      ['Calendar', 'A greyed-out block at the end of the day showing only the two Partners.'],
+      ['Teams', 'A Partner asking whether anyone needs anything built into the split before the two of them meet.'],
+      ['Note', 'This stage was added to Day 1 because of the 2025 Pulse survey: people could not tell when their PD would be involved, and feedback arrived too late to act on.']
+    ],
     anim: anim(5400, [
       { at: 900, do: el => { const t = $('.w-toast', el); if (t) { t.style.animation = 'none'; void t.offsetWidth; t.style.animation = 'toastin .42s both'; } } }
     ]),
@@ -1231,8 +1292,10 @@
       'Short enough to read without scrolling, and specific enough to hold someone to.',
       'The clearest statement they will get of what to expect from the two most senior people on the project.'
     ],
-    notes: () => copy('Note', 'How the two Partners are splitting the project, so nobody has to guess.')
-      + copy('Beat', 'The note arrives in the channel and its lines resolve one at a time.'),
+    notes: [
+      ['Note', 'How the two Partners are splitting the project, so nobody has to guess.'],
+      ['Beat', 'The note arrives in the channel and its lines resolve one at a time.']
+    ],
     anim: anim(7600, [
       { at: 600,  do: el => $$('.nl', el).forEach((n, i) => setTimeout(() => n.classList.add('in'), i * 420)) },
       { at: 7200, do: el => $$('.nl', el).forEach(n => n.classList.remove('in')) }
@@ -1261,8 +1324,10 @@
       'Offline reviews change how you have to write things up.',
       'Feedback within a day is an entitlement, so asking for it is not chasing.'
     ],
-    notes: () => copy('Translation', 'Each line of the note set against what it changes about the learner’s week.')
-      + copy('Beat', 'The rows open one at a time as the learner taps through them.'),
+    notes: [
+      ['Translation', 'Each line of the note set against what it changes about the learner’s week.'],
+      ['Beat', 'The rows open one at a time as the learner taps through them.']
+    ],
     anim: anim(8400, [
       { at: 700,  do: el => cls(el, '.trow', 'on', 0) },
       { at: 3200, do: el => cls(el, '.trow', 'on', 1) },
@@ -1333,7 +1398,9 @@
     label: 'What the Week 1 preview covers',
     summary: 'User is told this is not part of Day 1 and is not being standardised, and that it exists only to show where today’s outputs end up.',
     beats: [],
-    notes: () => copy('Copy', 'A line explaining Week 1 is included only so the learner can see where today’s outputs go.'),
+    notes: [
+      ['Copy', 'A line explaining Week 1 is included only so the learner can see where today’s outputs go.']
+    ],
     body: () => `
       <div class="stack">
         <div><h2 class="s-h1">Week 1</h2><p class="s-cap" style="margin:0">Out of scope for Day 1. Included for context.</p></div>
@@ -1354,8 +1421,10 @@
       'The claim that did not survive is the one that saved the most time.'
     ],
     carry: { read: ['tree', 'facts'] },
-    notes: () => copy('Beat', 'A day counter runs Monday to Friday while all four artefacts expand in sequence.')
-      + anno('By Friday the tree has already changed. The claim that did not survive is the one that saved the team the most time, because it stopped four weeks of research pointing the wrong way.'),
+    notes: [
+      ['Beat', 'A day counter runs Monday to Friday while all four artefacts expand in sequence.'],
+      ['Note', 'By Friday the tree has already changed. The claim that did not survive is the one that saved the team the most time, because it stopped four weeks of research pointing the wrong way.']
+    ],
     anim: anim(9000, [{ at: 300, do: el => week(el) }]),
     body: () => `
       <div class="stack">
@@ -1382,8 +1451,10 @@
       'There is no prose yet, so there is nothing to comment on but the argument.',
       'The review markers match the responsibilities note exactly — the first proof it is being kept.'
     ],
-    notes: () => copy('Copy', 'Explains the comments land on argument and structure, because there is no prose in the deck yet.')
-      + anno('Fixing an argument costs an afternoon at this stage and a fortnight once the slides are full.'),
+    notes: [
+      ['Copy', 'Explains the comments land on argument and structure, because there is no prose in the deck yet.'],
+      ['Note', 'Fixing an argument costs an afternoon at this stage and a fortnight once the slides are full.']
+    ],
     anim: anim(6600, [
       { at: 900,  do: el => $$('.rvw', el).forEach((n, i) => n.classList.toggle('in', i === 0)) },
       { at: 3000, do: el => $$('.rvw', el).forEach(n => n.classList.add('in')) },
@@ -1407,7 +1478,9 @@
     label: 'Why the preview was worth showing',
     summary: 'User is shown why finding a claim wrong in week one is the cheap outcome.',
     beats: [],
-    notes: () => anno('This stage has no checklists, because it is a preview rather than a part of Day 1.'),
+    notes: [
+      ['Note', 'This stage has no checklists, because it is a preview rather than a part of Day 1.']
+    ],
     body: () => `
       <div class="stack">
         <h2 class="s-h1">Why Week 1 was worth showing</h2>
@@ -1462,7 +1535,9 @@
     label: 'The training is complete',
     summary: 'User is told they are done and that everything stays available if they want to come back to it.',
     beats: [],
-    notes: () => copy('Copy', 'Confirms everything stays available here and on the Hub, and that the learner can come back at any time.'),
+    notes: [
+      ['Copy', 'Confirms everything stays available here and on the Hub, and that the learner can come back at any time.']
+    ],
     body: () => `
       <div class="stack" style="justify-content:center;align-items:center;text-align:center;gap:var(--s3)">
         <h1 class="s-display">Day 1 complete</h1>

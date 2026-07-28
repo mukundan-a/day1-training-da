@@ -1196,3 +1196,12 @@ body.editing-mode .track__row { cursor: default; }
 #editwarn p { font-size: 14px; line-height: 1.6; color: var(--ink); margin: 0 0 var(--s3); }
 #editwarn .warn__note { font-size: 12.5px; color: var(--mute); }
 #editwarn .warn__row { display: flex; gap: var(--s2); justify-content: flex-end; align-items: center; margin-top: var(--s4); }
+
+/* neither mode leaves the edge arrows live */
+.editing-mode .edge { display: none; }
+/* nothing looks clickable while editing except the text itself */
+.editing-mode .home__card, .editing-mode .sb__step, .editing-mode .track__row,
+.editing-mode .thumb, .editing-mode .dots button, .editing-mode .nav-btn,
+.editing-mode .trk__tick, .editing-mode .trk__name { cursor: default; }
+.editing-mode .home__card:hover, .editing-mode .sb__step:hover,
+.editing-mode .track__row:hover { border-color: var(--rule); transform: none; background: none; }

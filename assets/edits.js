@@ -29,7 +29,9 @@
           const m = {};
           rows.forEach(r => { if (r.path && typeof r.text === 'string') m[r.path] = r.text; });
           this.map = m;
-          this.rerender();
+          if (document.activeElement && document.activeElement.isContentEditable) {
+            Object.keys(m).forEach(k => { if (k !== document.activeElement.dataset.edit) this.paint(k, m[k]); });
+          } else this.rerender();
         });
       });
     },
@@ -47,11 +49,28 @@
       if (!clean) return;
       this.map[path] = clean;
       if (this.live()) {
-        try { await global.Live.setEdit(path, clean, global.Notes.who || 'anonymous'); this.rerender(); return; }
+        try { await global.Live.setEdit(path, clean, global.Notes.who || 'anonymous'); this.paint(path, clean); return; }
         catch (e) { global.Notes.flash('Could not share that edit — kept in this browser.'); }
       }
       try { localStorage.setItem(LOCAL, JSON.stringify(this.map)); } catch (e) {}
-      this.rerender();
+      this.paint(path, clean);
+    },
+
+    /* update every element on this path without a full re-render, so clicking
+       straight from one editable string to the next does not lose the caret */
+    paint(path, text) {
+      Array.from(document.querySelectorAll('[data-edit]')).forEach(el => {
+        if (el.dataset.edit !== path) return;
+        if (el !== document.activeElement) el.textContent = text;
+        el.setAttribute('data-edited', '1');
+      });
+      const bar = document.getElementById('edbar');
+      if (bar) {
+        const b = bar.querySelector('.cmtbar__who');
+        if (b) b.textContent = this.count() + ' edited';
+        else bar.querySelector('button').insertAdjacentHTML('beforebegin',
+          '<b class="cmtbar__who">' + this.count() + ' edited</b>');
+      }
     },
 
     rerender() { setTimeout(() => global.App.render(), 0); },
@@ -68,6 +87,7 @@
     toggleMode() {
       if (!this.mode && !this.warned) { this.warn(); return; }
       this.mode = !this.mode;
+      if (this.mode && global.Notes.mode) global.Notes.mode = false;
       document.body.classList.toggle('editing-mode', this.mode);
       global.App.render();
     },
@@ -97,6 +117,7 @@
         this.warned = true;
         try { sessionStorage.setItem('day1wf.editwarn', '1'); } catch (e) {}
         this.mode = true;
+        if (global.Notes.mode) global.Notes.mode = false;
         document.body.classList.add('editing-mode');
         global.App.render();
       };
@@ -107,6 +128,14 @@
       if (!this.mode) return;
       Array.from((root || document).querySelectorAll('[data-edit]')).forEach(el => {
         el.setAttribute('contenteditable', 'plaintext-only');
+        if (el.contentEditable !== 'plaintext-only') {
+          el.setAttribute('contenteditable', 'true');
+          el.onpaste = ev => {
+            ev.preventDefault();
+            const t = (ev.clipboardData || window.clipboardData).getData('text/plain');
+            document.execCommand('insertText', false, t.replace(/\s+/g, ' '));
+          };
+        }
         el.spellcheck = true;
         const path = el.dataset.edit;
         const before = el.textContent;

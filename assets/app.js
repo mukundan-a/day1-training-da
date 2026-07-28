@@ -49,6 +49,8 @@
 
       document.addEventListener('keydown', e => {
         if (/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+        if (e.target.isContentEditable) return;
+        if (global.Edits.mode) return;          // edit mode owns the keyboard
         if (e.metaKey || e.ctrlKey || e.altKey) return;
         if (this.view === 'walk' && e.key === 'ArrowRight') { e.preventDefault(); this.go(1); }
         else if (this.view === 'walk' && e.key === 'ArrowLeft') { e.preventDefault(); this.go(-1); }
@@ -105,6 +107,7 @@
       if (this.view !== 'walk') global.Notes.mount();
       if (global.Notes.mode) this.reminder();
       global.Edits.mount($('#root'));
+      this.lockNav();
       if (global.Edits.mode) this.editBar();
     },
 
@@ -159,7 +162,7 @@
         ${ED('home.lede', 'Hi there! You can choose to engage with this wireframe in one of 4 ways below.', 'h1', 'home__lede')}
 
         <div class="home__grid">
-          ${[['recap', 'Recap', 'The codified Day 1 — stage by stage, in one table.'],
+          ${[['recap', 'Recap', 'What you have seen on Teams.'],
              ['map', 'Storyboard', 'See storyboard of whole proposed training.'],
              ['walk', 'Walkthrough', 'Step through each screen in the training as the user would (you can also enter this by clicking on thumbnails inside storyboard view).'],
              ['notes', 'Notes', 'Your notes, collated.']].map(([k, name, text]) => `
@@ -551,6 +554,23 @@
     },
 
     closeSheet() { const s = $('#sheetwrap'); if (s) s.remove(); },
+
+    /* While editing, a click may place a caret and nothing else. Cards, rows and
+       thumbnails are all buttons, so this has to be caught before they fire. */
+    lockNav() {
+      const root = $('#root');
+      if (!root) return;
+      if (this._lock) root.removeEventListener('click', this._lock, true);
+      const NAV_OK = '.nav-btn, .dots button, .trk__tick, .trk__name, .sb__back, [data-back], #edbar, .sheet, #editwarn, .cmtbar';
+      const fn = e => {
+        if (!global.Edits.mode) return;
+        if (e.target.closest(NAV_OK)) return;          // Back, Next, dots, tracker still move you
+        e.stopPropagation();                            // cards and rows do not navigate
+        if (!e.target.closest('[data-edit]')) e.preventDefault();
+      };
+      root.addEventListener('click', fn, true);
+      this._lock = fn;
+    },
 
     editBar() {
       const old = $('#edbar'); if (old) old.remove();

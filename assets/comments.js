@@ -89,6 +89,10 @@
 
     toggleMode() {
       this.mode = !this.mode;
+      if (this.mode && global.Edits.mode) {
+        global.Edits.mode = false;
+        document.body.classList.remove('editing-mode');
+      }
       document.body.classList.toggle('commenting-mode', this.mode);
       this.closePop();
       global.App.render();

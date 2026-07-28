@@ -250,8 +250,9 @@
           <div class="walk__head">
             <div>
               <div class="walk__eyebrow">
-                <span class="verb">${s.verb}</span><span class="sep">·</span>
-                <span class="label">${esc(stage.name)}</span>
+                <span class="label">${esc(stage.name)}</span><span class="sep">·</span>
+                <span class="label" style="font-weight:400">User does</span>
+                <button class="verb" data-sheet="legend" title="What the five interaction types mean">${s.verb}</button>
                 ${open ? `<span class="sep">·</span><button class="openflag" data-view="notes">${open} open comment${open > 1 ? 's' : ''}</button>` : ''}
               </div>
               <h1 class="summary">${esc(s.summary)}</h1>
@@ -395,6 +396,9 @@
         </div>
 
         <div class="sb__steps">
+          <div class="sb__cols">
+            <span>Step</span><span>Screen</span><span>What happens</span><span>What the user does</span>
+          </div>
           ${items.map((s, k) => {
             const open = global.Notes.openOn(s.id);
             return `<button class="sb__step" data-jump="${s.id}">
@@ -402,7 +406,7 @@
               <span class="sb__thumb">${this.mini(s)}</span>
               <span class="sb__desc">${esc(s.summary)}</span>
               <span class="sb__side">
-                <span class="sb__verb">${s.verb}</span>
+                <span class="sb__verb" title="What the five interaction types mean">${s.verb}</span>
                 ${open ? `<span class="sb__pin">${open}</span>` : ''}
               </span>
             </button>`;

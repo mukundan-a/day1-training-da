@@ -998,3 +998,117 @@ input, textarea { font: inherit; color: inherit; }
 }
 
 .sb__side { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+
+/* ============================================================================
+   LEAD LINES — the per-screen claim, and the headings we want read first
+   ========================================================================= */
+
+.summary { color: var(--maroon); }
+.sb__desc { color: var(--ink-strong); }
+.sb__step:hover .sb__desc { color: var(--maroon); }
+
+/* ============================================================================
+   APPLICATION CHIPS — say which tool this is
+   ========================================================================= */
+
+.win__app {
+  display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0;
+  font-size: 9.5px; font-weight: 700; letter-spacing: .04em;
+  color: var(--mute); background: var(--paper);
+  border: 1px solid var(--rule-soft); border-radius: 2px; padding: 2px 7px;
+}
+.win__app svg { width: 10px !important; height: 10px !important; color: var(--maroon); }
+.win__dots { display: flex; gap: 4px; flex-shrink: 0; margin-left: auto; }
+.win__dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--rule); display: block; }
+
+/* ============================================================================
+   COMMENT MODE — unmistakable while it is on
+   ========================================================================= */
+
+.pinhost { position: relative; }
+
+body.commenting-mode { cursor: crosshair; }
+body.commenting-mode [data-anchor] { cursor: crosshair; }
+body.commenting-mode #root::after {
+  content: ""; position: fixed; left: 0; right: 0; top: 54px; bottom: 0;
+  background: rgba(35, 36, 38, .06); pointer-events: none; z-index: 4;
+}
+body.commenting-mode [data-anchor]:hover { outline: 1px dashed var(--pink); outline-offset: 2px; }
+
+.tool--cmt {
+  font-size: 12.5px; font-weight: 700;
+  border: 1px solid var(--rule); border-radius: var(--radius); padding: 6px 13px;
+}
+.tool--cmt svg { width: 14px; height: 14px; }
+.tool--cmt[aria-pressed="true"] {
+  background: var(--pink); color: #fff; border-color: var(--pink);
+  animation: cmtglow 2s ease-in-out infinite;
+}
+@keyframes cmtglow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(211, 97, 143, .5); }
+  50% { box-shadow: 0 0 0 6px rgba(211, 97, 143, 0); }
+}
+
+.cmtbar {
+  position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%);
+  display: flex; align-items: center; gap: var(--s3);
+  background: var(--ink-strong); color: #fff; border-radius: 999px;
+  padding: 9px 10px 9px 18px; z-index: 120; font-size: 13px;
+  box-shadow: 0 4px 18px rgba(35, 36, 38, .22);
+  animation: arrive var(--t) both;
+}
+.cmtbar span { display: inline-flex; align-items: center; gap: 7px; }
+.cmtbar svg { width: 13px; height: 13px; color: var(--pink); }
+.cmtbar button {
+  font-size: 11.5px; font-weight: 700; color: var(--ink-strong);
+  background: #fff; border-radius: 999px; padding: 5px 13px;
+}
+.cmtbar button:hover { background: var(--soft); }
+
+/* ============================================================================
+   WHO SAID IT
+   ========================================================================= */
+
+.ava {
+  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+  background: var(--soft); color: var(--maroon);
+  font-size: 10px; font-weight: 700; letter-spacing: .02em;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.ava--sm { width: 18px; height: 18px; font-size: 8.5px; }
+
+.note__who { display: flex; align-items: center; gap: var(--s2); }
+.note__who b { font-size: 14px; font-weight: 700; color: var(--ink-strong); }
+
+.note { grid-template-columns: 175px 150px 1fr 122px; }
+.pop__name { font-size: 13px; font-weight: 700; color: var(--ink-strong) !important; letter-spacing: 0 !important; text-transform: none !important; }
+.pop__meta { align-items: center; gap: 7px; }
+.note__replies div { display: flex; align-items: center; gap: 7px; }
+
+@media (max-width: 720px) { .note { grid-template-columns: 1fr; } }
+
+.cmtbar--ask { background: var(--maroon); padding-right: 10px; }
+.cmtbar input {
+  border: none; border-radius: 999px; padding: 6px 14px; font-size: 13px;
+  width: 170px; background: #fff; color: var(--ink-strong);
+}
+.cmtbar input:focus { outline: 2px solid var(--soft-deep); }
+.cmtbar__who {
+  font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  color: var(--pink); border-left: 1px solid rgba(255,255,255,.25); padding-left: var(--s3);
+}
+
+/* ============================================================================
+   STAGE MAP SCREENS — one centred block, not a heading stranded above a void
+   ========================================================================= */
+
+[data-kind="map"] .stack { justify-content: center; gap: var(--s4); }
+[data-kind="map"] .map5 { flex: none; align-items: stretch; }
+[data-kind="map"] .map5__node { min-height: 118px; }
+[data-kind="map"] .map5__band { margin-top: 0; }
+
+.maphead { flex-shrink: 0; }
+.maphead .s-h1 { margin-bottom: 5px; }
+
+/* the stage a learner is entering is the anchor; the overview anchors on its heading */
+.map5__node.is-here { box-shadow: 0 0 0 1px var(--maroon) inset; }

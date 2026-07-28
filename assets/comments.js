@@ -66,6 +66,7 @@
 
     all() { return this.items; },
     forScreen(id) { return this.items.filter(n => n.screen === id); },
+    forView(v) { return this.items.filter(n => (n.view || 'walk') === v); },
     openOn(id) { return this.items.filter(n => n.screen === id && !n.resolved).length; },
     openInStage(stage) {
       const ids = new Set(global.CONTENT.SCREENS.filter(s => s.stage === stage).map(s => s.id));
@@ -74,18 +75,16 @@
 
     /* --------------------------- name per session -------------------- */
 
-    askName() {
-      if (this.who) return true;
-      const v = (prompt('Your name, so the team knows whose note is whose:') || '').trim();
-      if (!v) return false;
-      this.who = v.slice(0, 60);
+    /* no browser prompt — the name is asked for inline, in the comment bar */
+    askName() { return !!this.who; },
+
+    setName(v) {
+      this.who = String(v || '').trim().slice(0, 60);
       try { sessionStorage.setItem(NAME, this.who); } catch (e) {}
-      this.refreshTop();
-      return true;
+      global.App.render();
     },
 
     toggleMode() {
-      if (!this.mode && !this.askName()) return;
       this.mode = !this.mode;
       document.body.classList.toggle('commenting-mode', this.mode);
       this.closePop();
@@ -95,31 +94,48 @@
     /* ------------------------- pins on the screen -------------------- */
 
     mount() {
-      const screen = $('#screen'), host = $('#pins');
-      if (!screen || !host) return;
-      host.style.cssText = 'position:absolute;inset:0;pointer-events:none';
-      screen.classList.toggle('commenting', this.mode);
+      const host = $('#pins');
+      if (!host) return;
+      const view = global.App.view;
+      const wrap = host.parentElement;
+      host.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:18';
 
-      const id = screen.dataset.screen;
-      host.innerHTML = this.forScreen(id).map((n, i) =>
-        `<button class="pin ${n.resolved ? 'pin--done' : ''}" data-pin-id="${n.id}"
-           style="left:${n.x}%;top:${n.y}%;pointer-events:auto"
+      // every pin hangs off a keyed element, so it survives reflow and resizing
+      const mine = this.items.filter(n => (n.view || 'walk') === view);
+      host.innerHTML = mine.map((n, i) => {
+        const el = wrap.querySelector('[data-anchor="' + cssEsc(n.anchor || n.screen) + '"]');
+        if (!el) return '';
+        const a = el.getBoundingClientRect(), w = wrap.getBoundingClientRect();
+        const left = (a.left - w.left) + (n.x / 100) * a.width;
+        const top = (a.top - w.top) + (n.y / 100) * a.height;
+        return `<button class="pin ${n.resolved ? 'pin--done' : ''}" data-pin-id="${n.id}"
+           style="left:${left}px;top:${top}px;pointer-events:auto"
            title="${esc(n.who || 'anonymous')}${n.resolved ? ' · resolved' : ''}">${
              n.resolved ? '✓' : (i + 1)}${
-             (n.replies && n.replies.length) ? `<em>${n.replies.length}</em>` : ''}</button>`).join('');
+             (n.replies && n.replies.length) ? `<em>${n.replies.length}</em>` : ''}</button>`;
+      }).join('');
 
       $$('[data-pin-id]', host).forEach(b => b.onclick = e => {
         e.stopPropagation(); this.openThread(b.dataset.pinId);
       });
 
-      screen.onclick = e => {
+      // capture phase: in comment mode a click drops a pin and never navigates,
+      // because most anchors are themselves buttons
+      if (this._grab) this._grab.el.removeEventListener('click', this._grab.fn, true);
+      const fn = e => {
         if (!this.mode) return;
-        if (e.target.closest('.pin') || e.target.closest('.pop')) return;
-        const r = screen.getBoundingClientRect();
-        this.openComposer(id,
-          +(((e.clientX - r.left) / r.width) * 100).toFixed(2),
-          +(((e.clientY - r.top) / r.height) * 100).toFixed(2));
+        if (e.target.closest('.pop')) return;
+        if (e.target.closest('.pin')) return;
+        const el = e.target.closest('[data-anchor]');
+        if (!el) return;
+        e.preventDefault(); e.stopPropagation();
+        const a = el.getBoundingClientRect();
+        this.openComposer(el.dataset.anchor, view,
+          +(((e.clientX - a.left) / a.width) * 100).toFixed(2),
+          +(((e.clientY - a.top) / a.height) * 100).toFixed(2));
       };
+      wrap.addEventListener('click', fn, true);
+      this._grab = { el: wrap, fn };
     },
 
     closePop() {
@@ -128,23 +144,20 @@
       this.draft = null;
     },
 
-    place(el, x, y) {
-      const wrap = $('#stagewrap'); if (!wrap) return;
-      const r = wrap.getBoundingClientRect();
-      el.style.left = Math.min(Math.max((x / 100) * r.width - 140, 8), Math.max(8, r.width - 292)) + 'px';
-      el.style.top = Math.min((y / 100) * r.height + 12, Math.max(8, r.height - 60)) + 'px';
+    place(el, anchorKey, x, y) {
+      const host = $('#pins'); if (!host) return;
+      const wrap = host.parentElement;
+      const a = wrap.querySelector('[data-anchor="' + cssEsc(anchorKey) + '"]');
+      const w = wrap.getBoundingClientRect();
+      const r = a ? a.getBoundingClientRect() : w;
+      const left = (r.left - w.left) + (x / 100) * r.width - 140;
+      const top = (r.top - w.top) + (y / 100) * r.height + 14;
+      el.style.left = Math.min(Math.max(left, 8), Math.max(8, w.width - 292)) + 'px';
+      el.style.top = Math.max(8, top) + 'px';
     },
 
-    openComposer(screenId, x, y) {
+    openComposer(anchorKey, view, x, y) {
       this.closePop();
-      const host = $('#pins');
-      if (host) {
-        const g = document.createElement('span');
-        g.className = 'pin'; g.id = 'ghostpin';
-        g.style.cssText = `left:${x}%;top:${y}%;background:var(--mute-2)`;
-        g.textContent = '+';
-        host.appendChild(g);
-      }
       this.draft = { type: 'concept' };
 
       const el = document.createElement('div');
@@ -159,8 +172,8 @@
           <button class="btn-quiet" data-cancel>Cancel</button>
           <button class="btn-pink" data-save>Add</button>
         </div>`;
-      $('#stagewrap').appendChild(el);
-      this.place(el, x, y);
+      $('#pins').parentElement.appendChild(el);
+      this.place(el, anchorKey, x, y);
 
       $$('[data-type]', el).forEach(b => b.onclick = () => {
         $$('[data-type]', el).forEach(x2 => x2.setAttribute('aria-pressed', String(x2 === b)));
@@ -172,9 +185,10 @@
 
       const save = async () => {
         const text = ta.value.trim();
+        const type = this.draft ? this.draft.type : 'concept';
         this.closePop();
         if (!text) return;
-        await this.add({ screen: screenId, x, y, type: this.draft ? this.draft.type : 'concept', text });
+        await this.add({ screen: anchorKey, anchor: anchorKey, view, x, y, type, text });
       };
       $('[data-save]', el).onclick = save;
       $('[data-cancel]', el).onclick = () => this.closePop();
@@ -194,15 +208,16 @@
       el.className = 'pop pop--thread'; el.id = 'pop';
       el.innerHTML = `
         <div class="pop__existing ${n.resolved ? 'is-done' : ''}">
-          <div class="pop__meta"><b>${esc(typeLabel(n.type))}</b>
-            <span>${esc(n.who || 'anonymous')} · ${when(n.at)}</span>
+          <div class="pop__meta"><span class="ava ava--sm">${initials(n.who)}</span>
+            <b class="pop__name">${esc(n.who || 'anonymous')}</b>
+            <span>${esc(typeLabel(n.type))} · ${when(n.at)}</span>
             ${n.resolved ? `<span class="pop__done">Resolved${n.resolvedBy ? ' by ' + esc(n.resolvedBy) : ''}</span>` : ''}</div>
           <div class="pop__text">${esc(n.text)}</div>
         </div>
 
         ${replies.length ? `<div class="pop__replies">${replies.map(r => `
-          <div class="pop__reply"><span class="pop__meta"><b style="color:var(--mute)">${esc(r.who || 'anonymous')}</b>
-            <span>${when(r.at)}</span></span>
+          <div class="pop__reply"><span class="pop__meta"><span class="ava ava--sm">${initials(r.who)}</span>
+            <b class="pop__name">${esc(r.who || 'anonymous')}</b><span>${when(r.at)}</span></span>
             <div class="pop__text">${esc(r.text)}</div></div>`).join('')}</div>` : ''}
 
         <textarea data-reply placeholder="Reply…"></textarea>
@@ -213,8 +228,8 @@
           <button class="btn-quiet" data-cancel>Close</button>
           <button class="btn-pink" data-send>Reply</button>
         </div>`;
-      $('#stagewrap').appendChild(el);
-      this.place(el, n.x, n.y);
+      $('#pins').parentElement.appendChild(el);
+      this.place(el, n.anchor || n.screen, n.x, n.y);
 
       $('[data-cancel]', el).onclick = () => this.closePop();
 
@@ -257,6 +272,7 @@
       note.id = 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
       note.at = new Date().toISOString();
       note.resolved = false; note.replies = []; note.mine = true;
+      note.anchor = note.anchor || note.screen;
       this.items.push(note); this.saveLocal(); global.App.render();
     },
 
@@ -340,8 +356,8 @@
             <div class="note__where">
               <b>${idx + 1} · ${esc(s ? ST[s.stage].name : '')}</b>
               ${esc(s ? s.label : n.screen)}
-              <br><span style="color:var(--maroon)">${esc(n.who || 'anonymous')}</span>
             </div>
+            <div class="note__who"><span class="ava">${initials(n.who)}</span><b>${esc(n.who || 'anonymous')}</b></div>
             <div class="note__type">${esc(typeLabel(n.type))}${n.resolved ? '<br><span style="color:var(--mute-2)">Resolved</span>' : ''}</div>
             <div>
               <div class="note__text">${esc(n.text)}</div>
@@ -517,6 +533,15 @@
   };
 
   /* ------------------------------ formats ---------------------------- */
+
+  function cssEsc(v) { return String(v == null ? '' : v).replace(/["\\]/g, '\\$&'); }
+
+  function initials(name) {
+    const n = String(name || 'anonymous').trim();
+    const parts = n.split(/\s+/).filter(Boolean);
+    const s2 = parts.length > 1 ? parts[0][0] + parts[parts.length - 1][0] : n.slice(0, 2);
+    return esc(s2.toUpperCase());
+  }
 
   function when(iso) {
     if (!iso) return '';

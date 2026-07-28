@@ -86,6 +86,7 @@
       $('#top').innerHTML = this.topbar();
       const root = $('#root');
       document.body.classList.toggle('commenting-mode', global.Notes.mode);
+      if (!global.Notes.mode) { const cb = $('#cmtbar'); if (cb) cb.remove(); }
 
       if (this.view === 'walk')       { root.innerHTML = this.walk();  this.wireWalk(); }
       else if (this.view === 'home')  { root.innerHTML = this.home();  this.wireLinks(); }
@@ -94,6 +95,8 @@
       else if (this.view === 'sb')    { root.innerHTML = this.board(); this.wireLinks(); }
       else                            { root.innerHTML = global.Notes.render(); global.Notes.wire(); }
       this.wireTop();
+      if (this.view !== 'walk') global.Notes.mount();
+      if (global.Notes.mode) this.reminder();
     },
 
     topbar() {
@@ -138,23 +141,23 @@
 
     home() {
       const open = global.Notes.all().filter(n => !n.resolved).length;
-      return `<div class="home">
+      return `<div class="home pinhost"><div id="pins"></div>
         <h1 class="home__title">Day 1 training — proposed design</h1>
-        <p class="home__lede">${SCREENS.length} screens across ${STAGES.length} parts. Four ways in.</p>
+        <p class="home__lede">Hi there! You can choose to engage with this wireframe in one of 4 ways below.</p>
 
         <div class="home__grid">
           ${[['recap', 'Recap', 'The codified Day 1 — stage by stage, in one table.'],
              ['map', 'Storyboard', 'See storyboard of whole proposed training.'],
              ['walk', 'Walkthrough', 'Step through each screen in the training as the user would (you can also enter this by clicking on thumbnails inside storyboard view).'],
              ['notes', 'Notes', 'Your notes, collated.']].map(([k, name, text]) => `
-            <button class="home__card" data-view="${k}">
+            <button class="home__card" data-view="${k}" data-anchor="home-${k}">
               <span class="home__mini">${this.homeMini(k)}</span>
               <span class="home__name">${name}</span>
               <span class="home__text">${text}</span>
             </button>`).join('')}
         </div>
 
-        <div class="home__cmt">
+        <div class="home__cmt" data-anchor="home-comment">
           <div class="home__cmtcopy">
             <h2>You can add comments anywhere!</h2>
             <p>Just click on “Comment” tab above to turn your cursor into a pin you can drop anywhere.</p>
@@ -187,7 +190,7 @@
     /* ------------------------------ RECAP ---------------------------- */
 
     recap() {
-      return `<div class="recap">
+      return `<div class="recap pinhost"><div id="pins"></div>
         <div class="recap__head">
           <h1>What does a codified “day 1” consist of?</h1>
           <p>The agreed table, kept as written. Small flags mark the few places where the
@@ -201,7 +204,7 @@
               <th>Process checklist</th><th>Content checklist</th><th>Why this is important</th>
             </tr></thead>
             <tbody>
-              ${RECAP.map(r => `<tr>
+              ${RECAP.map((r, ri) => `<tr data-anchor="recap-${ri}">
                 <td class="rt__stage">${esc(r.stage)}</td>
                 <td class="rt__act">${esc(r.activity)}</td>
                 <td>${cell(r.outputs)}</td>
@@ -213,7 +216,7 @@
           </table>
         </div>
 
-        <div class="recap__diffs">
+        <div class="recap__diffs" data-anchor="recap-diffs">
           <h3>Where the walkthrough differs</h3>
           <ol>${RECAP.flatMap(r => (r.flags || []).map(f =>
             `<li><b>${esc(r.stage)} · ${esc(r.activity)}</b>${esc(f)}</li>`)).join('')}</ol>
@@ -313,7 +316,7 @@
       } else inner = s.body();
 
       return `
-        <div class="screen ${isActivity ? 'is-activity' : ''}" id="screen" data-screen="${s.id}">
+        <div class="screen ${isActivity ? 'is-activity' : ''}" id="screen" data-screen="${s.id}" data-anchor="${s.id}" data-kind="${s.kind}">
           <div class="app-top">
             ${isActivity
               ? `<span class="app-top__act">${W.glyph('pin')}Your turn</span>`
@@ -348,7 +351,7 @@
       const rows = STAGES.map(st => {
         const items = SCREENS.filter(x => x.stage === st.n);
         const open = global.Notes.openInStage(st.n);
-        return `<button class="track__row" data-stage="${st.n}">
+        return `<button class="track__row" data-stage="${st.n}" data-anchor="stage-${st.n}">
           <span class="track__n">${st.n === 0 ? '—' : st.n}</span>
           <span>
             <span class="track__name">${esc(st.name)}</span>
@@ -364,7 +367,7 @@
         </button>`;
       }).join('');
 
-      return `<div class="map">
+      return `<div class="map pinhost"><div id="pins"></div>
         <div class="map__intro">
           <h1>The whole training, in ${STAGES.length} parts and ${SCREENS.length} screens.</h1>
           <p>Open a stage to read what happens in it, what the user puts in, what comes out,
@@ -380,9 +383,9 @@
       const st = STAGES[this.sbStage || 0];
       const items = SCREENS.filter(x => x.stage === st.n);
 
-      return `<div class="sb">
+      return `<div class="sb pinhost"><div id="pins"></div>
         <button class="sb__back" data-back>${A_L}All stages</button>
-        <div class="sb__head">
+        <div class="sb__head" data-anchor="sbhead-${st.n}">
           <div>
             <h1 class="sb__title">${esc(st.name)}</h1>
             <p class="sb__about">${esc(st.about)}</p>
@@ -401,7 +404,7 @@
           </div>
           ${items.map((s, k) => {
             const open = global.Notes.openOn(s.id);
-            return `<button class="sb__step" data-jump="${s.id}">
+            return `<button class="sb__step" data-jump="${s.id}" data-anchor="sbstep-${s.id}">
               <span class="sb__n">${k + 1}</span>
               <span class="sb__thumb">${this.mini(s)}</span>
               <span class="sb__desc">${esc(s.summary)}</span>
@@ -507,6 +510,29 @@
     },
 
     closeSheet() { const s = $('#sheetwrap'); if (s) s.remove(); },
+
+    reminder() {
+      const old = $('#cmtbar'); if (old) old.remove();
+      const named = !!global.Notes.who;
+      const el = document.createElement('div');
+      el.id = 'cmtbar'; el.className = 'cmtbar' + (named ? '' : ' cmtbar--ask');
+      el.innerHTML = named
+        ? `<span>${W.glyph('pin')}Comment mode is on — click anywhere to drop a pin.</span>
+           <b class="cmtbar__who">${esc(global.Notes.who)}</b>
+           <button data-off>Turn off</button>`
+        : `<span>${W.glyph('pin')}Your name, so the team knows whose comment is whose</span>
+           <input type="text" data-name placeholder="Type your name" autofocus>
+           <button data-go2>Start commenting</button>`;
+      document.body.appendChild(el);
+      const off = $('[data-off]', el); if (off) off.onclick = () => global.Notes.toggleMode();
+      const inp = $('[data-name]', el);
+      if (inp) {
+        setTimeout(() => inp.focus(), 30);
+        const go = () => { if (inp.value.trim()) global.Notes.setName(inp.value); };
+        $('[data-go2]', el).onclick = go;
+        inp.onkeydown = e => { if (e.key === 'Enter') go(); };
+      }
+    },
 
     legendSheet() {
       return `<h2>How to read this</h2>

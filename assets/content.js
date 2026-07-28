@@ -155,7 +155,8 @@
     summary: 'User sees the whole shape of what is ahead — five stages and how long each takes — so they can judge the commitment before starting.',
     beats: ['Nothing is open yet; this is orientation only.',
             'The same map reappears between stages so progress stays visible.'],
-    body: () => `<div class="stack"><h2 class="s-h2">Five stages, about half an hour</h2>${map5(-1)}</div>`
+    body: () => `<div class="stack"><div class="maphead"><h2 class="s-h1">Five stages, about half an hour</h2>
+      <p class="s-cap" style="margin:0">Day 0 happens in your own time. The rest is the first couple of days of the project.</p></div>${map5(-1)}</div>`
   },
 
   /* ------------------------------- DAY 0 -------------------------------- */
@@ -164,7 +165,7 @@
     label: 'Day 0 opens',
     summary: 'User sees the first stage unlock and the remaining four still closed, so progress through the whole experience stays legible.',
     beats: ['A version of this screen sits between every stage.'],
-    body: () => `<div class="stack">${map5(0)}</div>`
+    body: () => `<div class="stack"><div class="maphead"><h2 class="s-h1">Day 0 is open. Four stages still to come.</h2></div>${map5(0)}</div>`
   },
 
   {
@@ -430,7 +431,7 @@
     label: 'Day 0 complete',
     summary: 'User sees the first stage close and the kick-off open, so the sense of progression is maintained.',
     beats: [],
-    body: () => `<div class="stack">${map5(1)}</div>`
+    body: () => `<div class="stack"><div class="maphead"><h2 class="s-h1">Day 0 done. The kick-off is where the thinking starts.</h2></div>${map5(1)}</div>`
   },
 
   {
@@ -860,7 +861,7 @@
     label: 'Two stages complete',
     summary: 'User sees the morning close and the afternoon session open.',
     beats: [],
-    body: () => `<div class="stack">${map5(2)}</div>`
+    body: () => `<div class="stack"><div class="maphead"><h2 class="s-h1">Two done. The afternoon session belongs to the team.</h2></div>${map5(2)}</div>`
   },
 
   {
@@ -1179,7 +1180,7 @@
     label: 'Three stages complete',
     summary: 'User sees the next stage open, and that it is the one they are not in.',
     beats: [],
-    body: () => `<div class="stack">${map5(3)}</div>`
+    body: () => `<div class="stack"><div class="maphead"><h2 class="s-h1">Three done. The next one happens without you.</h2></div>${map5(3)}</div>`
   },
 
   {
@@ -1324,7 +1325,7 @@
     label: 'Four stages complete',
     summary: 'User sees the last item open, and that it is a preview rather than a stage.',
     beats: [],
-    body: () => `<div class="stack">${map5(4)}</div>`
+    body: () => `<div class="stack"><div class="maphead"><h2 class="s-h1">Four done. What is left is a preview, not a stage.</h2></div>${map5(4)}</div>`
   },
 
   {

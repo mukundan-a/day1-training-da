@@ -56,9 +56,9 @@
   function titlebar(o) {
     o = o || {};
     return `<div class="win__bar">
-      <i></i><i></i><i></i>
+      <span class="win__app">${glyph(o.glyph || 'doc')}${o.name || ''}</span>
       <span class="win__search">${glyph('search')}${bar('42%', 'faint')}</span>
-      <span class="win__glyph">${glyph(o.glyph || 'doc')}</span>
+      <span class="win__dots"><i></i><i></i><i></i></span>
     </div>`;
   }
 
@@ -125,7 +125,7 @@
       <div class="ol-reply">${bar('16%', 'faint')}<i></i><i></i></div>
     </div>`;
 
-    return `<div class="win">${titlebar({ glyph: 'mail' })}${ribbon(0, 6)}
+    return `<div class="win">${titlebar({ glyph: 'mail', name: 'Outlook' })}${ribbon(0, 6)}
       <div class="win__body">
         ${navRail(5, 0)}
         <div class="ol-folders">${folders}</div>
@@ -159,7 +159,7 @@
         </span>
       </div>`).join('');
 
-    return `<div class="win">${titlebar({ glyph: 'chat' })}
+    return `<div class="win">${titlebar({ glyph: 'chat', name: 'Teams' })}
       <div class="win__body">
         ${navRail(5, 4)}
         <div class="tm-side">
@@ -194,7 +194,7 @@
         <span class="n">${i + 1}</span><span>${it}</span></div>`).join('')}
     </div>` : '';
 
-    return `<div class="win">${titlebar({ glyph: 'chat' })}
+    return `<div class="win">${titlebar({ glyph: 'chat', name: 'Teams' })}
       <div class="win__body" style="flex-direction:column">
         <div class="mt-bar">${bar('22%', 'faint')}<span class="mt-bar__t">${glyph('clock')}${bar('100%', 'faint')}</span></div>
         <div class="mt-body">
@@ -226,7 +226,7 @@
         <span class="sp-row__o">${bar(w(i + 4, 40, 70), 'faint')}</span>
       </div>`).join('');
 
-    return `<div class="win">${titlebar({ glyph: 'folder' })}
+    return `<div class="win">${titlebar({ glyph: 'folder', name: 'SharePoint' })}
       <div class="sp-cmd">
         ${Array.from({ length: 4 }, (_, i) => `<span class="sp-cmd__b"><i></i>${bar(w(i, 42, 70), 'faint')}</span>`).join('')}
       </div>
@@ -249,7 +249,7 @@
       `<div class="pp-thumb ${i === at ? 'on' : ''}"><b>${i + 1}</b><span>${
         i === at ? '' : bars([[w(i, 40, 72), 'faint'], [w(i + 2, 56, 86), 'faint']])}</span></div>`).join('');
 
-    return `<div class="win">${titlebar({ glyph: 'deck' })}${ribbon(1, 5)}
+    return `<div class="win">${titlebar({ glyph: 'deck', name: 'PowerPoint' })}${ribbon(1, 5)}
       <div class="win__body">
         <div class="pp-rail">${thumbs}</div>
         <div class="pp-main">
@@ -285,7 +285,7 @@
         `<span class="xl-c">${v ? bar(v, 'faint') : ''}</span>`).join('')}</div>`;
     }).join('');
 
-    return `<div class="win">${titlebar({ glyph: 'grid' })}${ribbon(2, 5)}
+    return `<div class="win">${titlebar({ glyph: 'grid', name: 'Excel' })}${ribbon(2, 5)}
       <div class="xl-formula"><span>fx</span>${bar('40%', 'faint')}</div>
       <div class="win__body"><div class="xl-grid">${head}${body}</div></div>
       <div class="xl-tabs">${Array.from({ length: 3 }, (_, i) =>
@@ -304,7 +304,7 @@
         ${g.free ? `<span class="fm-free">${g.typed ? bar(g.typed, '') : ''}</span>` : ''}
       </div>`).join('');
 
-    return `<div class="win">${titlebar({ glyph: 'form' })}
+    return `<div class="win">${titlebar({ glyph: 'form', name: 'Forms' })}
       <div class="fm-band"><span>${bar('34%', 'strong')}</span><span class="fm-prog"><i style="width:${o.progress || 0}%"></i></span></div>
       <div class="win__body"><div class="fm-scroll">${groups}
         <div class="fm-submit">${bar('100%', 'faint')}</div></div></div></div>`;

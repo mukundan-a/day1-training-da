@@ -1,52 +1,55 @@
 /* ============================================================================
    app.js — render, navigate, animate
 
-   Views: Walk (one screen), Map (stage tracker), Storyboard (one stage in
-   full), Notes (every comment).
+   Views: Home, Recap, Storyboard (all stages, then one stage), Walkthrough,
+   Notes.
 
-   Nothing inside the panel is clickable. Navigation is the two buttons and
-   the faded edges of the screen. Anything that would be interactive loops.
+   Nothing inside the panel is clickable. Navigation is the two buttons and the
+   faded edges of the screen. Anything interactive plays as a loop.
    ========================================================================= */
 
 (function (global) {
   'use strict';
 
-  const { SCREENS, STAGES, PROGRESS, CARRY } = global.CONTENT;
+  const { SCREENS, STAGES, PROGRESS, CARRY, RECAP } = global.CONTENT;
   const W = global.WIN;
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-  const ARROW_L = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>';
-  const ARROW_R = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg>';
+  const A_L = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>';
+  const A_R = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg>';
+
+  const VIEWS = [
+    { k: 'home',  label: 'Home' },
+    { k: 'recap', label: 'Recap' },
+    { k: 'map',   label: 'Storyboard' },
+    { k: 'walk',  label: 'Walkthrough' },
+    { k: 'notes', label: 'Notes' }
+  ];
 
   const App = {
-    i: 0,
-    view: 'walk',
-    sbStage: null,
-    stopAnim: null,
+    i: 0, view: 'home', sbStage: null, stopAnim: null,
 
     init() {
       const h = location.hash.slice(1);
       const n = SCREENS.findIndex(s => s.id === h);
-      if (n > -1) this.i = n;
+      if (n > -1) { this.i = n; this.view = 'walk'; }
 
       window.addEventListener('hashchange', () => {
         const k = SCREENS.findIndex(s => s.id === location.hash.slice(1));
-        if (k > -1 && k !== this.i) { this.i = k; this.view = 'walk'; this.render(); }
+        if (k > -1 && (k !== this.i || this.view !== 'walk')) { this.i = k; this.view = 'walk'; this.render(); }
       });
 
       document.addEventListener('keydown', e => {
         if (/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
         if (e.metaKey || e.ctrlKey || e.altKey) return;
-        if (e.key === 'ArrowRight') { e.preventDefault(); this.go(1); }
-        else if (e.key === 'ArrowLeft') { e.preventDefault(); this.go(-1); }
-        else if (e.key === 'm') this.setView(this.view === 'walk' ? 'map' : 'walk');
-        else if (e.key === 'n') this.setView(this.view === 'notes' ? 'walk' : 'notes');
+        if (this.view === 'walk' && e.key === 'ArrowRight') { e.preventDefault(); this.go(1); }
+        else if (this.view === 'walk' && e.key === 'ArrowLeft') { e.preventDefault(); this.go(-1); }
         else if (e.key === 'c') global.Notes.toggleMode();
         else if (e.key === '?') this.sheet('legend');
-        else if (e.key === 'Escape') this.closeSheet();
+        else if (e.key === 'Escape') { this.closeSheet(); global.Notes.closePop(); }
       });
 
       this.render();
@@ -56,9 +59,8 @@
 
     go(d) {
       const n = Math.min(SCREENS.length - 1, Math.max(0, this.i + d));
-      if (n === this.i) { if (this.view !== 'walk') { this.view = 'walk'; this.render(); } return; }
-      this.i = n;
-      this.view = 'walk';
+      if (n === this.i && this.view === 'walk') return;
+      this.i = n; this.view = 'walk';
       history.replaceState(null, '', '#' + SCREENS[n].id);
       this.render();
     },
@@ -66,8 +68,7 @@
     jump(id) {
       const n = SCREENS.findIndex(s => s.id === id);
       if (n < 0) return;
-      this.i = n;
-      this.view = 'walk';
+      this.i = n; this.view = 'walk';
       history.replaceState(null, '', '#' + id);
       this.render();
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -80,37 +81,38 @@
       window.scrollTo({ top: 0 });
     },
 
-    /* ---------------------------------------------------------------- */
-
     render() {
       if (this.stopAnim) { this.stopAnim(); this.stopAnim = null; }
       $('#top').innerHTML = this.topbar();
       const root = $('#root');
       document.body.classList.toggle('commenting-mode', global.Notes.mode);
 
-      if (this.view === 'walk')      { root.innerHTML = this.walk();  this.wireWalk(); }
-      else if (this.view === 'map')  { root.innerHTML = this.map();   this.wireLinks(); }
-      else if (this.view === 'sb')   { root.innerHTML = this.board();  this.wireLinks(); }
-      else                           { root.innerHTML = global.Notes.render(); global.Notes.wire(); }
+      if (this.view === 'walk')       { root.innerHTML = this.walk();  this.wireWalk(); }
+      else if (this.view === 'home')  { root.innerHTML = this.home();  this.wireLinks(); }
+      else if (this.view === 'recap') { root.innerHTML = this.recap(); this.wireLinks(); }
+      else if (this.view === 'map')   { root.innerHTML = this.map();   this.wireLinks(); }
+      else if (this.view === 'sb')    { root.innerHTML = this.board(); this.wireLinks(); }
+      else                            { root.innerHTML = global.Notes.render(); global.Notes.wire(); }
       this.wireTop();
     },
 
     topbar() {
-      const n = global.Notes.all().length;
-      const onMap = this.view === 'map' || this.view === 'sb';
+      const open = global.Notes.all().filter(n => !n.resolved).length;
+      const here = this.view === 'sb' ? 'map' : this.view;
+      const st = global.Notes.statusLabel();
       return `
         <div class="topbar__id">
           <span class="topbar__title">Day 1</span>
           <span class="topbar__sub">wireframe</span>
         </div>
         <div class="views" role="tablist">
-          <button role="tab" data-view="walk"  aria-selected="${this.view === 'walk'}">Walk</button>
-          <button role="tab" data-view="map"   aria-selected="${onMap}">Storyboard</button>
-          <button role="tab" data-view="notes" aria-selected="${this.view === 'notes'}">Notes${n ? `<span class="count">${n}</span>` : ''}</button>
+          ${VIEWS.map(v => `<button role="tab" data-view="${v.k}" aria-selected="${here === v.k}">${v.label}${
+            v.k === 'notes' && open ? `<span class="count">${open}</span>` : ''}</button>`).join('')}
         </div>
         <span class="topbar__spacer"></span>
         <div class="topbar__tools">
-          <button class="tool" data-cmt aria-pressed="${global.Notes.mode}">${W.glyph('pin')}Comment</button>
+          <span class="conn ${st.cls}" title="${global.Notes.who ? 'Signed as ' + esc(global.Notes.who) : ''}">${st.t}</span>
+          <button class="tool tool--cmt" data-cmt aria-pressed="${global.Notes.mode}">${W.glyph('pin')}Comment</button>
           <button class="tool" data-sheet="export">Export</button>
           <button class="tool" data-sheet="legend" title="Legend and shortcuts">?</button>
           <svg class="notch" viewBox="0 0 26 13" fill="none" aria-hidden="true">
@@ -128,7 +130,109 @@
       $$('[data-jump]').forEach(b => b.onclick = () => this.jump(b.dataset.jump));
       $$('[data-stage]').forEach(b => b.onclick = () => this.setView('sb', +b.dataset.stage));
       $$('[data-back]').forEach(b => b.onclick = () => this.setView('map'));
+      $$('[data-view]').forEach(b => b.onclick = () => this.setView(b.dataset.view));
       $$('[data-sheet]').forEach(b => b.onclick = () => this.sheet(b.dataset.sheet));
+    },
+
+    /* ------------------------------ HOME ----------------------------- */
+
+    home() {
+      const open = global.Notes.all().filter(n => !n.resolved).length;
+      return `<div class="home">
+        <h1 class="home__title">Day 1 training — proposed design</h1>
+        <p class="home__lede">${SCREENS.length} screens across ${STAGES.length} parts. Four ways in.</p>
+
+        <div class="home__grid">
+          ${[['recap', 'Recap', 'The codified Day 1 — stage by stage, in one table.'],
+             ['map', 'Storyboard', 'See storyboard of whole proposed training.'],
+             ['walk', 'Walkthrough', 'Step through each screen in the training as the user would (you can also enter this by clicking on thumbnails inside storyboard view).'],
+             ['notes', 'Notes', 'Your notes, collated.']].map(([k, name, text]) => `
+            <button class="home__card" data-view="${k}">
+              <span class="home__mini">${this.homeMini(k)}</span>
+              <span class="home__name">${name}</span>
+              <span class="home__text">${text}</span>
+            </button>`).join('')}
+        </div>
+
+        <div class="home__cmt">
+          <div class="home__cmtcopy">
+            <h2>You can add comments anywhere!</h2>
+            <p>Just click on “Comment” tab above to turn your cursor into a pin you can drop anywhere.</p>
+            <p class="home__cmtsub">Everyone’s comments are shared as they are written. You can reply to
+               anyone’s, and mark one resolved once it is dealt with — it stays visible.
+               ${open ? `<b>${open} open right now.</b>` : ''}</p>
+          </div>
+          <div class="home__demo" aria-hidden="true">
+            <div class="home__demobar"><span>${W.glyph('pin')}Comment</span></div>
+            <div class="home__demoscreen">
+              ${W.bars([['46%', 'strong'], ['86%', 'faint'], ['72%', 'faint']])}
+              <span class="home__cursor">${W.glyph('pin')}</span>
+              <span class="home__pin">1</span>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    },
+
+    homeMini(k) {
+      if (k === 'recap') return `<span class="hm hm--recap">${Array.from({ length: 5 }, (_, r) =>
+        `<i>${Array.from({ length: 4 }, () => '<b></b>').join('')}</i>`).join('')}</span>`;
+      if (k === 'map') return `<span class="hm hm--map">${Array.from({ length: 4 }, (_, r) =>
+        `<i class="${r === 1 ? 'on' : ''}"></i>`).join('')}</span>`;
+      if (k === 'walk') return `<span class="hm hm--walk"><i></i><b></b></span>`;
+      return `<span class="hm hm--notes">${Array.from({ length: 3 }, (_, r) =>
+        `<i class="${r === 0 ? 'on' : ''}"></i>`).join('')}</span>`;
+    },
+
+    /* ------------------------------ RECAP ---------------------------- */
+
+    recap() {
+      return `<div class="recap">
+        <div class="recap__head">
+          <h1>What does a codified “day 1” consist of?</h1>
+          <p>The agreed table, kept as written. Small flags mark the few places where the
+             walkthrough differs from it.</p>
+        </div>
+
+        <div class="recap__scroll">
+          <table class="rt">
+            <thead><tr>
+              <th>Stage</th><th>Activity</th><th>Key outputs</th>
+              <th>Process checklist</th><th>Content checklist</th><th>Why this is important</th>
+            </tr></thead>
+            <tbody>
+              ${RECAP.map(r => `<tr>
+                <td class="rt__stage">${esc(r.stage)}</td>
+                <td class="rt__act">${esc(r.activity)}</td>
+                <td>${cell(r.outputs)}</td>
+                <td>${cell(r.process)}</td>
+                <td>${groups(r.content)}</td>
+                <td>${cell(r.why)}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="recap__diffs">
+          <h3>Where the walkthrough differs</h3>
+          <ol>${RECAP.flatMap(r => (r.flags || []).map(f =>
+            `<li><b>${esc(r.stage)} · ${esc(r.activity)}</b>${esc(f)}</li>`)).join('')}</ol>
+        </div>
+
+        <p class="recap__link">Link to notion with compiled resources + detailed steps per stage:
+          <a href="https://app.notion.com/p/Craft-Day-1-Draft-17-Jul-3a3913a77fdf8109af5fce33b30d10b1"
+             target="_blank" rel="noopener">app.notion.com/p/Craft-Day-1-Draft-17-Jul</a></p>
+      </div>`;
+
+      function cell(items) {
+        if (!items || !items.length) return '<span class="rt__na">N/A</span>';
+        return `<ul>${items.map(i => `<li>${esc(i)}</li>`).join('')}</ul>`;
+      }
+      function groups(g) {
+        if (!g) return '';
+        return Object.keys(g).map(k =>
+          `<div class="rt__grp"><b>${esc(k)}</b>${cell(g[k])}</div>`).join('');
+      }
     },
 
     /* ------------------------------ WALK ----------------------------- */
@@ -139,6 +243,7 @@
       const inStage = SCREENS.filter(x => x.stage === s.stage);
       const pos = inStage.indexOf(s);
       const first = this.i === 0, last = this.i === SCREENS.length - 1;
+      const open = global.Notes.openOn(s.id);
 
       return `
         <div class="walk">
@@ -147,37 +252,34 @@
               <div class="walk__eyebrow">
                 <span class="verb">${s.verb}</span><span class="sep">·</span>
                 <span class="label">${esc(stage.name)}</span>
+                ${open ? `<span class="sep">·</span><button class="openflag" data-view="notes">${open} open comment${open > 1 ? 's' : ''}</button>` : ''}
               </div>
               <h1 class="summary">${esc(s.summary)}</h1>
               ${(s.beats && s.beats.length) ? `<ul class="beats">${s.beats.map(b => `<li>${esc(b)}</li>`).join('')}</ul>` : ''}
-            </div>
-            <div class="walk__marks">
-              ${s.decision ? `<button class="decision" data-sheet="decisions"><i class="dot"></i>Open decision</button>` : ''}
             </div>
           </div>
 
           <div class="stage-wrap">
             <div class="stage-frame" id="stagewrap">
               ${this.screen(s)}
-              <button class="edge edge--l" data-go="-1" ${first ? 'disabled' : ''} aria-label="Previous">${first ? '' : ARROW_L}</button>
-              <button class="edge edge--r" data-go="1" ${last ? 'disabled' : ''} aria-label="Next">${last ? '' : ARROW_R}</button>
+              <button class="edge edge--l" data-go="-1" ${first ? 'disabled' : ''} aria-label="Previous">${first ? '' : A_L}</button>
+              <button class="edge edge--r" data-go="1" ${last ? 'disabled' : ''} aria-label="Next">${last ? '' : A_R}</button>
               <div id="pins"></div>
             </div>
             <aside class="specs">${s.notes ? s.notes() : ''}</aside>
           </div>
 
           <div class="walk__foot">
-            <button class="nav-btn" data-go="-1" ${first ? 'disabled' : ''}>${ARROW_L}Back</button>
+            <button class="nav-btn" data-go="-1" ${first ? 'disabled' : ''}>${A_L}Back</button>
             <div class="dots">
               ${inStage.map((x, k) => {
                 const gi = SCREENS.indexOf(x);
-                const notes = global.Notes.forScreen(x.id).length;
                 return `<button data-jump="${x.id}" title="${esc(x.label)}"
-                  class="${gi < this.i ? 'done' : ''} ${k === pos ? 'here' : ''} ${notes ? 'has-notes' : ''}"></button>`;
+                  class="${gi < this.i ? 'done' : ''} ${k === pos ? 'here' : ''} ${global.Notes.openOn(x.id) ? 'has-notes' : ''}"></button>`;
               }).join('')}
             </div>
             <span class="walk__where">${this.i + 1} / ${SCREENS.length}</span>
-            <button class="nav-btn" data-go="1" ${last ? 'disabled' : ''}>Next${ARROW_R}</button>
+            <button class="nav-btn" data-go="1" ${last ? 'disabled' : ''}>Next${A_R}</button>
           </div>
         </div>`;
     },
@@ -195,9 +297,11 @@
       const carry = CARRY.map(c => {
         const held = upto.has(c.k);
         const used = reads.indexOf(c.k) > -1 && held;
-        const writing = writes.indexOf(c.k) > -1;
-        return `<span class="carry__item ${used ? 'used' : held || writing ? 'held' : ''}"><i></i>${c.label}</span>`;
+        return `<span class="carry__item ${used ? 'used' : held || writes.indexOf(c.k) > -1 ? 'held' : ''}"><i></i>${c.label}</span>`;
       }).join('');
+
+      // An activity says so, and puts its action where the eye lands first.
+      const isActivity = s.verb === 'DO' || s.verb === 'DECIDE';
 
       let inner, wellCls = 'app-well';
       if (s.kind === 'sim') { wellCls = 'app-well app-well--flush'; inner = s.body(); }
@@ -208,15 +312,20 @@
       } else inner = s.body();
 
       return `
-        <div class="screen" id="screen" data-screen="${s.id}">
+        <div class="screen ${isActivity ? 'is-activity' : ''}" id="screen" data-screen="${s.id}">
           <div class="app-top">
-            <span class="app-top__name">${esc(STAGES[s.stage].name)}</span>
+            ${isActivity
+              ? `<span class="app-top__act">${W.glyph('pin')}Your turn</span>`
+              : `<span class="app-top__name">${esc(STAGES[s.stage].name)}</span>`}
             <span class="app-top__prog">${prog}</span>
+            ${isActivity ? `<span class="act act--top">${esc(s.action || 'Check')}</span>` : ''}
           </div>
           <div class="${wellCls}">${inner}</div>
           <div class="app-foot">
             <span class="carry">${carry}</span>
-            <span class="act">${s.action || 'Next'}</span>
+            ${isActivity
+              ? `<span class="app-foot__hint">${esc(STAGES[s.stage].name)}</span>`
+              : `<span class="act">${esc(s.action || 'Next')}</span>`}
           </div>
         </div>`;
     },
@@ -224,6 +333,7 @@
     wireWalk() {
       $$('[data-go]').forEach(b => { if (!b.disabled) b.onclick = () => this.go(+b.dataset.go); });
       $$('[data-jump]').forEach(b => b.onclick = () => this.jump(b.dataset.jump));
+      $$('[data-view]').forEach(b => b.onclick = () => this.setView(b.dataset.view));
       $$('[data-sheet]').forEach(b => b.onclick = () => this.sheet(b.dataset.sheet));
 
       const s = this.cur(), el = $('#screen');
@@ -231,13 +341,12 @@
       global.Notes.mount();
     },
 
-    /* --------------------------- MAP: TRACKER ------------------------ */
+    /* ------------------------ STORYBOARD: STAGES --------------------- */
 
     map() {
       const rows = STAGES.map(st => {
         const items = SCREENS.filter(x => x.stage === st.n);
-        const notes = items.reduce((a, x) => a + global.Notes.forScreen(x.id).length, 0);
-        const dec = items.filter(x => x.decision).length;
+        const open = global.Notes.openInStage(st.n);
         return `<button class="track__row" data-stage="${st.n}">
           <span class="track__n">${st.n === 0 ? '—' : st.n}</span>
           <span>
@@ -246,63 +355,55 @@
           </span>
           <span class="track__meta">
             <span><b>${items.length}</b> screens</span>
-            <span>${dec ? `<b>${dec}</b> open decision${dec > 1 ? 's' : ''}` : 'No open decisions'}</span>
-            ${notes ? `<span class="track__notes" style="align-self:flex-start">${notes} note${notes > 1 ? 's' : ''}</span>` : ''}
+            ${open ? `<span class="track__notes">${open} open comment${open > 1 ? 's' : ''}</span>` : ''}
           </span>
           <span class="track__bar">${items.map(x =>
-            `<i class="${SCREENS.indexOf(x) <= this.i ? 'on' : ''}"></i>`).join('')}</span>
+            `<i class="${global.Notes.openOn(x.id) ? 'note' : SCREENS.indexOf(x) <= this.i ? 'on' : ''}"></i>`).join('')}</span>
           <span class="track__go">&rarr;</span>
         </button>`;
       }).join('');
 
-      const dec = SCREENS.filter(s => s.decision).length;
       return `<div class="map">
         <div class="map__intro">
-          <h1>The whole experience, in ${STAGES.length} parts and ${SCREENS.length} screens.</h1>
-          <p>Open a stage to read what actually happens in it, what the user puts in, what comes out,
-             and every screen in order. ${dec} decisions are still open.</p>
+          <h1>The whole training, in ${STAGES.length} parts and ${SCREENS.length} screens.</h1>
+          <p>Open a stage to read what happens in it, what the user puts in, what comes out,
+             and every screen in order.</p>
         </div>
         <div class="track">${rows}</div>
       </div>`;
     },
 
-    /* ------------------------ MAP: ONE STAGE ------------------------- */
+    /* ------------------------ STORYBOARD: ONE ------------------------ */
 
     board() {
       const st = STAGES[this.sbStage || 0];
       const items = SCREENS.filter(x => x.stage === st.n);
 
       return `<div class="sb">
-        <button class="sb__back" data-back>${ARROW_L}All stages</button>
-
+        <button class="sb__back" data-back>${A_L}All stages</button>
         <div class="sb__head">
           <div>
             <h1 class="sb__title">${esc(st.name)}</h1>
             <p class="sb__about">${esc(st.about)}</p>
           </div>
           <div class="io">
-            <div class="io__panel">
-              <h4>What the user puts in</h4>
-              <ul>${st.inputs.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
-            </div>
-            <div class="io__panel io__panel--out">
-              <h4>What comes out</h4>
-              <ul>${st.outputs.map(i => `<li>${esc(i)}</li>`).join('')}</ul>
-            </div>
+            <div class="io__panel"><h4>What the user puts in</h4>
+              <ul>${st.inputs.map(i => `<li>${esc(i)}</li>`).join('')}</ul></div>
+            <div class="io__panel io__panel--out"><h4>What comes out</h4>
+              <ul>${st.outputs.map(i => `<li>${esc(i)}</li>`).join('')}</ul></div>
           </div>
         </div>
 
         <div class="sb__steps">
           ${items.map((s, k) => {
-            const notes = global.Notes.forScreen(s.id).length;
+            const open = global.Notes.openOn(s.id);
             return `<button class="sb__step" data-jump="${s.id}">
               <span class="sb__n">${k + 1}</span>
               <span class="sb__thumb">${this.mini(s)}</span>
               <span class="sb__desc">${esc(s.summary)}</span>
-              <span style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+              <span class="sb__side">
                 <span class="sb__verb">${s.verb}</span>
-                ${notes ? `<span class="sb__pin">${notes}</span>` : ''}
-                ${s.decision ? `<span class="sb__verb" style="color:var(--maroon)">Decision open</span>` : ''}
+                ${open ? `<span class="sb__pin">${open}</span>` : ''}
               </span>
             </button>`;
           }).join('')}
@@ -310,8 +411,6 @@
       </div>`;
     },
 
-
-    /* each simulated app reads differently even at 250px wide */
     simMini(app) {
       const col = (w, n, extra) => `<div style="width:${w};display:flex;flex-direction:column;gap:2px;${extra || ''}">${
         W.bars(Array.from({ length: n }, (_, i) => [(62 + (i * 13) % 32) + '%', 'faint']))}</div>`;
@@ -362,7 +461,6 @@
       }[app] || `<div style="flex:1;background:var(--fill);border-radius:1px"></div>`;
     },
 
-    /* a cheap abstract of each screen kind — never a full render */
     mini(s) {
       const b = (w, m) => W.bar(w, m);
       const inner = {
@@ -376,7 +474,7 @@
         intro:    `${b('50%', 'strong')}<div style="display:flex;gap:4px;flex:1;margin-top:3px">
                    <div style="flex:1;background:var(--soft);border-radius:1px"></div>
                    <div style="flex:1;background:var(--fill);border-radius:1px"></div></div>`,
-        sim: this.simMini(s.app),
+        sim:      this.simMini(s.app),
         exercise: `<div style="flex:1;display:flex;gap:3px">${Array.from({ length: 3 }, (_, k) =>
                    `<div style="flex:1;border:1px solid var(--rule-soft);border-radius:1px;background:${k === 2 ? 'var(--soft)' : 'transparent'};padding:3px;display:flex;flex-direction:column;gap:2px">${
                      W.bars([[(72 - k * 8) + '%','faint'],[(86 - k * 6) + '%','faint']])}</div>`).join('')}</div>`,
@@ -385,7 +483,6 @@
         vault:    `<div style="flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:2px">${Array.from({ length: 8 }, (_, k) =>
                    `<div style="border:1px solid var(--rule-soft);border-radius:1px;background:${k % 4 === 0 ? 'var(--soft)' : 'transparent'}"></div>`).join('')}</div>`
       }[s.kind] || '';
-
       return `<span class="thumb__strip"></span><span class="thumb__mini">${inner}</span><span class="thumb__foot"></span>`;
     },
 
@@ -393,9 +490,7 @@
 
     sheet(which) {
       this.closeSheet();
-      const body = which === 'legend' ? this.legendSheet()
-                 : which === 'decisions' ? this.decisionSheet()
-                 : global.Notes.exportSheet();
+      const body = which === 'legend' ? this.legendSheet() : global.Notes.exportSheet();
       const el = document.createElement('div');
       el.id = 'sheetwrap';
       el.innerHTML = `<div class="scrim" data-close></div>
@@ -411,30 +506,30 @@
 
     legendSheet() {
       return `<h2>How to read this</h2>
-        <p>Each screen does one thing. The bold line above it says what the user gets from that screen;
-           the bullets under it say how it plays out. That is the level of feedback this is for.</p>
-        <p>Nothing inside the panel is clickable. Anything that would be interactive plays as a loop,
-           so you see the whole thing without having to work it. Move with the two buttons, the arrow
-           keys, or by clicking either faded edge of the screen.</p>
+        <p>Each screen does one thing. The bold line above it says what the user gets from that
+           screen; the bullets say how it plays out.</p>
+        <p>Nothing inside the panel is clickable. Anything the user would interact with plays as a
+           loop instead, so you see it without having to work it. Move with the two buttons, the
+           arrow keys, or by clicking either faded edge of the screen.</p>
 
         <h3>Interaction</h3>
         <dl class="legend">
-          ${[['Read', 'There is nothing to do. The user reads it and moves on.'],
+          ${[['Read', 'Nothing to do. The user reads it and moves on.'],
              ['Watch', 'Something plays out. No input from the user.'],
              ['Explore', 'The user can move around freely. Nothing to complete.'],
-             ['Do', 'The user produces something the app carries forward.'],
-             ['Decide', 'The user chooses. Nothing is carried forward.']].map(([d, t]) =>
+             ['Do', 'An activity. The screen says “Your turn” and the action sits at the top.'],
+             ['Decide', 'An activity where the user chooses. Nothing is carried forward.']].map(([d, t]) =>
             `<div class="legend__row"><dt>${d}</dt><dd>${t}</dd></div>`).join('')}
         </dl>
 
         <h3>Colour</h3>
         <dl class="legend">
           <div class="legend__row"><dt><span class="swatch" style="background:var(--soft)"></span></dt>
-            <dd>The focal element — the one thing a screen is really about. One per screen.</dd></div>
+            <dd>The focal element — the one thing a screen is really about.</dd></div>
           <div class="legend__row"><dt><span class="swatch" style="background:var(--maroon)"></span></dt>
             <dd>Whatever is live or moving right now.</dd></div>
           <div class="legend__row"><dt><span class="swatch" style="background:var(--pink)"></span></dt>
-            <dd>Reviewer comments, and nothing else.</dd></div>
+            <dd>Comments.</dd></div>
         </dl>
 
         <h3>Copy</h3>
@@ -442,26 +537,9 @@
            replaced by a description of what it will need to say, in the column to the right.
            Choreography lives there too, tagged Beat.</p>
 
-        <h3>Carried forward</h3>
-        <p>The row at the bottom-left of every screen shows what the app is holding for the user.
-           It turns maroon on the screen that uses it.</p>
-
         <h3>Keys</h3>
         <p><span class="kbd">←</span> <span class="kbd">→</span> move &nbsp;
-           <span class="kbd">m</span> storyboard &nbsp; <span class="kbd">n</span> notes &nbsp;
            <span class="kbd">c</span> comment &nbsp; <span class="kbd">esc</span> close</p>`;
-    },
-
-    decisionSheet() {
-      const items = SCREENS.filter(s => s.decision);
-      return `<h2>Open decisions</h2>
-        <p>These come from the build notes and content notes in the storyboard deck.
-           None are resolved, and each links to the screen it affects.</p>
-        <div>${items.map(s => `<div class="decisions__item">
-          <b>${esc(STAGES[s.stage].name)} — ${esc(s.label)}</b>
-          <p>${esc(s.decision)}</p>
-          <a data-jump="${s.id}">Go to screen &rarr;</a>
-        </div>`).join('')}</div>`;
     }
   };
 

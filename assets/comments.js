@@ -1,13 +1,15 @@
 /* ============================================================================
-   comments.js — in-place review notes
+   comments.js — shared review notes
 
-   No login, no backend. Notes live in this browser.
+   Comments live on a shared Firestore board, so everyone sees everyone else's
+   as they arrive. No login: reviewers type their name once a session.
+
+   If the shared board is unreachable, everything falls back to this browser's
+   local storage and the export file still carries the work out.
 
    The JSON export is the round-trip format. Every note carries the screen id
-   it is anchored to plus its position as a percentage of the screen box, so
-   dropping the file back in re-attaches every pin exactly where it was — on
-   any machine, at any window size. CSV and Markdown are for reading, not for
-   re-importing.
+   it is pinned to plus its position as a percentage of the screen box, so
+   dropping the file back in re-attaches every pin exactly where it was.
    ========================================================================= */
 
 (function (global) {
@@ -18,10 +20,9 @@
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-  const KEY  = 'day1wf.notes.v2';
-  const IMP  = 'day1wf.imported.v2';
-  const WHO  = 'day1wf.who.v2';
-  const SCHEMA = 'day1-wireframe-notes/2';
+  const LOCAL = 'day1wf.local.v3';
+  const NAME  = 'day1wf.name';
+  const SCHEMA = 'day1-wireframe-notes/3';
 
   const TYPES = [
     { k: 'concept', label: 'Concept' },
@@ -31,31 +32,62 @@
   ];
 
   const Notes = {
-    items: [], imported: [], mode: false, who: '', filter: 'all', draft: null,
+    items: [], mode: false, who: '', filter: 'all', showResolved: true,
+    source: 'connecting', unsub: null, draft: null,
 
     init() {
-      try {
-        this.items = JSON.parse(localStorage.getItem(KEY) || '[]');
-        this.imported = JSON.parse(localStorage.getItem(IMP) || '[]');
-        this.who = localStorage.getItem(WHO) || '';
-      } catch (e) { this.items = []; this.imported = []; }
+      try { this.who = sessionStorage.getItem(NAME) || ''; } catch (e) {}
+      this.loadLocal();
+
+      window.addEventListener('live-ready', e => {
+        if (e.detail.ok) {
+          this.source = 'live';
+          this.unsub = global.Live.watch((rows, err) => {
+            if (err) { this.source = 'local'; this.loadLocal(); global.App.render(); return; }
+            this.items = rows.map(r => Object.assign({}, r, { mine: r.uid === global.Live.uid }));
+            global.App.render();
+          });
+        } else {
+          this.source = 'local';
+        }
+        global.App.render();
+      });
     },
 
-    persist() {
-      try {
-        localStorage.setItem(KEY, JSON.stringify(this.items));
-        localStorage.setItem(IMP, JSON.stringify(this.imported));
-      } catch (e) {}
+    live() { return this.source === 'live' && global.Live && global.Live.ok; },
+
+    loadLocal() {
+      try { this.items = JSON.parse(localStorage.getItem(LOCAL) || '[]'); } catch (e) { this.items = []; }
+    },
+    saveLocal() {
+      if (this.live()) return;
+      try { localStorage.setItem(LOCAL, JSON.stringify(this.items)); } catch (e) {}
     },
 
-    all() { return this.items.concat(this.imported); },
-    forScreen(id) { return this.all().filter(n => n.screen === id); },
+    all() { return this.items; },
+    forScreen(id) { return this.items.filter(n => n.screen === id); },
+    openOn(id) { return this.items.filter(n => n.screen === id && !n.resolved).length; },
+    openInStage(stage) {
+      const ids = new Set(global.CONTENT.SCREENS.filter(s => s.stage === stage).map(s => s.id));
+      return this.items.filter(n => ids.has(n.screen) && !n.resolved).length;
+    },
+
+    /* --------------------------- name per session -------------------- */
+
+    askName() {
+      if (this.who) return true;
+      const v = (prompt('Your name, so the team knows whose note is whose:') || '').trim();
+      if (!v) return false;
+      this.who = v.slice(0, 60);
+      try { sessionStorage.setItem(NAME, this.who); } catch (e) {}
+      this.refreshTop();
+      return true;
+    },
 
     toggleMode() {
+      if (!this.mode && !this.askName()) return;
       this.mode = !this.mode;
       document.body.classList.toggle('commenting-mode', this.mode);
-      const b = $('[data-cmt]'); if (b) b.setAttribute('aria-pressed', String(this.mode));
-      const s = $('#screen'); if (s) s.classList.toggle('commenting', this.mode);
       this.closePop();
       global.App.render();
     },
@@ -63,17 +95,18 @@
     /* ------------------------- pins on the screen -------------------- */
 
     mount() {
-      const screen = $('#screen'), host = $('#pins'), wrap = $('#stagewrap');
-      if (!screen || !host || !wrap) return;
-
+      const screen = $('#screen'), host = $('#pins');
+      if (!screen || !host) return;
       host.style.cssText = 'position:absolute;inset:0;pointer-events:none';
       screen.classList.toggle('commenting', this.mode);
 
       const id = screen.dataset.screen;
       host.innerHTML = this.forScreen(id).map((n, i) =>
-        `<button class="pin ${n.mine === false ? 'pin--imported' : ''}" data-pin-id="${n.id}"
+        `<button class="pin ${n.resolved ? 'pin--done' : ''}" data-pin-id="${n.id}"
            style="left:${n.x}%;top:${n.y}%;pointer-events:auto"
-           title="${esc(n.who || 'anonymous')}">${i + 1}</button>`).join('');
+           title="${esc(n.who || 'anonymous')}${n.resolved ? ' · resolved' : ''}">${
+             n.resolved ? '✓' : (i + 1)}${
+             (n.replies && n.replies.length) ? `<em>${n.replies.length}</em>` : ''}</button>`).join('');
 
       $$('[data-pin-id]', host).forEach(b => b.onclick = e => {
         e.stopPropagation(); this.openThread(b.dataset.pinId);
@@ -96,10 +129,10 @@
     },
 
     place(el, x, y) {
-      const wrap = $('#stagewrap');
+      const wrap = $('#stagewrap'); if (!wrap) return;
       const r = wrap.getBoundingClientRect();
-      el.style.left = Math.min(Math.max((x / 100) * r.width - 136, 8), Math.max(8, r.width - 280)) + 'px';
-      el.style.top = Math.min((y / 100) * r.height + 12, r.height - 40) + 'px';
+      el.style.left = Math.min(Math.max((x / 100) * r.width - 140, 8), Math.max(8, r.width - 292)) + 'px';
+      el.style.top = Math.min((y / 100) * r.height + 12, Math.max(8, r.height - 60)) + 'px';
     },
 
     openComposer(screenId, x, y) {
@@ -122,7 +155,7 @@
         </div>
         <textarea placeholder="What do you want to say about this screen?"></textarea>
         <div class="pop__row">
-          <span class="pop__hint">${esc(screenId)}</span>
+          <span class="pop__hint">${esc(this.who || 'anonymous')}</span>
           <button class="btn-quiet" data-cancel>Cancel</button>
           <button class="btn-pink" data-save>Add</button>
         </div>`;
@@ -137,10 +170,11 @@
       const ta = $('textarea', el);
       setTimeout(() => ta.focus(), 20);
 
-      const save = () => {
+      const save = async () => {
         const text = ta.value.trim();
-        if (text) this.add({ screen: screenId, x, y, type: this.draft.type, text });
-        this.closePop(); this.mount(); this.refreshTop();
+        this.closePop();
+        if (!text) return;
+        await this.add({ screen: screenId, x, y, type: this.draft ? this.draft.type : 'concept', text });
       };
       $('[data-save]', el).onclick = save;
       $('[data-cancel]', el).onclick = () => this.closePop();
@@ -152,39 +186,111 @@
 
     openThread(noteId) {
       this.closePop();
-      const n = this.all().find(z => z.id === noteId);
+      const n = this.items.find(z => z.id === noteId);
       if (!n) return;
-      const own = n.mine !== false;
+      const replies = n.replies || [];
 
       const el = document.createElement('div');
-      el.className = 'pop'; el.id = 'pop';
+      el.className = 'pop pop--thread'; el.id = 'pop';
       el.innerHTML = `
-        <div class="pop__existing">
+        <div class="pop__existing ${n.resolved ? 'is-done' : ''}">
           <div class="pop__meta"><b>${esc(typeLabel(n.type))}</b>
-            <span>${esc(n.who || 'anonymous')} · ${new Date(n.at).toLocaleDateString()}</span></div>
+            <span>${esc(n.who || 'anonymous')} · ${when(n.at)}</span>
+            ${n.resolved ? `<span class="pop__done">Resolved${n.resolvedBy ? ' by ' + esc(n.resolvedBy) : ''}</span>` : ''}</div>
           <div class="pop__text">${esc(n.text)}</div>
         </div>
-        <div class="pop__row"><span class="pop__hint"></span>
-          ${own ? '<button class="btn-quiet" data-del>Delete</button>' : ''}
-          <button class="btn-quiet" data-cancel>Close</button></div>`;
+
+        ${replies.length ? `<div class="pop__replies">${replies.map(r => `
+          <div class="pop__reply"><span class="pop__meta"><b style="color:var(--mute)">${esc(r.who || 'anonymous')}</b>
+            <span>${when(r.at)}</span></span>
+            <div class="pop__text">${esc(r.text)}</div></div>`).join('')}</div>` : ''}
+
+        <textarea data-reply placeholder="Reply…"></textarea>
+        <div class="pop__row">
+          <button class="btn-quiet" data-resolve>${n.resolved ? 'Reopen' : 'Resolve'}</button>
+          ${n.mine ? `<button class="btn-quiet" data-del>Delete</button>` : ''}
+          <span style="flex:1"></span>
+          <button class="btn-quiet" data-cancel>Close</button>
+          <button class="btn-pink" data-send>Reply</button>
+        </div>`;
       $('#stagewrap').appendChild(el);
       this.place(el, n.x, n.y);
 
       $('[data-cancel]', el).onclick = () => this.closePop();
+
+      $('[data-resolve]', el).onclick = async () => {
+        if (!this.askName()) return;
+        this.closePop();
+        await this.setResolved(noteId, !n.resolved);
+      };
+
       const d = $('[data-del]', el);
-      if (d) d.onclick = () => {
-        this.items = this.items.filter(z => z.id !== noteId);
-        this.persist(); this.closePop(); this.mount(); this.refreshTop();
+      if (d) d.onclick = async () => {
+        if (!confirm('Delete this comment and its replies?')) return;
+        this.closePop();
+        await this.remove(noteId);
+      };
+
+      const ta = $('[data-reply]', el);
+      const send = async () => {
+        const t = ta.value.trim();
+        if (!t) return;
+        if (!this.askName()) return;
+        this.closePop();
+        await this.reply(noteId, t);
+      };
+      $('[data-send]', el).onclick = send;
+      ta.onkeydown = e => {
+        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) send();
+        if (e.key === 'Escape') this.closePop();
       };
     },
 
-    add(n) {
-      n.id = 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-      n.at = new Date().toISOString();
-      n.who = this.who;
-      n.mine = true;
-      this.items.push(n);
-      this.persist();
+    /* ------------------------------ writes --------------------------- */
+
+    async add(note) {
+      note.who = this.who || 'anonymous';
+      if (this.live()) {
+        try { await global.Live.add(note); return; }
+        catch (e) { this.flash('Could not save to the shared board — kept locally.'); }
+      }
+      note.id = 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      note.at = new Date().toISOString();
+      note.resolved = false; note.replies = []; note.mine = true;
+      this.items.push(note); this.saveLocal(); global.App.render();
+    },
+
+    async reply(id, text) {
+      if (this.live()) {
+        try { await global.Live.reply(id, this.who, text); return; } catch (e) {}
+      }
+      const n = this.items.find(z => z.id === id);
+      if (n) { (n.replies = n.replies || []).push({ who: this.who || 'anonymous', text, at: new Date().toISOString() }); }
+      this.saveLocal(); global.App.render();
+    },
+
+    async setResolved(id, on) {
+      if (this.live()) {
+        try { await global.Live.setResolved(id, on, this.who); return; } catch (e) {}
+      }
+      const n = this.items.find(z => z.id === id);
+      if (n) { n.resolved = on; n.resolvedBy = on ? this.who : ''; }
+      this.saveLocal(); global.App.render();
+    },
+
+    async remove(id) {
+      if (this.live()) {
+        try { await global.Live.remove(id); return; } catch (e) {}
+      }
+      this.items = this.items.filter(z => z.id !== id);
+      this.saveLocal(); global.App.render();
+    },
+
+    flash(msg) {
+      const el = document.createElement('div');
+      el.className = 'flash'; el.textContent = msg;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
     },
 
     refreshTop() {
@@ -192,43 +298,60 @@
       global.App.wireTop();
     },
 
+    statusLabel() {
+      if (this.source === 'connecting') return { t: 'Connecting…', cls: '' };
+      if (this.source === 'live') return { t: 'Shared', cls: 'is-live' };
+      return { t: 'This browser only', cls: 'is-local' };
+    },
+
     /* ---------------------------- NOTES VIEW ------------------------- */
 
     render() {
       const S = global.CONTENT.SCREENS, ST = global.CONTENT.STAGES;
-      const all = this.all();
-      const rows = all
+      const rows = this.items
         .filter(n => this.filter === 'all' || n.type === this.filter)
+        .filter(n => this.showResolved || !n.resolved)
         .sort((a, b) => S.findIndex(s => s.id === a.screen) - S.findIndex(s => s.id === b.screen));
 
       const counts = {};
-      TYPES.forEach(t => counts[t.k] = all.filter(n => n.type === t.k).length);
-      const people = new Set(all.map(n => n.who || 'anonymous'));
+      TYPES.forEach(t => counts[t.k] = this.items.filter(n => n.type === t.k).length);
+      const open = this.items.filter(n => !n.resolved).length;
+      const people = new Set(this.items.map(n => n.who || 'anonymous'));
+      const st = this.statusLabel();
 
       return `<div class="notes">
         <div class="notes__bar">
           <div class="notes__filters">
-            <button data-f="all" aria-pressed="${this.filter === 'all'}">All ${all.length}</button>
+            <button data-f="all" aria-pressed="${this.filter === 'all'}">All ${this.items.length}</button>
             ${TYPES.map(t => `<button data-f="${t.k}" aria-pressed="${this.filter === t.k}">${t.label} ${counts[t.k]}</button>`).join('')}
           </div>
+          <button class="notes__toggle" data-showres aria-pressed="${this.showResolved}">
+            ${this.showResolved ? 'Hiding nothing' : 'Open only'}</button>
           <span class="topbar__spacer"></span>
-          ${this.imported.length ? `<span class="label">${people.size} reviewer${people.size > 1 ? 's' : ''}</span>` : ''}
-          <button class="btn-out" data-sheet="export">Export &amp; import</button>
+          <span class="label">${open} open · ${people.size} reviewer${people.size === 1 ? '' : 's'}</span>
+          <span class="conn ${st.cls}">${st.t}</span>
+          <button class="btn-out" data-sheet="export">Export</button>
         </div>
         ${rows.length ? rows.map(n => {
           const idx = S.findIndex(z => z.id === n.screen);
           const s = S[idx];
-          return `<div class="note">
+          const reps = (n.replies || []).length;
+          return `<div class="note ${n.resolved ? 'is-done' : ''}">
             <div class="note__where">
               <b>${idx + 1} · ${esc(s ? ST[s.stage].name : '')}</b>
               ${esc(s ? s.label : n.screen)}
-              ${n.mine === false ? `<br><span style="color:var(--maroon)">${esc(n.who || 'anonymous')}</span>` : ''}
+              <br><span style="color:var(--maroon)">${esc(n.who || 'anonymous')}</span>
             </div>
-            <div class="note__type">${esc(typeLabel(n.type))}</div>
-            <div class="note__text">${esc(n.text)}</div>
+            <div class="note__type">${esc(typeLabel(n.type))}${n.resolved ? '<br><span style="color:var(--mute-2)">Resolved</span>' : ''}</div>
+            <div>
+              <div class="note__text">${esc(n.text)}</div>
+              ${reps ? `<div class="note__replies">${(n.replies || []).map(r =>
+                `<div><b>${esc(r.who || 'anonymous')}</b> ${esc(r.text)}</div>`).join('')}</div>` : ''}
+            </div>
             <div class="note__act">
               <button data-jump="${n.screen}">Go</button>
-              ${n.mine !== false ? `<button data-del="${n.id}">Delete</button>` : ''}
+              <button data-res="${n.id}">${n.resolved ? 'Reopen' : 'Resolve'}</button>
+              ${n.mine ? `<button data-del="${n.id}">Delete</button>` : ''}
             </div>
           </div>`;
         }).join('') : `<div class="empty">No notes yet. Switch on Comment in the top bar, then click anywhere on a screen to leave one.</div>`}
@@ -237,10 +360,14 @@
 
     wire() {
       $$('[data-f]').forEach(b => b.onclick = () => { this.filter = b.dataset.f; global.App.render(); });
+      $$('[data-showres]').forEach(b => b.onclick = () => { this.showResolved = !this.showResolved; global.App.render(); });
       $$('[data-jump]').forEach(b => b.onclick = () => global.App.jump(b.dataset.jump));
+      $$('[data-res]').forEach(b => b.onclick = () => {
+        const n = this.items.find(z => z.id === b.dataset.res);
+        if (this.askName()) this.setResolved(b.dataset.res, !(n && n.resolved));
+      });
       $$('[data-del]').forEach(b => b.onclick = () => {
-        this.items = this.items.filter(z => z.id !== b.dataset.del);
-        this.persist(); global.App.render();
+        if (confirm('Delete this comment and its replies?')) this.remove(b.dataset.del);
       });
       $$('[data-sheet]').forEach(b => b.onclick = () => global.App.sheet(b.dataset.sheet));
     },
@@ -248,47 +375,46 @@
     /* ----------------------- EXPORT AND IMPORT ----------------------- */
 
     exportSheet() {
-      const mine = this.items.length, imp = this.imported.length;
-      return `<h2>Export and import</h2>
-        <p>${mine} note${mine === 1 ? '' : 's'} of your own${imp ? `, plus ${imp} imported from other people` : ''}.
-           Everything stays in this browser — nothing is sent anywhere.</p>
+      const st = this.statusLabel();
+      const open = this.items.filter(n => !n.resolved).length;
+      return `<h2>Export</h2>
+        <p><span class="conn ${st.cls}">${st.t}</span></p>
+        ${this.live()
+          ? `<p>Comments are shared. Everyone sees everyone else's as they arrive, and replies appear
+             without anyone refreshing. The export below is a snapshot for your own records.</p>`
+          : `<p>The shared board could not be reached, so comments are being kept in this browser only.
+             Export the JSON and send it on — anyone can load it back in.</p>`}
+        <p>${this.items.length} comment${this.items.length === 1 ? '' : 's'}, ${open} still open.</p>
 
         <div class="field">
-          <label>Your name, so your notes can be told apart. Optional.</label>
-          <input type="text" data-who value="${esc(this.who)}" placeholder="Leave blank to stay anonymous">
+          <label>Your name this session</label>
+          <input type="text" data-who value="${esc(this.who)}" placeholder="Type your name">
         </div>
 
-        <h3>Send your notes back</h3>
-        <p>JSON is the one to send. It carries the screen each note is pinned to and where on that
-           screen, so dropping it back in puts every pin exactly where you left it. CSV and Markdown
-           are for reading.</p>
+        <h3>Take a snapshot</h3>
+        <p>JSON carries the screen each comment is pinned to and where on that screen, so loading it
+           back in puts every pin exactly where it was. CSV and Markdown are for reading.</p>
         <div class="btn-row">
           <button class="btn-out btn-out--primary" data-dl="json">JSON</button>
           <button class="btn-out" data-dl="csv">CSV</button>
           <button class="btn-out" data-dl="md">Markdown</button>
         </div>
 
-        <h3>Load notes back in</h3>
-        <p>Drop the JSON files people send you. Their pins appear on the screens, in maroon, alongside
-           your own. Duplicates are ignored, so re-dropping the same file is safe.</p>
+        <h3>Load comments back in</h3>
+        <p>Drop a JSON file exported from here.${this.live()
+          ? ' They are added to the shared board, so everyone gets them.'
+          : ' They are added to this browser.'} Duplicates are skipped.</p>
         <div class="drop" data-drop>Drop JSON files, or click to choose
           <input type="file" accept=".json,application/json" multiple hidden data-file></div>
-        <div data-mergeout style="margin-top:12px"></div>
-
-        <h3>Clear</h3>
-        <div class="btn-row">
-          <button class="btn-out" data-clear="mine">Delete my notes</button>
-          ${imp ? `<button class="btn-out" data-clear="imported">Remove imported</button>` : ''}
-        </div>`;
+        <div data-mergeout style="margin-top:12px"></div>`;
     },
 
     wireExport(root) {
       const who = $('[data-who]', root);
       if (who) who.oninput = () => {
-        this.who = who.value.trim();
-        try { localStorage.setItem(WHO, this.who); } catch (e) {}
+        this.who = who.value.trim().slice(0, 60);
+        try { sessionStorage.setItem(NAME, this.who); } catch (e) {}
       };
-
       $$('[data-dl]', root).forEach(b => b.onclick = () => this.download(b.dataset.dl));
 
       const drop = $('[data-drop]', root), file = $('[data-file]', root);
@@ -299,48 +425,53 @@
         drop.ondrop = e => { e.preventDefault(); drop.classList.remove('over'); this.ingest(Array.from(e.dataTransfer.files), root); };
         file.onchange = () => this.ingest(Array.from(file.files), root);
       }
-
-      $$('[data-clear]', root).forEach(b => b.onclick = () => {
-        const what = b.dataset.clear;
-        if (!confirm(what === 'mine' ? 'Delete all of your own notes?' : 'Remove all imported notes?')) return;
-        if (what === 'mine') this.items = []; else this.imported = [];
-        this.persist(); global.App.closeSheet(); global.App.render();
-      });
     },
 
     ingest(files, root) {
-      const known = new Set(this.all().map(n => n.id));
+      const seen = new Set(this.items.map(n => (n.who || '') + '|' + n.screen + '|' + n.text));
       const valid = new Set(global.CONTENT.SCREENS.map(s => s.id));
-      let added = 0, skipped = 0, orphan = 0, names = [], pending = files.length;
+      let queue = [], skipped = 0, orphan = 0, names = [], pending = files.length;
       if (!pending) return;
 
       files.forEach(f => {
         const r = new FileReader();
-        r.onload = () => {
+        r.onload = async () => {
           try {
             const parsed = JSON.parse(r.result);
             const arr = Array.isArray(parsed) ? parsed : (parsed.notes || []);
             arr.forEach(n => {
               if (!n || !n.screen || !n.text) return;
               if (!valid.has(n.screen)) { orphan++; return; }
-              const id = n.id || ('i' + Math.random().toString(36).slice(2, 10));
-              if (known.has(id)) { skipped++; return; }
-              known.add(id);
-              this.imported.push({
-                id, screen: n.screen,
+              const key = (n.who || '') + '|' + n.screen + '|' + n.text;
+              if (seen.has(key)) { skipped++; return; }
+              seen.add(key);
+              queue.push({
+                screen: n.screen,
                 x: typeof n.x === 'number' ? n.x : 50,
                 y: typeof n.y === 'number' ? n.y : 50,
-                type: n.type || 'concept',
-                text: n.text,
-                who: n.who || (parsed.reviewer || 'anonymous'),
-                at: n.at || new Date().toISOString(),
-                mine: false
+                type: TYPES.some(t => t.k === n.type) ? n.type : 'concept',
+                text: String(n.text).slice(0, 3900),
+                who: (n.who || parsed.reviewer || 'anonymous')
               });
-              added++;
             });
             names.push(f.name);
           } catch (e) { names.push(f.name + ' — could not be read'); }
-          if (--pending === 0) { this.persist(); this.mergeOut(root, added, skipped, orphan, names); }
+
+          if (--pending === 0) {
+            let added = 0;
+            if (this.live()) {
+              for (const q of queue) { try { await global.Live.add(q); added++; } catch (e) {} }
+            } else {
+              queue.forEach(q => {
+                q.id = 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+                q.at = new Date().toISOString(); q.resolved = false; q.replies = []; q.mine = true;
+                this.items.push(q); added++;
+              });
+              this.saveLocal();
+            }
+            this.mergeOut(root, added, skipped, orphan, names);
+            global.App.render();
+          }
         };
         r.readAsText(f);
       });
@@ -349,74 +480,71 @@
     mergeOut(root, added, skipped, orphan, names) {
       const out = $('[data-mergeout]', root);
       if (!out) return;
-      const people = new Set(this.all().map(n => n.who || 'anonymous'));
-      const bits = [`${added} note${added === 1 ? '' : 's'} loaded`];
+      const bits = [`${added} comment${added === 1 ? '' : 's'} loaded`];
       if (skipped) bits.push(`${skipped} already here`);
       if (orphan) bits.push(`${orphan} pointed at screens that no longer exist`);
-
-      out.innerHTML = `<p style="font-size:12px;color:var(--mute);margin-bottom:8px">
-          ${bits.join(' · ')}. ${this.all().length} in total, from ${people.size} reviewer${people.size === 1 ? '' : 's'}.
-          <br><span style="color:var(--mute-2)">${esc(names.join(', '))}</span></p>
-        <div class="btn-row">
-          <button class="btn-out btn-out--primary" data-see>See them on the screens</button>
-          <button class="btn-out" data-mdl>Download everything as CSV</button>
-        </div>`;
+      out.innerHTML = `<p style="font-size:12px;color:var(--mute)">${bits.join(' · ')}.
+        <br><span style="color:var(--mute-2)">${esc(names.join(', '))}</span></p>
+        <div class="btn-row"><button class="btn-out btn-out--primary" data-see>See them</button></div>`;
       $('[data-see]', out).onclick = () => { global.App.closeSheet(); global.App.setView('notes'); };
-      $('[data-mdl]', out).onclick = () => blob(csv(this.all()), 'day1-wireframe-all-notes.csv', 'text/csv');
     },
 
     download(fmt) {
       const stamp = new Date().toISOString().slice(0, 10);
       const tag = (this.who || 'notes').replace(/[^a-z0-9]+/gi, '-').toLowerCase();
-      const mine = this.items.map(n => Object.assign({}, n, { who: n.who || this.who }));
+      const items = this.items;
 
       if (fmt === 'json') {
-        const payload = {
+        blob(JSON.stringify({
           schema: SCHEMA,
           exported: new Date().toISOString(),
-          reviewer: this.who || 'anonymous',
-          screens: global.CONTENT.SCREENS.length,
-          note: 'Drop this file into the wireframe’s Export and import panel to put every pin back where it was.',
-          notes: mine.map(n => {
+          board: this.live() ? 'shared' : 'local',
+          note: 'Drop this file into the wireframe’s Export panel to put every pin back where it was.',
+          notes: items.map(n => {
             const m = meta(n);
             return {
-              id: n.id, screen: n.screen, screenIndex: m.no, stage: m.stage, screenLabel: m.label,
+              screen: n.screen, screenIndex: m.no, stage: m.stage, screenLabel: m.label,
               x: n.x, y: n.y, anchor: 'percent-of-screen-box',
-              type: n.type, text: n.text, who: n.who || 'anonymous', at: n.at
+              type: n.type, text: n.text, who: n.who || 'anonymous', at: n.at,
+              resolved: !!n.resolved, replies: n.replies || []
             };
           })
-        };
-        blob(JSON.stringify(payload, null, 2), `day1-wireframe-${tag}-${stamp}.json`, 'application/json');
+        }, null, 2), `day1-wireframe-${tag}-${stamp}.json`, 'application/json');
       }
-      if (fmt === 'csv') blob(csv(mine), `day1-wireframe-${tag}-${stamp}.csv`, 'text/csv');
-      if (fmt === 'md')  blob(md(mine), `day1-wireframe-${tag}-${stamp}.md`, 'text/markdown');
+      if (fmt === 'csv') blob(csv(items), `day1-wireframe-${tag}-${stamp}.csv`, 'text/csv');
+      if (fmt === 'md')  blob(md(items), `day1-wireframe-${tag}-${stamp}.md`, 'text/markdown');
     }
   };
 
   /* ------------------------------ formats ---------------------------- */
+
+  function when(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return isNaN(d) ? '' : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+  }
 
   function meta(n) {
     const S = global.CONTENT.SCREENS, ST = global.CONTENT.STAGES;
     const i = S.findIndex(s => s.id === n.screen);
     const s = S[i];
     return {
-      no: i + 1,
-      stage: s ? ST[s.stage].name : '',
-      label: s ? s.label : '',
-      summary: s ? s.summary : '',
-      verb: s ? s.verb : '',
+      no: i + 1, stage: s ? ST[s.stage].name : '', label: s ? s.label : '',
+      summary: s ? s.summary : '', verb: s ? s.verb : '',
       link: location.origin + location.pathname + '#' + n.screen
     };
   }
 
   function csv(items) {
     const head = ['Reviewer', 'Screen no', 'Stage', 'Screen id', 'Screen', 'What the screen does',
-                  'Interaction', 'Comment type', 'Comment', 'x%', 'y%', 'Added', 'Link'];
+                  'Interaction', 'Comment type', 'Comment', 'Replies', 'Status', 'x%', 'y%', 'Added', 'Link'];
     const q = v => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
     const rows = items.slice().sort((a, b) => meta(a).no - meta(b).no).map(n => {
       const m = meta(n);
+      const reps = (n.replies || []).map(r => `${r.who}: ${r.text}`).join(' | ');
       return [n.who || 'anonymous', m.no, m.stage, n.screen, m.label, m.summary, m.verb,
-              typeLabel(n.type), n.text, n.x, n.y, n.at, m.link].map(q).join(',');
+              typeLabel(n.type), n.text, reps, n.resolved ? 'Resolved' : 'Open',
+              n.x, n.y, n.at, m.link].map(q).join(',');
     });
     return '﻿' + [head.map(q).join(','), ...rows].join('\r\n');
   }
@@ -427,13 +555,14 @@
       const m = meta(n);
       (byStage[m.stage] = byStage[m.stage] || []).push({ n, m });
     });
-    let out = `# Day 1 wireframe — review notes\n\n${items.length} notes`;
-    if (Notes.who) out += ` from ${Notes.who}`;
-    out += '\n';
+    let out = `# Day 1 wireframe — review notes\n\n${items.length} comments, ` +
+              `${items.filter(n => !n.resolved).length} open\n`;
     Object.keys(byStage).forEach(stage => {
       out += `\n## ${stage}\n`;
       byStage[stage].forEach(({ n, m }) => {
-        out += `\n**${m.no}. ${m.label}**  \n\`${typeLabel(n.type)}\` · ${n.screen}${n.who ? ' · ' + n.who : ''}\n\n${n.text}\n`;
+        out += `\n**${m.no}. ${m.label}** — \`${typeLabel(n.type)}\`${n.resolved ? ' · resolved' : ''}\n\n`;
+        out += `${n.who || 'anonymous'}: ${n.text}\n`;
+        (n.replies || []).forEach(r => { out += `\n> ${r.who}: ${r.text}\n`; });
       });
     });
     return out;

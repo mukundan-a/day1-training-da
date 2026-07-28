@@ -57,7 +57,7 @@
 
   const MAP5 = [
     { n: 'Day 0',              why: 'Get set up and take on the context',             mins: '6 min'  },
-    { n: 'Full-team kick-off', why: 'Build a hypothesis tree, agree the deliverable', mins: '10 min' },
+    { n: 'Full-team kick-off', why: 'Build a hypothesis tree, agree on the deliverable', mins: '10 min' },
     { n: 'Core team kick-off', why: 'Ways of working, and early ownership',           mins: '10 min' },
     { n: 'PD alignment',       why: 'How the two PDs split the project',              mins: '3 min'  },
     { n: 'Week 1',             why: 'Where today’s outputs end up',                   mins: '2 min'  }
@@ -103,7 +103,7 @@
   {
     id: 's0a', stage: 0, kind: 'splash', verb: 'READ', action: 'Start',
     label: 'The opening screen',
-    summary: 'User arrives, learns what they are about to go through and roughly how long it takes, and is told up front that nothing here is assessed.',
+    summary: 'User arrives and learns what the experience is, roughly how long it takes, and that nothing here is assessed.',
     beats: [
       'Sets the frame before anything is asked of them.',
       'Makes clear this is a benchmark to observe, not an exercise to pass.',
@@ -131,7 +131,7 @@
   {
     id: 's0b', stage: 0, kind: 'argument', verb: 'READ', action: 'Next',
     label: 'Why the first day matters',
-    summary: 'User is given the case for why Day 1 deserves this much attention, before being asked to spend time on it.',
+    summary: 'User is given four reasons why the first day of a project matters more than any other.',
     beats: [
       'Four reasons, each one a claim they could argue with.',
       'Establishes that the first day shapes the ten weeks after it.'
@@ -155,7 +155,6 @@
     summary: 'User sees the whole shape of what is ahead — five stages and how long each takes — so they can judge the commitment before starting.',
     beats: ['Nothing is open yet; this is orientation only.',
             'The same map reappears between stages so progress stays visible.'],
-    decision: 'The deck’s stage map repeats one description across Core team KO, PD alignment and Week 1, and every duration reads “X mins”. Durations here are taken from each stage intro.',
     body: () => `<div class="stack"><h2 class="s-h2">Five stages, about half an hour</h2>${map5(-1)}</div>`
   },
 
@@ -195,7 +194,7 @@
     app: 'outlook',
     id: 's1f1', stage: 1, kind: 'sim', verb: 'READ', action: 'Next',
     label: 'The staffing note arrives',
-    summary: 'User watches the project land in their inbox and clocks that the only thing asked of them before the kick-off is to skim the proposal.',
+    summary: 'User sees the staffing note and a follow-up from the PM arrive. The only thing asked of them is to skim the proposal.',
     beats: [
       'The staffing note is the entire brief at this point — project, client, dates, team.',
       'A second email from the PM takes the setup work off the team.',
@@ -224,7 +223,7 @@
     app: 'sharepoint',
     id: 's1f2', stage: 1, kind: 'sim', verb: 'EXPLORE', action: 'Next',
     label: 'The project folder',
-    summary: 'User is walked through the standard project folder so it already looks familiar the first time they are staffed for real.',
+    summary: 'Having read the staffing note, user opens the project folder and can look around any part of it.',
     beats: [
       'Every folder is open — this is about recognition, not hunting for something.',
       'Two folders are drawn out because the next two screens happen in them.'
@@ -257,7 +256,7 @@
     app: 'ppt',
     id: 's1f2b', stage: 1, kind: 'sim', verb: 'WATCH', action: 'Next',
     label: 'The documents get skimmed',
-    summary: 'User sees the proposal and a past qual being skimmed rather than studied, which sets the expected effort for Day 0.',
+    summary: 'Acting on the PM’s one ask, user watches the proposal and a past qual deck being skimmed rather than studied.',
     beats: ['Models the pace: fast, and looking for what already exists.'],
     notes: () => copy('Beat', 'Two documents open and scroll past quickly, over a few seconds.')
       + anno('The previous screen told the learner to read the proposal. This one shows it being read, because showing the pace works better than describing it.'),
@@ -280,7 +279,7 @@
     app: 'ppt',
     id: 's1f3', stage: 1, kind: 'sim', verb: 'DO', action: 'Next',
     label: 'Pinning facts from the brief',
-    summary: 'User reads the Partner’s context brief and pins the facts worth keeping, which builds a shared fact pack the whole team draws on.',
+    summary: 'A day or two before the kick-off the Partner posts a context brief. User reads it and pins facts into the team’s shared fact pack.',
     beats: [
       'The brief lands before the meeting, so senior input is already in play.',
       'Its third section, key tensions, is the part a proposal never contains.',
@@ -316,7 +315,7 @@
     app: 'ppt',
     id: 's1f4', stage: 1, kind: 'sim', verb: 'DECIDE', action: 'Accept task',
     label: 'The prep task is set',
-    summary: 'User is asked, along with everyone else including the PM, to draft their own SCQ before the meeting — nobody is handed the answer.',
+    summary: 'Still reading the brief, user is asked — along with everyone else including the PM — to draft their own SCQ before the meeting.',
     beats: [
       'The task arrives while they are still reading, so it lands in context.',
       'Framed as everyone drafting separately, not one person being assigned it.'
@@ -336,54 +335,53 @@
   {
     id: 's1f5', stage: 1, kind: 'exercise', verb: 'DO', action: 'Check',
     label: 'Writing your own SCQ',
-    summary: 'User drafts their own SCQ and problem statement and gets a score they can improve on, so iterating feels normal rather than like failing.',
+    summary: 'Taking up that task, user enters their own SCQ and problem statement, then presses Check for feedback from an AI coach.',
     beats: [
+      'The coach points at a specific line and says what to do about it, rather than returning a mark.',
       'Every source they need sits along the bottom and opens without leaving the screen.',
-      'The score is formative — it rises as they revise, and never blocks them.',
       'What they write is kept and comes back in the kick-off.'
     ],
     carry: { write: ['scq'] },
-    decision: 'Load-bearing. The SCQ must persist — it returns in the full-team kick-off, and that continuity is what makes the next stage land.',
     notes: () => copy('Prompt', 'The task from the PM repeated here as context for what the learner is now doing.')
-      + copy('Beat', 'Three passes at the bar: the score climbs, then clears.')
-      + anno('Iteration is how quality gets driven everywhere else at the firm. The bar is there to be cleared on the second or third pass, not the first.'),
-    anim: anim(6400, [
-      { at: 300,  do: el => $$('.scq-fill', el).forEach((n, i) => setTimeout(() => n.style.width = n.dataset.w, i * 220)) },
-      { at: 2200, do: el => setScore(el, 48, 41) },
-      { at: 3600, do: el => setScore(el, 71, 66) },
-      { at: 5000, do: el => setScore(el, 86, 84) },
-      { at: 6200, do: el => { setScore(el, 0, 0); $$('.scq-fill', el).forEach(n => n.style.width = '0%'); } }
+      + copy('Coach', 'Names the weak line and asks one question that would fix it. Never a grade on its own.')
+      + copy('Beat', 'Two passes: the coach flags the complication, the learner revises, the coach confirms and moves to the question.')
+      + anno('Iteration is how quality gets driven everywhere else at the firm. The coach is there to be argued with on the second or third pass, not obeyed on the first.'),
+    anim: anim(11000, [
+      { at: 300,  do: el => $$('.scq-fill', el).forEach((n, i) => setTimeout(() => n.style.width = n.dataset.w, i * 200)) },
+      { at: 2600, do: el => coach(el, 'c', 'Points at the complication: it restates the situation rather than saying what has changed.', 1) },
+      { at: 5600, do: el => { const b = $('[data-fix]', el); if (b) b.style.width = '78%'; coach(el, '', '', 0); } },
+      { at: 6400, do: el => coach(el, 'q', 'Confirms the complication now holds, and asks whether the question is answerable in four weeks.', 2) },
+      { at: 10200, do: el => { coach(el, '', '', 0); $$('.scq-fill', el).forEach(n => n.style.width = '0%'); const b = $('[data-fix]', el); if (b) b.style.width = '52%'; } }
     ]),
     body: () => `
-      <div class="stack">
-        <div class="grid3" style="flex:0 0 auto;height:42%">
-          ${[['S', 'Situation', '86%'], ['C', 'Complication', '78%'], ['Q', 'Question', '92%']].map(([k, n, w]) => `
-            <div class="card"><span class="tag">${k} · ${n}</span>
+      <div class="stack" style="gap:var(--s3)">
+        <div class="grid3" style="flex:0 0 auto;height:34%">
+          ${[['S', 'Situation', '86%', 's'], ['C', 'Complication', '78%', 'c'], ['Q', 'Question', '92%', 'q']].map(([k, n, w, id]) => `
+            <div class="card" data-fld="${id}"><span class="tag">${k} · ${n}</span>
               <div style="flex:1;display:flex;flex-direction:column;gap:6px;padding-top:2px">
-                <i class="bar scq-fill" data-w="${w}" style="width:0;transition:width .9s ease-out"></i>
-                <i class="bar scq-fill" data-w="${parseInt(w) - 22}%" style="width:0;transition:width .9s ease-out .1s"></i>
-                <i class="bar scq-fill bar--faint" data-w="${parseInt(w) - 40}%" style="width:0;transition:width .9s ease-out .2s"></i>
+                <i class="bar scq-fill" data-w="${w}" style="width:0;transition:width .8s ease-out"></i>
+                <i class="bar scq-fill${id === 'c' ? '' : ''}" ${id === 'c' ? 'data-fix' : ''} data-w="${parseInt(w) - 26}%" style="width:0;transition:width .8s ease-out .1s"></i>
+                <i class="bar scq-fill bar--faint" data-w="${parseInt(w) - 42}%" style="width:0;transition:width .8s ease-out .2s"></i>
               </div></div>`).join('')}
         </div>
+
         <div class="card card--focus" style="flex:0 0 auto">
           <span class="tag tag--maroon">Problem statement</span>
           <div style="display:flex;flex-direction:column;gap:6px">
-            <i class="bar scq-fill" data-w="94%" style="width:0;background:var(--maroon);opacity:.7;transition:width .9s ease-out .3s"></i>
-            <i class="bar scq-fill" data-w="62%" style="width:0;background:var(--maroon);opacity:.7;transition:width .9s ease-out .4s"></i>
+            <i class="bar scq-fill" data-w="94%" style="width:0;background:var(--maroon);opacity:.7;transition:width .8s ease-out .3s"></i>
+            <i class="bar scq-fill" data-w="62%" style="width:0;background:var(--maroon);opacity:.7;transition:width .8s ease-out .4s"></i>
           </div>
         </div>
-        <div style="display:flex;gap:var(--s5);align-items:center;flex-shrink:0">
-          ${['SCQ holds up', 'Statement follows'].map((n, i) => `
-            <div style="flex:1;display:flex;align-items:center;gap:10px">
-              <span class="s-micro" style="white-space:nowrap">${n}</span>
-              <div style="flex:1;height:4px;background:var(--fill-2);border-radius:2px;overflow:hidden">
-                <div class="sc-fill" data-k="${i}" style="height:100%;width:0;background:var(--mute-2);transition:width .5s"></div></div>
-              <b class="sc-pct" data-k="${i}" style="font-size:12px;color:var(--ink);min-width:32px;text-align:right;font-variant-numeric:tabular-nums">—</b>
-            </div>`).join('')}
+
+        <div class="coach" data-coach>
+          <span class="coach__who">${W.glyph('chat')}AI coach</span>
+          <span class="coach__msg">Waiting for a first draft.</span>
+          <span class="coach__pass" data-pass></span>
         </div>
+
         <div style="display:flex;gap:5px;flex-shrink:0">
           ${['Context brief', 'Proposal', 'Past quals', 'Fact pack'].map(r =>
-            `<span style="font-size:10px;color:var(--mute);border:1px solid var(--rule);border-bottom:none;border-radius:3px 3px 0 0;padding:5px 10px;background:var(--fill);display:inline-flex;gap:5px;align-items:center">${W.glyph('doc')}${r}</span>`).join('')}
+            `<span class="reftab">${W.glyph('doc')}${r}</span>`).join('')}
         </div>
       </div>`
   },
@@ -391,7 +389,7 @@
   {
     id: 's1f6a', stage: 1, kind: 'argument', verb: 'READ', action: 'Next',
     label: 'Why Day 0 mattered',
-    summary: 'User is shown what their preparation bought the team, so the effort reads as leverage rather than homework.',
+    summary: 'User is shown what their Day 0 preparation bought the team.',
     beats: ['Three claims, each one arguable.'],
     body: () => `
       <div class="stack">
@@ -476,7 +474,7 @@
     ]),
     body: () => W.teamsMeeting({
       tiles: [{ id: 'A' }, { id: 'T' }, { id: 'H' }, { id: 'You', you: true }],
-      side: { title: 'Agenda', items: ['Agree the problem', 'Build the starting answer', 'Agree the deliverable'] },
+      side: { title: 'Agenda', items: ['Agree on the problem', 'Build the starting answer', 'Agree on the deliverable'] },
       stage: `<div style="display:flex;flex-direction:column;gap:8px;opacity:.5">${W.bars(['72%', '88%', '64%', '80%'])}</div>
         <style>.tm-panel__row{opacity:0;transform:translateY(-4px);transition:all .35s}.tm-panel__row.in{opacity:1;transform:none}</style>`
     })
@@ -485,14 +483,13 @@
   {
     id: 's2f2', stage: 2, kind: 'exercise', verb: 'READ', action: 'Next',
     label: 'Your SCQ against theirs',
-    summary: 'User sees the SCQ they wrote in Day 0 side by side with their colleagues’, clocks that all three differ — mostly in the question — and the team works from there towards one shared problem statement.',
+    summary: 'The kick-off opens with the SCQs everyone wrote in Day 0 side by side. All three differ, mostly in the question, and the team works from there towards one shared problem statement.',
     beats: [
       'Their own draft is marked as theirs, so the earlier prep visibly pays off.',
       'The differences are surfaced rather than left to be hunted for.',
       'The point lands on its own: drafting alone first is what put three ideas in the room.'
     ],
     carry: { read: ['scq'] },
-    decision: 'Depends on the Day 0 input persisting. Without it this still works with three pre-written cards, but loses most of its force.',
     notes: () => copy('Cards', 'Each card carries one person’s situation, complication and question, in their own words.')
       + copy('Beat', 'The learner’s card loads first; the other two arrive beside it, then the diverging Q rows take a highlight.')
       + anno('All three SCQs are defensible, and the question is different in each one. If everyone had waited to hear the Partner’s version first, this meeting would have one idea in it instead of three.'),
@@ -521,7 +518,7 @@
   {
     id: 's2f3', stage: 2, kind: 'exercise', verb: 'DECIDE', action: 'Next',
     label: 'Finding the undefined words',
-    summary: 'User discovers that a problem statement everyone just agreed to contains four words nobody has actually defined, and that two of them become client questions.',
+    summary: 'With the three SCQs merged into one problem statement, user finds the four words in it that nobody has actually defined.',
     beats: [
       'The sentence looks settled, which is what makes the exercise land.',
       'Each word opens the question hiding inside it.',
@@ -556,39 +553,43 @@
   {
     id: 's2f4a', stage: 2, kind: 'exercise', verb: 'READ', action: 'Next',
     label: 'The hypothesis, stated flat',
-    summary: 'User watches the Partner commit to an answer before any research exists, and sits with the discomfort of that for a moment before it gets explained.',
+    summary: 'With the problem agreed, the Partner states a hypothesis as one flat claim. That claim becomes the top of the tree the team is about to build.',
     beats: [
-      'The claim is alone on the screen with nothing to soften it.',
-      'The definition only arrives after the pause has done its work.'
+      'The claim sits alone first, with nothing to soften it.',
+      'Branch stubs then sprout from it, showing where the next exercise goes.'
     ],
     notes: () => copy('Claim', 'The top-level hypothesis, stated flat as a claim, with no hedging.')
       + copy('Definition', 'Best answer to the client’s question, written before the research, specific enough that evidence can prove it wrong.')
-      + copy('Beat', 'The frame holds on the claim a beat longer than is comfortable. The definition panel then offers itself.'),
-    anim: anim(6000, [
-      { at: 500,  do: el => { const c = $('.claim-box', el); if (c) c.classList.add('in'); } },
-      { at: 3400, do: el => { const d = $('.defn-box', el); if (d) d.classList.add('in'); } },
-      { at: 5700, do: el => $$('.claim-box,.defn-box', el).forEach(n => n.classList.remove('in')) }
+      + copy('Beat', 'The frame holds on the claim a beat longer than is comfortable, then the definition offers itself and the branch stubs appear.'),
+    anim: anim(8000, [
+      { at: 400,  do: el => { const c = $('.tnode--l1', el); if (c) c.classList.add('in'); } },
+      { at: 3200, do: el => { const d = $('.defn-box', el); if (d) d.classList.add('in'); } },
+      { at: 5000, do: el => { const g = $('.tlegs', el); if (g) g.classList.add('in');
+        $$('.tnode--stub', el).forEach((n, i) => setTimeout(() => n.classList.add('in'), i * 180)); } },
+      { at: 7600, do: el => $$('.in', el).forEach(n => n.classList.remove('in')) }
     ]),
     body: () => `
-      <div class="stack" style="justify-content:center;align-items:center;gap:var(--s5)">
-        <div class="focus claim-box" style="max-width:56ch;width:100%;text-align:center;align-items:center">
-          <span class="s-micro">The claim</span>
-          <span style="display:flex;flex-direction:column;gap:8px;width:100%;align-items:center">
-            ${W.bars([['86%', 'live'], ['94%', 'live'], ['48%', 'live']])}</span>
+      <div class="stack" style="justify-content:center;gap:0">
+        <div class="ttree">
+          <div class="tnode tnode--l1"><span class="tnode__tag">L1 · the claim</span>
+            <span class="tnode__body">${W.bars([['92%', 'live'], ['64%', 'live']])}</span></div>
+          <div class="tlegs" data-n="3"></div>
+          <div class="trow">
+            ${[0,1,2].map(() => `<div class="tnode tnode--stub"><span class="tnode__tag">L2</span>
+              <span class="tnode__body">${W.bars([['80%','faint'],['52%','faint']])}</span></div>`).join('')}
+          </div>
         </div>
-        <div class="defn-box panel" style="max-width:56ch;width:100%">
+        <div class="defn-box panel" style="max-width:60ch;margin:var(--s4) auto 0;width:100%">
           <span class="s-eyebrow">What a hypothesis is</span>
           <span class="s-cap" style="font-style:italic">Best answer to the client’s question, written before the research, specific enough that evidence can prove it wrong.</span>
         </div>
-      </div>
-      <style>.claim-box,.defn-box{opacity:0;transform:translateY(8px);transition:all .5s}
-        .claim-box.in,.defn-box.in{opacity:1;transform:none}</style>`
+      </div>`
   },
 
   {
     id: 's2f4b', stage: 2, kind: 'exercise', verb: 'DECIDE', action: 'Next',
     label: 'Answering the real objection',
-    summary: 'User picks whichever doubt they actually hold about committing early, and gets a straight answer to that one rather than a generic reassurance.',
+    summary: 'Before anyone builds on that claim, user turns over whichever objection to committing early they actually hold, and gets an answer to that one.',
     beats: [
       'Four objections, phrased the way someone would really think them.',
       'The replies come from different people, because the honest answers differ in kind.'
@@ -618,7 +619,7 @@
   {
     id: 's2f4c', stage: 2, kind: 'exercise', verb: 'DECIDE', action: 'Next',
     label: 'The field narrows',
-    summary: 'User is shown the honest scale of the question, realises three people cannot cover it, and then sees the hypothesis cut it to a shortlist they could actually work through.',
+    summary: 'To show what the claim is for, user sees the full field of research topics, then sees the hypothesis cut it to a shortlist three people could work through.',
     beats: [
       'Every topic on the field is legitimately worth studying.',
       'Applying the claims fades out everything that would not test one.',
@@ -676,68 +677,86 @@
 
   {
     id: 's2f5', stage: 2, kind: 'exercise', verb: 'DO', action: 'Check',
-    label: 'Building the branches',
-    summary: 'User breaks the top claim into what would have to be true for it to hold, and learns as much from the wrong options as the right ones.',
+    label: 'Building the hypothesis tree',
+    summary: 'Now user builds the tree out: placing L2 branches under the claim, editing them, adding one and drilling one down, then pressing Check for feedback from an AI coach.',
     beats: [
-      'The bank contains decoys: one out of scope, one an activity rather than a claim, one true but untestable.',
-      'Picking one up and putting it back is part of the learning, not a mistake.',
-      'Clearing the bar turns their rough tree into the team’s real one.'
+      'The tree is drawn as a tree: the claim on top, branches beneath it, connected.',
+      'Branches can be added, edited and drilled a level further down.',
+      'The bank holds decoys. The coach names which one and why, rather than marking it wrong.'
     ],
     carry: { write: ['tree'] },
     notes: () => copy('Prompt', 'The question that drives every hypothesis tree: for this claim to be true, what would have to be true?')
-      + copy('Beat', 'Candidates drag into three slots. A decoy gets placed, then withdrawn with its reason shown.'),
-    anim: anim(8600, [
-      { at: 800,  do: el => drop(el, 0, 0) },
-      { at: 2000, do: el => drop(el, 1, 3) },
-      { at: 3200, do: el => { unfill(el, 1); mark(el, 3, 'activity, not a claim'); } },
-      { at: 4400, do: el => drop(el, 1, 2) },
-      { at: 5600, do: el => drop(el, 2, 4) },
-      { at: 6600, do: el => setScore(el, 92, 88, 96) },
-      { at: 8300, do: el => reset(el) }
+      + copy('Controls', 'Per branch: edit the wording, drill down a level, remove. Plus add branch on the row itself.')
+      + copy('Coach', 'Names the decoy and what is wrong with it, then confirms when the three branches hold.')
+      + copy('Beat', 'Two branches land, a decoy is placed and withdrawn, a fourth is added and one is drilled to L3.'),
+    anim: anim(13000, [
+      { at: 600,  do: el => tdrop(el, 0, 0) },
+      { at: 1900, do: el => tdrop(el, 1, 3) },
+      { at: 3100, do: el => { tclear(el, 1); tmark(el, 3, 'activity, not a claim');
+        coach(el, '', 'Names the decoy and why: it is an activity, not something evidence could prove wrong.', 1); } },
+      { at: 4600, do: el => tdrop(el, 1, 2) },
+      { at: 5900, do: el => tdrop(el, 2, 4) },
+      { at: 7200, do: el => { const r = $('.trow', el); if (r) r.classList.add('four'); tdrop(el, 3, 1); } },
+      { at: 8600, do: el => { const d = $('.tdrill', el); if (d) d.classList.add('in'); } },
+      { at: 10000, do: el => coach(el, '', 'Confirms all four branches are claims, testable and in scope.', 2) },
+      { at: 12400, do: el => treset(el) }
     ]),
     body: () => `
-      <div class="stack">
+      <div class="stack" style="gap:var(--s3)">
         <div class="focus focus--tight" style="flex-shrink:0">
           <span class="s-micro">For this claim to be true, what would have to be true?</span>
-          <span style="display:flex;flex-direction:column;gap:6px">${W.bars([['82%', 'live'], ['54%', 'live']])}</span>
         </div>
-        <div class="row">
-          <div style="flex:1.4;display:flex;flex-direction:column;gap:9px;min-height:0">
-            ${[0, 1, 2].map(i => `<div class="slot" data-s="${i}" style="flex:1;border:1px dashed var(--mute-2);border-radius:3px;display:flex;align-items:center;padding:0 14px;font-size:11.5px;color:var(--mute-2);transition:all .3s">Branch ${i + 1}</div>`).join('')}
+
+        <div class="row" style="gap:var(--s4)">
+          <div class="ttree" style="flex:2.2">
+            <div class="tnode tnode--l1 in"><span class="tnode__tag">L1 · the claim</span>
+              <span class="tnode__body">${W.bars([['88%', 'live'], ['56%', 'live']])}</span></div>
+            <div class="tlegs in" data-n="3"></div>
+            <div class="trow">
+              ${[0,1,2,3].map(i => `<div class="tnode tnode--slot" data-s="${i}">
+                <span class="tnode__tag">L2</span>
+                <span class="tnode__body tnode__empty">Branch ${i + 1}</span>
+                <span class="tnode__ctrls">
+                  <i title="Edit">${W.glyph('doc')}</i><i title="Drill down">${W.glyph('down')}</i><i title="Remove">×</i>
+                </span></div>`).join('')}
+              <button class="tadd">+ Add branch</button>
+            </div>
+            <div class="tdrill">
+              <div class="tlegs in" data-n="2" style="height:14px"></div>
+              <div class="trow trow--l3">
+                ${[0,1].map(() => `<div class="tnode tnode--l3"><span class="tnode__tag">L3</span>
+                  <span class="tnode__body">${W.bars([['76%','faint']])}</span></div>`).join('')}
+              </div>
+            </div>
           </div>
+
           <div style="flex:1;display:flex;flex-direction:column;gap:6px;min-height:0">
-            <span class="s-micro">Candidates</span>
+            <span class="s-micro">Candidate sub-claims</span>
             <div style="display:flex;flex-direction:column;gap:5px;flex:1;justify-content:space-between">
-              ${[0, 1, 2, 3, 4, 5].map(i => `<div class="bnk" data-b="${i}" style="border:1px solid var(--rule);border-radius:3px;padding:6px 9px;font-size:11px;color:var(--ink);display:flex;justify-content:space-between;gap:8px;transition:all .3s">
-                <span>Candidate ${i + 1}</span><em class="why" style="font-style:normal;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute-2)">—</em></div>`).join('')}
+              ${[0,1,2,3,4,5].map(i => `<div class="bnk" data-b="${i}">
+                <span>Candidate ${i + 1}</span>
+                <em class="why">—</em></div>`).join('')}
             </div>
           </div>
         </div>
-        <div style="display:flex;gap:var(--s4);align-items:center;flex-shrink:0">
-          ${['Is a claim', 'Testable', 'In scope'].map((n, i) => `
-            <div style="flex:1;display:flex;align-items:center;gap:9px">
-              <span class="s-micro" style="white-space:nowrap">${n}</span>
-              <div style="flex:1;height:4px;background:var(--fill-2);border-radius:2px;overflow:hidden">
-                <div class="sc-fill" data-k="${i}" style="height:100%;width:0;background:var(--mute-2);transition:width .5s"></div></div>
-              <b class="sc-pct" data-k="${i}" style="font-size:12px;min-width:32px;text-align:right;font-variant-numeric:tabular-nums">—</b>
-            </div>`).join('')}
+
+        <div class="coach" data-coach>
+          <span class="coach__who">${W.glyph('chat')}AI coach</span>
+          <span class="coach__msg">Waiting for three branches.</span>
+          <span class="coach__pass" data-pass></span>
         </div>
-      </div>
-      <style>.slot.filled{border-style:solid;border-color:var(--maroon);background:var(--soft);color:var(--maroon)}
-        .bnk.used{opacity:.3}.bnk.bad .why{color:var(--maroon)}</style>`
+      </div>`
   },
 
   {
-    app: 'ppt',
     id: 's2f6', stage: 2, kind: 'sim', verb: 'READ', action: 'Next',
     label: 'What a real Day 1 output looks like',
-    summary: 'User sees the genuine artefact this project ended Day 1 with — unfinished, with a broken sentence and an unfilled placeholder still in it — and clocks that this is the standard, not a polished version.',
+    summary: 'Once the tree is drilled, user sees the real Day 1 output from this project — the hypothesis-driven executive summary, left exactly as it was, unfinished.',
     beats: [
       'Shown exactly as it was left, because the imperfections are the teaching.',
       'Two flaws are called out rather than quietly fixed.',
       'The team stopped because the meeting ended, not because the thinking was done.'
     ],
-    decision: 'The real slide is in the previous Dalberg template. Show it as it was, or re-render in the current one?',
     notes: () => copy('Annotation 1', 'Points at a sentence in the tensions section that does not parse.')
       + copy('Annotation 2', 'Points at a yellow placeholder the team had not filled in.')
       + anno('This is the most useful artefact in the archive, because it shows what the end of a real Day 1 actually looks like, which is nothing like the polished version that circulates later.'),
@@ -772,7 +791,7 @@
     app: 'teams',
     id: 's2f7', stage: 2, kind: 'sim', verb: 'WATCH', action: 'Next',
     label: 'Agreeing the deliverable',
-    summary: 'User watches the team settle what they are producing and who reads it in about two minutes, and clocks that this cheap decision is the expensive one to defer.',
+    summary: 'With the tree done, user watches the team agree in about two minutes what the deliverable is and who reads it.',
     beats: [
       'Deliberately anticlimactic after the hypothesis work.',
       'A deck and a report are different arguments, not the same one in different clothes.'
@@ -800,7 +819,7 @@
   {
     id: 's2f8a', stage: 2, kind: 'argument', verb: 'READ', action: 'Next',
     label: 'Why the kick-off mattered',
-    summary: 'User is shown what those two hours actually bought, including the reframe that changed what the project was about.',
+    summary: 'User is shown what the two-hour kick-off produced, including the reframe that changed the project.',
     beats: ['Three claims, and a recap of what they personally did in the session.'],
     notes: () => anno('The recap covers which branches the learner placed first, which decoys they picked up and put back, and how many passes it took.'),
     body: () => `
@@ -847,7 +866,7 @@
   {
     id: 's3intro', stage: 3, kind: 'intro', verb: 'READ', action: 'Begin',
     label: 'What the core team kick-off covers',
-    summary: 'User learns this smaller session is the one that belongs to the team, run by the PM without the Partner in the room.',
+    summary: 'User learns the afternoon session is run by the PM, without the Partner, and is mostly about how the team will work together.',
     beats: ['Most of the time goes on agreeing how the team will work together.'],
     notes: () => copy('Copy', 'A line explaining this is a smaller session later the same day, run by the PM, with the Partner not in the room.'),
     body: () => `
@@ -857,7 +876,7 @@
           ['Fill in your working preferences before the session',
            'Watch the hypothesis tree become a dot-dash storyline',
            'Flag your experience against the research plan',
-           'Agree the team’s norms — where most of your time goes'],
+           'Agree on the team’s norms — where most of your time goes'],
           ['Explain what a dot-dash storyline is and where it comes from',
            'Say what would prove and what would kill your own branch',
            'Hold a norms conversation specific enough to point to later'])}
@@ -868,7 +887,7 @@
     app: 'outlook',
     id: 's3f1', stage: 3, kind: 'sim', verb: 'READ', action: 'Next',
     label: 'The deck and the form arrive',
-    summary: 'User gets the kick-off deck and one small ask before the afternoon, and learns the PM has already drafted the storyline and workplan for them to argue with.',
+    summary: 'Straight after the morning session, user receives the core team kick-off deck and a request to fill in a preferences form before the afternoon.',
     beats: [
       'Sets the expectation that the team is reacting to a draft, not building from nothing.',
       'The single ask takes five minutes and is deliberately made in writing.'
@@ -894,13 +913,12 @@
     app: 'forms',
     id: 's3f2', stage: 3, kind: 'sim', verb: 'DO', action: 'Submit',
     label: 'Filling in your preferences',
-    summary: 'User answers three honest questions about how they work, knowing the whole team will see the answers, which is what makes the later conversation useful.',
+    summary: 'User answers three questions about how they work. The answers go to the whole team later in this stage.',
     beats: [
       'No scoring and no right answer — the prompt says so explicitly.',
       'Takes about five minutes, and the answers come back later in this stage.'
     ],
     carry: { write: ['prefs'] },
-    decision: 'Second persistence requirement — answers must return in Frame 7. Question set and wording come from the core team kick-off deck, still to be uploaded.',
     notes: () => copy('Prompt', 'Asks the learner to answer for themselves rather than for the version a new team might want, and notes that everyone’s answers go up on screen.')
       + copy('Beat', 'Three question groups, answered in turn, with the progress bar filling.'),
     anim: anim(7200, [
@@ -923,7 +941,7 @@
     app: 'meeting',
     id: 's3f3', stage: 3, kind: 'sim', verb: 'READ', action: 'Next',
     label: 'A smaller room, without the Partner',
-    summary: 'User sees a visibly smaller meeting and is told why the Partner is absent rather than left to wonder, and hears the three things the PM wants by the end.',
+    summary: 'User joins a smaller meeting without the Partner, and hears the three things the PM wants by the end of it.',
     beats: [
       'The absence is explained, which matters more than it sounds.',
       'The last item is flagged as the one to leave most time for.'
@@ -946,7 +964,7 @@
   {
     id: 's3f4', stage: 3, kind: 'exercise', verb: 'EXPLORE', action: 'Next',
     label: 'The tree becomes the storyline',
-    summary: 'User watches the morning’s hypothesis tree rotate into the storyline of the final deliverable, and clocks that the storyline is not a new document at all.',
+    summary: 'After agreeing on the hypothesis tree, user sees how that tree turns into a dot-dash storyline — the outline of the final deliverable, section by section.',
     beats: [
       'Each top-level claim becomes a section heading.',
       'The sub-claims line up as the points that section has to make.',
@@ -987,7 +1005,7 @@
     app: 'excel',
     id: 's3f5', stage: 3, kind: 'sim', verb: 'DECIDE', action: 'Next',
     label: 'Flagging what you already know',
-    summary: 'User is invited to say where they have relevant experience or know a source, at the point where it can still change who does what.',
+    summary: 'With the storyline set, user can flag relevant experience or suggest a source against each row of the PM’s half-empty research plan.',
     beats: [
       'The plan is visibly half-empty, and the gaps are stated to be real gaps.',
       'Flagging experience is modelled as normal for a junior person, not showing off.'
@@ -1027,7 +1045,7 @@
   {
     id: 's3f6', stage: 3, kind: 'exercise', verb: 'EXPLORE', action: 'Next',
     label: 'Planned against what happened',
-    summary: 'User compares the workplan written on Day 1 with what the project actually did, and takes away that getting the order right matters more than getting the dates right.',
+    summary: 'User compares the workplan written on Day 1 with what the project actually did.',
     beats: [
       'The research phase ran closer to six weeks than four.',
       'The project closed in September, not July.',
@@ -1051,7 +1069,7 @@
   {
     id: 's3f7', stage: 3, kind: 'exercise', verb: 'DO', action: 'Add context',
     label: 'Everyone’s preferences, together',
-    summary: 'User sees the whole team’s submitted answers at once, including their own, then hears the context behind each — which is the part the form could not capture.',
+    summary: 'Later in the same session, everyone’s submitted preferences go up at once, including user’s own, and each person talks through theirs.',
     beats: [
       'The spread is visible before anyone speaks, which is why it was collected in writing.',
       'Some of the context is specific and inconvenient, which is the point.',
@@ -1086,8 +1104,8 @@
 
   {
     id: 's3f8', stage: 3, kind: 'exercise', verb: 'DO', action: 'Agree',
-    label: 'Agreeing the norms',
-    summary: 'User takes part in turning a generic norms template into commitments specific enough that someone could actually be found to have broken them.',
+    label: 'Agreeing on the norms',
+    summary: 'With the preferences on the table, user takes part in turning a generic norms template into specific commitments for this team.',
     beats: [
       'This is the live activity of the stage and where most of the time should go.',
       'Where submitted preferences conflict, the conflict is on screen and gets resolved with them in the room.'
@@ -1121,7 +1139,7 @@
   {
     id: 's3f9a', stage: 3, kind: 'argument', verb: 'READ', action: 'Next',
     label: 'Why the afternoon mattered',
-    summary: 'User is shown that the storyline they just watched being built is the skeleton of the published deliverable, and that named norms are the ones you can hold people to.',
+    summary: 'User is shown what the afternoon session produced and why each part of it matters.',
     beats: [],
     body: () => `
       <div class="stack">
@@ -1142,7 +1160,7 @@
     anim: anim(7000, [{ at: 300, do: el => tabCycle(el, 0) }, { at: 3600, do: el => tabCycle(el, 1) }]),
     tabsData: () => [
       { label: 'Process · has this happened?', html: roles({ head: 'Checklist items', body: [
-        ['P/AP', ['Stepped out and let the core team build the plan', 'Agreed when you will review the storyline and workplan']],
+        ['P/AP', ['Stepped out and let the core team build the plan', 'Agreed on when you will review the storyline and workplan']],
         ['SPM/PM', ['Sent the deck and collected preferences beforehand', 'Drafted a first-cut storyline from the tree', 'Drafted a research plan and workplan with gaps left visible', 'Ran the norms conversation', 'Said your own preferences out loud']],
         ['SC/C', ['Filled in your preferences honestly beforehand', 'Flagged relevant past experience', 'Suggested sources or activities', 'Added the context behind your own preferences']],
         ['AC/AN', ['Filled in your preferences honestly beforehand', 'Flagged experience, including from before Dalberg', 'Understood which part of the storyline you are on', 'Added the context behind your own preferences']]
@@ -1186,7 +1204,7 @@
     app: 'outlook',
     id: 's4f1', stage: 4, kind: 'sim', verb: 'DECIDE', action: 'Reply or skip',
     label: 'Asked before the meeting',
-    summary: 'User sees a meeting on the calendar they are not part of, and is asked in advance whether they need anything built into how the Partners split the work.',
+    summary: 'At the end of the day the two Partners meet without the team. Beforehand, user is asked whether they need anything built into how they split the work.',
     beats: [
       'The exclusion is explained rather than glossed over.',
       'Replying is genuinely optional, and skipping costs nothing.'
@@ -1267,7 +1285,7 @@
   {
     id: 's4f3a', stage: 4, kind: 'argument', verb: 'READ', action: 'Next',
     label: 'Why PD alignment mattered',
-    summary: 'User learns this stage exists because of what people said in the Pulse survey, and what twenty minutes of written agreement prevents.',
+    summary: 'User learns why this stage was added, and what twenty minutes of written agreement prevents.',
     beats: [],
     body: () => `
       <div class="stack">
@@ -1288,7 +1306,7 @@
     anim: anim(7000, [{ at: 300, do: el => tabCycle(el, 0) }, { at: 3600, do: el => tabCycle(el, 1) }]),
     tabsData: () => [
       { label: 'Process · has this happened?', html: roles({ head: 'Checklist items', body: [
-        ['P/AP', ['Asked the team what they need from the split', 'Agreed who leads the hypothesis and who leads the client', 'Agreed how coaching splits and how location affects review', 'Agreed a feedback cadence tied to checkpoints', 'Written it down and sent it']],
+        ['P/AP', ['Asked the team what they need from the split', 'Agreed on who leads the hypothesis and who leads the client', 'Agreed on how coaching splits and how location affects review', 'Agreed on a feedback cadence tied to checkpoints', 'Written it down and sent it']],
         ['SPM/PM', ['Received the note and know what to route where', 'Put the agreed feedback points in the calendar']],
         ['SC/C and AC/AN', ['Read the note', 'Know who to go to on content and who on client work', 'Know when to expect feedback, and that you can ask sooner']]
       ]})},
@@ -1328,7 +1346,7 @@
   {
     id: 's5f1', stage: 5, kind: 'exercise', verb: 'WATCH', action: 'Next',
     label: 'The artefacts grow, one claim fails',
-    summary: 'User watches the four things they built on Day 1 fill out across the week, and sees one branch of the tree fail — which is the process working, not breaking.',
+    summary: 'Jumping forward a week, user watches the four Day 1 artefacts fill out day by day, and one branch of the hypothesis tree fail.',
     beats: [
       'The storyline becomes a deck with a page count; the plan gets names and dates.',
       'The fact pack thickens as colleagues drop things into it.',
@@ -1358,7 +1376,7 @@
     app: 'ppt',
     id: 's5f2', stage: 5, kind: 'sim', verb: 'READ', action: 'Next',
     label: 'Reviewing the deck while it is empty',
-    summary: 'User sees the first review land on an empty deck, aimed at argument and structure, and clocks how much cheaper a structural fix is now than in week four.',
+    summary: 'As the storyline becomes a deck, user sees the first review land on it while it is still empty, aimed at argument and structure.',
     beats: [
       'There is no prose yet, so there is nothing to comment on but the argument.',
       'The review markers match the responsibilities note exactly — the first proof it is being kept.'
@@ -1386,7 +1404,7 @@
   {
     id: 's5f3', stage: 5, kind: 'argument', verb: 'READ', action: 'Next',
     label: 'Why the preview was worth showing',
-    summary: 'User takes away that being wrong early is cheap, and that Day 1 is what makes an early review possible at all.',
+    summary: 'User is shown why finding a claim wrong in week one is the cheap outcome.',
     beats: [],
     notes: () => anno('This stage has no checklists, because it is a preview rather than a part of Day 1.'),
     body: () => `
@@ -1422,7 +1440,7 @@
   {
     id: 'fin2', stage: 6, kind: 'argument', verb: 'READ', action: 'Next',
     label: 'What happened to the real hypothesis',
-    summary: 'User finds out what became of the five claims they watched the team commit to, and that being unfinished but specific is what a good Day 1 looks like.',
+    summary: 'To close, user finds out what became of the five claims the team committed to on Day 1.',
     beats: [],
     body: () => `
       <div class="stack">
@@ -1457,6 +1475,17 @@
      ANIMATION HELPERS
      ======================================================================= */
 
+  /* the coach points at a field and says one useful thing about it */
+  function coach(el, field, msg, pass) {
+    $$('[data-fld]', el).forEach(n => n.classList.toggle('flagged', !!field && n.dataset.fld === field));
+    const box = $('[data-coach]', el);
+    const m = $('.coach__msg', el);
+    const p = $('[data-pass]', el);
+    if (box) box.classList.toggle('on', !!pass);
+    if (m && msg) m.textContent = msg;
+    if (p) p.textContent = pass ? 'Pass ' + pass : '';
+  }
+
   function setScore(el, a, b, c) {
     [a, b, c].forEach((v, k) => {
       if (v === undefined) return;
@@ -1490,6 +1519,38 @@
     const l = $('.pair-l', el), r = $('.pair-r', el);
     if (l) l.innerHTML = W.bars(PAIRS[i][0]);
     if (r) r.innerHTML = W.bars(PAIRS[i][1]);
+  }
+
+  function tdrop(el, slot, b) {
+    const s2 = el.querySelector('.tnode--slot[data-s="' + slot + '"]');
+    const n = el.querySelector('.bnk[data-b="' + b + '"]');
+    if (s2) {
+      s2.classList.add('filled');
+      const body = s2.querySelector('.tnode__body');
+      body.classList.remove('tnode__empty');
+      body.innerHTML = W.bars([['84%', ''], ['58%', 'faint']]);
+    }
+    if (n) n.classList.add('used');
+  }
+  function tclear(el, slot) {
+    const s2 = el.querySelector('.tnode--slot[data-s="' + slot + '"]');
+    if (s2) {
+      s2.classList.remove('filled');
+      const body = s2.querySelector('.tnode__body');
+      body.classList.add('tnode__empty');
+      body.textContent = 'Branch ' + (slot + 1);
+    }
+  }
+  function tmark(el, b, why) {
+    const n = el.querySelector('.bnk[data-b="' + b + '"]');
+    if (n) { n.classList.remove('used'); n.classList.add('bad'); const w = $('.why', n); if (w) w.textContent = why; }
+  }
+  function treset(el) {
+    [0,1,2,3].forEach(i => tclear(el, i));
+    const r = $('.trow', el); if (r) r.classList.remove('four');
+    const d = $('.tdrill', el); if (d) d.classList.remove('in');
+    $$('.bnk', el).forEach(n => { n.classList.remove('used', 'bad'); const w = $('.why', n); if (w) w.textContent = '—'; });
+    coach(el, '', 'Waiting for three branches.', 0);
   }
 
   function drop(el, slot, b) {
@@ -1651,6 +1712,91 @@
     }
   ];
 
+
+  /* ==========================================================================
+     RECAP — the agreed table, kept as written. Flags mark where the
+     walkthrough differs from it.
+     ======================================================================= */
+
+  const RECAP = [
+    {
+      stage: 'Day 0', activity: 'Preparation',
+      outputs: ['Project folder',
+                'A sense of client context, problem statement, proposed approach, and key stakeholders'],
+      process: ['Set up project folder on OneDrive',
+                'Download relevant client documents (e.g. proposal), quick literature review (AI-driven+direct)',
+                'Set up initial set of meetings (e.g. IKO Day 1 Problem solving)'],
+      content: {
+        'PDs': ['Prep Day 0 brief with context, client notes, tensions'],
+        'Core team': ['Read the proposal/additional client materials',
+                      'Read day 0 brief from PDs',
+                      'Review KM to see if similar Dalberg projects exist, consider speaking with teams that have worked in the same sector/clients',
+                      'Come up with early questions (e.g., use issue trees, day 1 bot)',
+                      'Develop individual hypo trees',
+                      'Collate a fact pack for the project']
+      },
+      why: ['Understanding of client context',
+            'Quickly gets teams up to speed',
+            'Ensures that IKO is content and brainstorm focused, vs process/PDs talking at teams to get them up to speed'],
+      flags: ['The walkthrough shows the project site in SharePoint rather than OneDrive.',
+              'The AI-driven literature review and the day 1 bot are not shown anywhere in the walkthrough.',
+              'Here each person develops an individual hypo tree. In the walkthrough they draft an SCQ and problem statement, and the tree is built together in the kick-off.']
+    },
+    {
+      stage: 'Day 1', activity: 'IKO',
+      outputs: ['Clearly articulated problem statement',
+                'Day 1 hypothesis tree',
+                'A sense of workstreams and final deliverable Table of Contents (TOC)'],
+      process: [],
+      content: {
+        'PDs': ['Lead content brainstorm, either by (1) coming with exec summary/hypo tree for team, (2) building with the team during IKO, or (3) review PM + team first hypo tree',
+                'Communicate additional client contexts/early thoughts to the team'],
+        'Core team': ['Discuss and align on day 1 hypo tree/exec summary',
+                      'Refine and articulate clear problem statement.',
+                      'Align with PD on deliverable format + TOC']
+      },
+      why: ['Alignment across the team on what we’re aiming for',
+            'Help identify what analyses can be prioritized vs deprioritized',
+            'Avoid churn and wasted time by establishing what workstreams look like and the type of analyses expected'],
+      flags: ['The walkthrough calls this the full-team kick-off, with the content jam.']
+    },
+    {
+      stage: 'Day 1', activity: 'Core team kick-off',
+      outputs: ['Dot-dash storyline/exec summary', 'A preliminary research plan',
+                'Ownership of workstreams', 'PM-team working and WLB norms'],
+      process: ['Schedule 1 hour KO', 'Schedule daily check ins',
+                'Fill out WLB norms, working styles, personal development goals'],
+      content: {
+        'Core team': ['Based on aligned hypo tree, layout what we need to prove, how, and by whom',
+                      'Discussion on working and WLB norms (PDs may join for these too)']
+      },
+      why: ['Clarity over workstreams and research plan',
+            'Outlines expectations and preferences across the team'],
+      flags: ['Personal development goals are listed here but are not covered in the walkthrough’s norms conversation.']
+    },
+    {
+      stage: 'Day 1', activity: 'PD alignment on responsibilities',
+      outputs: ['Note from PDs explaining how they intend to engage with team and split responsibilities'],
+      process: ['30min call between co-PDs'],
+      content: {
+        'PDs': ['Agree on what role each PD will play (e.g., content review vs client lead)',
+                'Communicate expectations to the team']
+      },
+      why: ['Clarity across team on which PD to go to for what'],
+      flags: ['The walkthrough adds a step before the call, where the team is asked what they need built into the split.']
+    },
+    {
+      stage: 'Week 1', activity: 'Storylining',
+      outputs: ['Storyline of final deliverable'],
+      process: [],
+      content: {
+        'PM': ['Build skeleton deck - executive summary forms lead line, workplan forms body of the slide']
+      },
+      why: ['Provides proposed ‘final answer’ for team to fill out'],
+      flags: ['The walkthrough treats Week 1 as a preview the learner watches, not a stage they go through.']
+    }
+  ];
+
   const PROGRESS = { 0: -1, 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5 };
 
   const CARRY = [
@@ -1660,6 +1806,6 @@
     { k: 'facts', label: 'Facts' }
   ];
 
-  global.CONTENT = { SCREENS, STAGES, MAP5, PROGRESS, CARRY };
+  global.CONTENT = { SCREENS, STAGES, MAP5, PROGRESS, CARRY, RECAP };
 
 })(window);

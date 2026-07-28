@@ -7,12 +7,14 @@ Static site. No build step, no dependencies, no backend.
 
 ---
 
-## Three views
+## Views
 
 | | |
 |---|---|
-| **Walk** | One screen at a time. Arrow keys, the two buttons, or click either faded edge of the screen. |
-| **Storyboard** | Every stage as a card. Open one to get what actually happens in it, what the user puts in, what comes out, and each screen in order. |
+| **Home** | What this is and the four ways in. |
+| **Recap** | The agreed "codified Day 1" table, kept as written, with small flags where the walkthrough differs. |
+| **Storyboard** | Every stage as a card. Open one for what happens in it, what the user puts in, what comes out, and each screen in order. |
+| **Walkthrough** | One screen at a time. Arrow keys, the two buttons, or click either faded edge of the screen. |
 | **Notes** | Every comment, filterable, exportable, importable. |
 
 Nothing inside the panel is clickable. Anything that would be interactive plays as a loop, so you
@@ -26,7 +28,16 @@ Switch on **Comment**, then click anywhere on a screen to drop a pin. Comments a
 **Concept** (default), **Flow & state**, **Screen**, **Copy** — so concept feedback separates
 cleanly from UX feedback.
 
-Notes live in your browser. No login, no backend.
+Comments are **shared live** through Firestore — everyone sees everyone else's as they arrive, and
+replies appear without anyone refreshing. There is still no login: anonymous sign-in happens
+silently so the rules can stop one reviewer editing another's comment, and reviewers just type
+their name once a session.
+
+Comments can be **replied to** and **resolved**. Resolved ones stay visible, greyed. Every counter
+in the app — storyboard, stage rows, screen dots — tracks *open* comments.
+
+If the shared board is unreachable, everything falls back to this browser's local storage and the
+export still carries the work out. The badge in the top bar says which mode you are in.
 
 ### Getting them back
 
@@ -120,20 +131,22 @@ index.html          shell
 netlify.toml        publish root, no build
 assets/
   app.css           design system and every component
+  live.js           Firestore board + anonymous sign-in (ES module)
   chrome.js         simulated Outlook / Teams / SharePoint / PowerPoint / Excel / Forms
-  content.js        the 55 screens — summaries, beats, copy specs, animation loops
-  comments.js       comment layer, export, round-trip import
-  app.js            render, navigate, animate, storyboard views
+  content.js        the 55 screens, the stage write-ups, and the recap table
+  comments.js       comment layer, replies, resolve, export, round-trip import
+  app.js            render, navigate, animate, all five views
 ```
+
+### Firebase
+
+Project `day1-wireframe`. Firestore path `boards/main/comments`. Anonymous auth is on. The web
+apiKey in `live.js` is a public project identifier, not a secret — the security rules are what
+protect the data. Free tier covers this many times over.
 
 To change what a screen says or does, `content.js` is almost always the only file to touch.
 
 ---
-
-## Open decisions
-
-Five, from the deck's build notes and content notes, listed in the Storyboard view and linked to
-their screens. None are resolved.
 
 ## Content issues found in the deck
 
@@ -150,4 +163,4 @@ Flagged in the wireframe rather than silently fixed:
 ## Not yet built
 
 - Question set and norms categories for the core team kick-off — that deck is still to be uploaded
-- The real Day 1 slide is shown in the previous template; whether to re-render it is an open decision
+- The real Day 1 slide is shown in the previous Dalberg template rather than the current one

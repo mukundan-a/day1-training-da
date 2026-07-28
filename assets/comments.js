@@ -127,7 +127,7 @@
         <div class="pop__types">
           ${TYPES.map(t => `<button data-type="${t.k}" aria-pressed="${t.k === 'concept'}">${t.label}</button>`).join('')}
         </div>
-        <textarea placeholder="What about this screen?" autofocus></textarea>
+        <textarea placeholder="What do you want to say about this screen?" autofocus></textarea>
         <div class="pop__row">
           <span class="pop__hint">${esc(s ? s.id : '')}</span>
           <button class="btn-quiet" data-cancel>Cancel</button>
@@ -231,7 +231,7 @@
           return `<div class="note">
             <div class="note__where">
               <b>${idx + 1} · ${esc(s ? ST[s.stage].name : '')}</b>
-              ${esc(s ? s.intent : n.screen)}
+              ${esc(s ? (s.label || s.intent) : n.screen)}
             </div>
             <div class="note__type">${esc(typeLabel(n.type))}</div>
             <div class="note__text">${esc(n.text)}</div>
@@ -240,7 +240,7 @@
               <button data-del="${n.id}">Delete</button>
             </div>
           </div>`;
-        }).join('') : `<div class="empty">No notes yet. Turn on Comment in the top bar, then click anywhere on a screen.</div>`}
+        }).join('') : `<div class="empty">No notes yet. Switch on Comment in the top bar, then click anywhere on a screen to leave one.</div>`}
       </div>`;
     },
 
@@ -261,7 +261,7 @@
       return `<h2>Export</h2>
         <p>${n} note${n === 1 ? '' : 's'} in this browser. Nothing is sent anywhere.</p>
         <div class="field">
-          <label>Your name — optional, so notes are attributable</label>
+          <label>Your name, so your notes can be told apart from other people’s. Optional.</label>
           <input type="text" data-who value="${esc(this.who)}" placeholder="Leave blank to stay anonymous">
         </div>
         <div class="btn-row">
@@ -271,7 +271,7 @@
         </div>
 
         <h3>Reconcile several reviewers</h3>
-        <p>Drop the JSON files people send back. They combine into one CSV, sorted by screen.</p>
+        <p>Drop in the JSON files other reviewers send back. They are combined with yours into a single CSV, sorted by screen.</p>
         <div class="drop" data-drop>Drop JSON files, or click to choose
           <input type="file" accept=".json,application/json" multiple hidden data-file></div>
         <div data-mergeout style="margin-top:12px"></div>
@@ -364,6 +364,7 @@
     return {
       no: i + 1,
       stage: s ? ST[s.stage].name : '',
+      label: s ? (s.label || s.intent) : '',
       intent: s ? s.intent : '',
       verb: s ? s.verb : '',
       link: location.origin + location.pathname + '#' + n.screen
@@ -371,15 +372,15 @@
   }
 
   function csv(items) {
-    const head = ['Reviewer', 'Screen no', 'Stage', 'Screen id', 'Screen intent', 'Interaction',
-                  'Comment type', 'Comment', 'Anchor x%', 'Anchor y%', 'Added', 'Link'];
+    const head = ['Reviewer', 'Screen no', 'Stage', 'Screen id', 'Screen', 'What the screen does',
+                  'Interaction', 'Comment type', 'Comment', 'Anchor x%', 'Anchor y%', 'Added', 'Link'];
     const q = v => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
     const rows = items
       .slice()
       .sort((a, b) => meta(a).no - meta(b).no)
       .map(n => {
         const m = meta(n);
-        return [n.who || 'anonymous', m.no, m.stage, n.screen, m.intent, m.verb,
+        return [n.who || 'anonymous', m.no, m.stage, n.screen, m.label, m.intent, m.verb,
                 typeLabel(n.type), n.text, Math.round(n.x), Math.round(n.y), n.at, m.link].map(q).join(',');
       });
     return '﻿' + [head.map(q).join(','), ...rows].join('\r\n');
@@ -397,7 +398,7 @@
     Object.keys(byStage).forEach(stage => {
       out += `\n## ${stage}\n`;
       byStage[stage].forEach(({ n, m }) => {
-        out += `\n**${m.no}. ${m.intent}**  \n`;
+        out += `\n**${m.no}. ${m.label}**  \n`;
         out += `\`${typeLabel(n.type)}\` · ${n.screen}${n.who ? ' · ' + n.who : ''}\n\n`;
         out += `${n.text}\n`;
       });

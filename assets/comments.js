@@ -361,13 +361,12 @@
           <button class="btn-out" data-sheet="export">Export</button>
         </div>
         ${rows.length ? rows.map(n => {
-          const idx = S.findIndex(z => z.id === n.screen);
-          const s = S[idx];
+          const m = meta(n);
           const reps = (n.replies || []).length;
           return `<div class="note ${n.resolved ? 'is-done' : ''}">
             <div class="note__where">
-              <b>${idx + 1} · ${esc(s ? ST[s.stage].name : '')}</b>
-              ${esc(s ? s.label : n.screen)}
+              <b>${m.no ? m.no + ' · ' : ''}${esc(m.stage)}</b>
+              ${esc(m.label)}
             </div>
             <div class="note__who"><span class="ava">${initials(n.who)}</span><b>${esc(n.who || 'anonymous')}</b></div>
             <div class="note__type">${esc(typeLabel(n.type))}${n.resolved ? '<br><span style="color:var(--mute-2)">Resolved</span>' : ''}</div>
@@ -377,7 +376,7 @@
                 `<div><b>${esc(r.who || 'anonymous')}</b> ${esc(r.text)}</div>`).join('')}</div>` : ''}
             </div>
             <div class="note__act">
-              <button data-jump="${n.screen}">Go</button>
+              <button data-goto="${esc(n.id)}">Go</button>
               <button data-res="${n.id}">${n.resolved ? 'Reopen' : 'Resolve'}</button>
               ${n.mine ? `<button data-del="${n.id}">Delete</button>` : ''}
             </div>
@@ -390,6 +389,23 @@
       $$('[data-f]').forEach(b => b.onclick = () => { this.filter = b.dataset.f; global.App.render(); });
       $$('[data-showres]').forEach(b => b.onclick = () => { this.showResolved = !this.showResolved; global.App.render(); });
       $$('[data-jump]').forEach(b => b.onclick = () => global.App.jump(b.dataset.jump));
+      /* a comment can sit outside the walkthrough, so go back to wherever it was left */
+      $$('[data-goto]').forEach(b => b.onclick = () => {
+        const n = this.items.find(z => z.id === b.dataset.goto);
+        if (!n) return;
+        const S = global.CONTENT.SCREENS;
+        const key = String(n.screen || '');
+        const view = n.view || 'walk';
+        if (view === 'sb') {
+          const m = key.match(/^sbhead-(\d+)$/);
+          const s = m ? null : S.find(x => x.id === key.replace(/^sbstep-/, ''));
+          return global.App.setView('sb', m ? +m[1] : (s ? s.stage : 0));
+        }
+        if (view !== 'walk') return global.App.setView(view);
+        const id = key.replace(/^(?:head|specs)-/, '');
+        if (S.some(s => s.id === id)) return global.App.jump(id);
+        global.App.setView('walk');
+      });
       $$('[data-res]').forEach(b => b.onclick = () => {
         const n = this.items.find(z => z.id === b.dataset.res);
         if (this.askName()) this.setResolved(b.dataset.res, !(n && n.resolved));
@@ -561,14 +577,56 @@
     return isNaN(d) ? '' : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
   }
 
+  /* A comment can sit on a screen or on anything else in the wireframe — a home
+     card, a recap row, a stage card, the lead line, the notes beside a screen.
+     Everything downstream reads this, so every place gets a plain name here. */
   function meta(n) {
-    const S = global.CONTENT.SCREENS, ST = global.CONTENT.STAGES;
-    const i = S.findIndex(s => s.id === n.screen);
-    const s = S[i];
+    const S = global.CONTENT.SCREENS, ST = global.CONTENT.STAGES, RC = global.CONTENT.RECAP;
+    const key = String(n.screen || '');
+    const onScreen = id => {
+      const i = S.findIndex(s => s.id === id);
+      return { i, s: S[i] };
+    };
+
+    let { i, s } = onScreen(key);
+    let part = '';                                     // which bit of that place
+
+    if (!s) {
+      let m = key.match(/^(head|specs|sbstep)-(.+)$/);
+      if (m) {
+        ({ i, s } = onScreen(m[2]));
+        part = { head: 'lead line above the screen', specs: 'notes beside the screen',
+                 sbstep: 'row in the storyboard' }[m[1]];
+      }
+    }
+
+    if (s) {
+      return {
+        no: i + 1, stage: ST[s.stage].name, label: s.label + (part ? ' — ' + part : ''),
+        summary: s.summary, verb: s.verb,
+        link: location.origin + location.pathname + '#' + s.id
+      };
+    }
+
+    const VIEW = { home: 'Home', recap: 'Recap', map: 'Storyboard', sb: 'Storyboard',
+                   walk: 'Walkthrough', notes: 'Notes' };
+    const plain = () => {
+      let m = key.match(/^(?:stage|sbhead)-(\d+)$/);
+      if (m) return ST[+m[1]] ? 'Stage card — ' + ST[+m[1]].name : key;
+      m = key.match(/^recap-(\d+)$/);
+      if (m) return RC[+m[1]] ? 'Table row — ' + RC[+m[1]].activity : key;
+      return {
+        'home-home': 'Card — Home', 'home-recap': 'Card — Recap',
+        'home-map': 'Card — Storyboard', 'home-walk': 'Card — Walkthrough',
+        'home-notes': 'Card — Notes', 'home-comment': 'Note about commenting',
+        'map-intro': 'Heading above the stages',
+        'recap-diffs': 'List of differences from the table'
+      }[key] || key;
+    };
+
     return {
-      no: i + 1, stage: s ? ST[s.stage].name : '', label: s ? s.label : '',
-      summary: s ? s.summary : '', verb: s ? s.verb : '',
-      link: location.origin + location.pathname + '#' + n.screen
+      no: 0, stage: VIEW[n.view] || 'Elsewhere', label: plain(), summary: '', verb: '',
+      link: location.origin + location.pathname
     };
   }
 

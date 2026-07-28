@@ -13,7 +13,7 @@ Static site. No build step, no dependencies, no backend.
 |---|---|
 | **Home** | What this is and the four ways in. |
 | **Recap** | The agreed "codified Day 1" table, kept as written, with small flags where the walkthrough differs. |
-| **Storyboard** | Every stage as a card. Open one for what happens in it, what the user puts in, what comes out, and each screen in order. |
+| **Storyboard** | The seven stages laid left to right as a journey. Open one for what happens in it, what the user puts in, what comes out, and each screen in order with a real scaled-down render of it. |
 | **Walkthrough** | One screen at a time. Arrow keys, the two buttons, or click either faded edge of the screen. |
 | **Notes** | Every comment, filterable, exportable, importable. |
 
@@ -24,9 +24,13 @@ see the whole thing without having to work it.
 
 ## Commenting
 
-Switch on **Comment**, then click anywhere on a screen to drop a pin. Comments are typed —
-**Concept** (default), **Flow & state**, **Screen**, **Copy** — so concept feedback separates
-cleanly from UX feedback.
+Switch on **Comment**, then click anywhere to drop a pin — on a screen, on the line above it, on
+the notes beside it, on a home card, a recap row or a stage card. A comment can optionally say what
+it is about: **Underlying Day 1 step**, **Training app design**, **Actual text I see**, **Other**.
+
+Every comment records the place it was left in plain words, so the Notes list and the exports read
+"Full-team kick-off · Your SCQ against theirs — lead line above the screen", never an internal key.
+**Go** takes you back to exactly that place, whichever view it was in.
 
 Comments are **shared live** through Firestore — everyone sees everyone else's as they arrive, and
 replies appear without anyone refreshing. There is still no login: anonymous sign-in happens
@@ -53,6 +57,27 @@ rather than silently dropped.
 CSV and Markdown are for reading. CSV carries reviewer, screen number, stage, screen id, the short
 screen name, what the screen does, interaction type, comment type, the comment, coordinates,
 timestamp and a deep link.
+
+---
+
+## Direct edit
+
+The unlabelled pencil in the top bar turns on direct edit. Anything dotted can be rewritten in
+place, and the change is what everyone else sees. Turning it on warns that a comment is preferred,
+because nothing here tracks who changed what.
+
+While it is on, nothing navigates by accident: cards, rows and thumbnails place a caret instead of
+opening, and the keyboard shortcuts are off. Back, Next, the dots and the stage tracker still work.
+
+Bullet lists can grow and shrink, not just be reworded. The two headings that repeat across every
+stage — "What the user puts in" and "What comes out" — are edited once and change everywhere.
+
+**History** in the edit bar keeps the twelve previous versions of every string, named by whoever
+changed it, plus the original wording. Anything can be put back.
+
+Edits share through the same Firestore project, at `boards/main/edits`. The rules for that
+collection are in `firestore.rules` and need pasting into the Firebase console; until then edits
+stay in the editor's own browser and the comments are unaffected.
 
 ---
 
@@ -91,7 +116,13 @@ from the furniture people actually navigate by — ribbons, folder trees, breadc
 composers, sheet tabs, thumbnail rails. No product names, no logos, no labels inside the mocks.
 Each one also has its own thumbnail, so the storyboard reads at a glance.
 
-**Five interactions**, and no others: `READ` · `WATCH` · `EXPLORE` · `DO` · `DECIDE`.
+**Five interactions**, and no others: `READ` · `WATCH` · `EXPLORE` · `DO` · `DECIDE`. They sit under
+a "What the user does" column heading in the storyboard, and the chip in the walkthrough opens the
+legend that defines them.
+
+**Hypothesis trees are built, not chosen from.** The learner types every sub-claim; there is no
+bank of candidates and nothing is dragged. Branches can be added, edited, removed or drilled a
+level down, and the AI coach names the branch that is not yet a testable claim.
 
 ---
 
@@ -135,8 +166,21 @@ assets/
   chrome.js         simulated Outlook / Teams / SharePoint / PowerPoint / Excel / Forms
   content.js        the 55 screens, the stage write-ups, and the recap table
   comments.js       comment layer, replies, resolve, export, round-trip import
+  edits.js          direct edits to the wording, shared, with version history
   app.js            render, navigate, animate, all five views
 ```
+
+### Two things worth knowing before editing app.js
+
+**Storyboard thumbnails are the real screen**, rendered and scaled to a quarter. Two consequences:
+a storyboard row cannot be a `<button>`, because a screen may contain controls of its own and the
+parser will not nest them; and each screen's own `<style>` block is rewritten at render time to
+apply only to that screen, because fourteen of them share one page. Both are handled in `app.js` —
+`scoped()` and the `role="button"` row — and both fail loudly and visibly if undone.
+
+**Thumbnails also settle their animation.** A screen that fills itself in over a few seconds would
+otherwise thumbnail as an empty frame, so `anim().settle()` puts the mini straight into the state
+the loop reaches just before it clears down.
 
 ### Firebase
 

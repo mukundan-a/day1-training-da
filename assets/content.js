@@ -38,12 +38,21 @@
     `<span class="${i === on ? 'on' : ''}">${t}</span>`).join('')}</div>`;
 
   /* loop runner: returns a starter that yields its own cleanup */
-  const anim = (total, steps) => el => {
-    let timers = [];
-    const run = () => steps.forEach(s => timers.push(setTimeout(() => { try { s.do(el); } catch (e) {} }, s.at)));
-    run();
-    const iv = setInterval(() => { timers.forEach(clearTimeout); timers = []; run(); }, total);
-    return () => { clearInterval(iv); timers.forEach(clearTimeout); };
+  const anim = (total, steps) => {
+    const start = el => {
+      let timers = [];
+      const run = () => steps.forEach(s => timers.push(setTimeout(() => { try { s.do(el); } catch (e) {} }, s.at)));
+      run();
+      const iv = setInterval(() => { timers.forEach(clearTimeout); timers = []; run(); }, total);
+      return () => { clearInterval(iv); timers.forEach(clearTimeout); };
+    };
+    /* A thumbnail never runs the loop, so it would show the screen before
+       anything has appeared on it. This puts it straight into the state the
+       loop reaches just before it clears itself down and starts again. */
+    start.settle = el => steps
+      .filter(s => s.at < total * 0.9)
+      .forEach(s => { try { s.do(el); } catch (e) {} });
+    return start;
   };
 
   const $ = (sel, el) => el.querySelector(sel);
@@ -710,30 +719,28 @@
   {
     id: 's2f5', stage: 2, kind: 'exercise', verb: 'DO', action: 'Check',
     label: 'Building the hypothesis tree',
-    summary: 'Now user builds the tree out: placing L2 branches under the claim, editing them, adding one and drilling one down, then pressing Check for feedback from an AI coach.',
+    summary: 'Now user builds the tree out: typing their own sub-claims under the top claim, adding branches and drilling one down, then pressing Check for feedback from an AI coach.',
     beats: [
       'The tree is drawn as a tree: the claim on top, branches beneath it, connected.',
-      'Branches can be added, edited and drilled a level further down.',
-      'The bank holds decoys. The coach names which one and why, rather than marking it wrong.'
+      'Branches are typed in freely — nothing is chosen from a list.',
+      'Any branch can be added, edited, removed or drilled a level further down.'
     ],
     carry: { write: ['tree'] },
     notes: [
       ['Prompt', 'The question that drives every hypothesis tree: for this claim to be true, what would have to be true?'],
       ['Controls', 'Per branch: edit the wording, drill down a level, remove. Plus add branch on the row itself.'],
-      ['Coach', 'Names the decoy and what is wrong with it, then confirms when the three branches hold.'],
-      ['Beat', 'Two branches land, a decoy is placed and withdrawn, a fourth is added and one is drilled to L3.']
+      ['Coach', 'Reads what the learner wrote and says which branch is not yet a testable claim, and why.'],
+      ['Beat', 'Three branches typed in, a fourth added, one drilled to L3, then the coach responds.']
     ],
-    anim: anim(13000, [
-      { at: 600,  do: el => tdrop(el, 0, 0) },
-      { at: 1900, do: el => tdrop(el, 1, 3) },
-      { at: 3100, do: el => { tclear(el, 1); tmark(el, 3, 'activity, not a claim');
-        coach(el, '', 'Names the decoy and why: it is an activity, not something evidence could prove wrong.', 1); } },
-      { at: 4600, do: el => tdrop(el, 1, 2) },
-      { at: 5900, do: el => tdrop(el, 2, 4) },
-      { at: 7200, do: el => { const r = $('.trow', el); if (r) r.classList.add('four'); tdrop(el, 3, 1); } },
-      { at: 8600, do: el => { const d = $('.tdrill', el); if (d) d.classList.add('in'); } },
-      { at: 10000, do: el => coach(el, '', 'Confirms all four branches are claims, testable and in scope.', 2) },
-      { at: 12400, do: el => treset(el) }
+    anim: anim(14000, [
+      { at: 600,  do: el => ttype(el, 0) },
+      { at: 2100, do: el => ttype(el, 1) },
+      { at: 3600, do: el => { ttype(el, 2); coach(el, '', 'Reads branch two and says it is an activity rather than something evidence could prove wrong.', 1); } },
+      { at: 6000, do: el => tfix(el, 1) },
+      { at: 7400, do: el => { const r = $('.trow', el); if (r) r.classList.add('four'); ttype(el, 3); } },
+      { at: 9000, do: el => { const d = $('.tdrill', el); if (d) d.classList.add('in'); } },
+      { at: 10600, do: el => coach(el, '', 'Confirms all four branches are claims, testable and in scope.', 2) },
+      { at: 13400, do: el => treset(el) }
     ]),
     body: () => `
       <div class="stack" style="gap:var(--s3)">
@@ -741,42 +748,31 @@
           <span class="s-micro">For this claim to be true, what would have to be true?</span>
         </div>
 
-        <div class="row" style="gap:var(--s4)">
-          <div class="ttree" style="flex:2.2">
-            <div class="tnode tnode--l1 in"><span class="tnode__tag">L1 · the claim</span>
-              <span class="tnode__body">${W.bars([['88%', 'live'], ['56%', 'live']])}</span></div>
-            <div class="tlegs in" data-n="3"></div>
-            <div class="trow">
-              ${[0,1,2,3].map(i => `<div class="tnode tnode--slot" data-s="${i}">
-                <span class="tnode__tag">L2</span>
-                <span class="tnode__body tnode__empty">Branch ${i + 1}</span>
-                <span class="tnode__ctrls">
-                  <i title="Edit">${W.glyph('doc')}</i><i title="Drill down">${W.glyph('down')}</i><i title="Remove">×</i>
-                </span></div>`).join('')}
-              <button class="tadd">+ Add branch</button>
-            </div>
-            <div class="tdrill">
-              <div class="tlegs in" data-n="2" style="height:14px"></div>
-              <div class="trow trow--l3">
-                ${[0,1].map(() => `<div class="tnode tnode--l3"><span class="tnode__tag">L3</span>
-                  <span class="tnode__body">${W.bars([['76%','faint']])}</span></div>`).join('')}
-              </div>
-            </div>
+        <div class="ttree" style="flex:1;min-height:0">
+          <div class="tnode tnode--l1 in"><span class="tnode__tag">L1 · the claim</span>
+            <span class="tnode__body">${W.bars([['88%', 'live'], ['56%', 'live']])}</span></div>
+          <div class="tlegs in" data-n="3"></div>
+          <div class="trow">
+            ${[0, 1, 2, 3].map(i => `<div class="tnode tnode--slot" data-s="${i}">
+              <span class="tnode__tag">L2</span>
+              <span class="tnode__body tnode__empty">Type a sub-claim…<i class="caret"></i></span>
+              <span class="tnode__ctrls">
+                <i title="Edit">${W.glyph('doc')}</i><i title="Drill down">${W.glyph('down')}</i><i title="Remove">×</i>
+              </span></div>`).join('')}
           </div>
-
-          <div style="flex:1;display:flex;flex-direction:column;gap:6px;min-height:0">
-            <span class="s-micro">Candidate sub-claims</span>
-            <div style="display:flex;flex-direction:column;gap:5px;flex:1;justify-content:space-between">
-              ${[0,1,2,3,4,5].map(i => `<div class="bnk" data-b="${i}">
-                <span>Candidate ${i + 1}</span>
-                <em class="why">—</em></div>`).join('')}
+          <button class="tadd">+ Add branch</button>
+          <div class="tdrill">
+            <div class="tlegs in" data-n="2" style="height:14px"></div>
+            <div class="trow trow--l3">
+              ${[0, 1].map(() => `<div class="tnode tnode--l3"><span class="tnode__tag">L3</span>
+                <span class="tnode__body">${W.bars([['76%', 'faint']])}</span></div>`).join('')}
             </div>
           </div>
         </div>
 
         <div class="coach" data-coach>
           <span class="coach__who">${W.glyph('chat')}AI coach</span>
-          <span class="coach__msg">Waiting for three branches.</span>
+          <span class="coach__msg">Waiting for your first branch.</span>
           <span class="coach__pass" data-pass></span>
         </div>
       </div>`
@@ -1597,36 +1593,43 @@
     if (r) r.innerHTML = W.bars(PAIRS[i][1]);
   }
 
-  function tdrop(el, slot, b) {
-    const s2 = el.querySelector('.tnode--slot[data-s="' + slot + '"]');
-    const n = el.querySelector('.bnk[data-b="' + b + '"]');
-    if (s2) {
-      s2.classList.add('filled');
-      const body = s2.querySelector('.tnode__body');
-      body.classList.remove('tnode__empty');
-      body.innerHTML = W.bars([['84%', ''], ['58%', 'faint']]);
-    }
-    if (n) n.classList.add('used');
+  /* a branch fills in as if it were being typed */
+  function ttype(el, slot) {
+    const n = el.querySelector('.tnode--slot[data-s="' + slot + '"]');
+    if (!n) return;
+    n.classList.add('typing');
+    const body = n.querySelector('.tnode__body');
+    body.classList.remove('tnode__empty');
+    body.innerHTML = '<i class="bar grow" style="width:0"></i><i class="bar grow bar--faint" style="width:0"></i>';
+    const bars = body.querySelectorAll('.grow');
+    setTimeout(() => { bars[0].style.width = '86%'; }, 40);
+    setTimeout(() => { bars[1].style.width = '54%'; }, 380);
+    setTimeout(() => { n.classList.remove('typing'); n.classList.add('filled'); }, 800);
+  }
+  function tfix(el, slot) {
+    const n = el.querySelector('.tnode--slot[data-s="' + slot + '"]');
+    if (!n) return;
+    n.classList.add('flagged');
+    setTimeout(() => {
+      n.classList.remove('flagged');
+      const b = n.querySelectorAll('.grow');
+      if (b[0]) b[0].style.width = '94%';
+      if (b[1]) b[1].style.width = '68%';
+    }, 900);
   }
   function tclear(el, slot) {
-    const s2 = el.querySelector('.tnode--slot[data-s="' + slot + '"]');
-    if (s2) {
-      s2.classList.remove('filled');
-      const body = s2.querySelector('.tnode__body');
-      body.classList.add('tnode__empty');
-      body.textContent = 'Branch ' + (slot + 1);
-    }
-  }
-  function tmark(el, b, why) {
-    const n = el.querySelector('.bnk[data-b="' + b + '"]');
-    if (n) { n.classList.remove('used'); n.classList.add('bad'); const w = $('.why', n); if (w) w.textContent = why; }
+    const n = el.querySelector('.tnode--slot[data-s="' + slot + '"]');
+    if (!n) return;
+    n.classList.remove('filled', 'flagged', 'typing');
+    const body = n.querySelector('.tnode__body');
+    body.classList.add('tnode__empty');
+    body.innerHTML = 'Type a sub-claim…<i class="caret"></i>';
   }
   function treset(el) {
-    [0,1,2,3].forEach(i => tclear(el, i));
+    [0, 1, 2, 3].forEach(i => tclear(el, i));
     const r = $('.trow', el); if (r) r.classList.remove('four');
     const d = $('.tdrill', el); if (d) d.classList.remove('in');
-    $$('.bnk', el).forEach(n => { n.classList.remove('used', 'bad'); const w = $('.why', n); if (w) w.textContent = '—'; });
-    coach(el, '', 'Waiting for three branches.', 0);
+    coach(el, '', 'Waiting for your first branch.', 0);
   }
 
   function drop(el, slot, b) {

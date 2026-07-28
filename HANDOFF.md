@@ -40,19 +40,41 @@ Static site, no build, no dependencies. Classic script tags in order, plus one E
 ```
 index.html          shell
 netlify.toml        publish root, no build command
+firestore.rules     to be pasted into the Firebase console — comments and edits
 assets/
   app.css           the whole design system
   live.js           ES module — Firestore + anonymous auth. Config is inline.
   chrome.js         simulated Outlook / Teams / SharePoint / PowerPoint / Excel / Forms
   content.js        55 screens, 7 stage write-ups, the recap table. Almost all edits go here.
   comments.js       comments, replies, resolve, export, round-trip import
+  edits.js          direct edits to the wording, shared, with version history
   app.js            render, navigate, animate, all five views
 ```
 
-**Firestore:** project `day1-wireframe`, path `boards/main/comments`. The `apiKey` in `live.js` is a
-public identifier, not a secret. Security rules are in the Firebase console under Firestore → Rules;
-they validate field types, cap text length, require `uid == request.auth.uid` on create, allow
-anyone to reply or resolve, and allow delete only by the author.
+### Three traps in app.js
+
+The storyboard thumbnails are the **real screen**, rendered and scaled to a quarter. That makes
+three things load-bearing, each of which broke visibly once already:
+
+1. **A storyboard row must not be a `<button>`.** A screen can contain controls of its own, and the
+   parser closes the outer button when it meets a nested one — the page then falls apart from that
+   row down. The row is a `div` with `role="button"`.
+2. **Each screen's own `<style>` block is rewritten** by `App.scoped()` to apply only to that
+   screen. Fourteen screens share one storyboard page, and one screen's `.card{opacity:0}` was
+   blanking another's.
+3. **Thumbnails settle their animation** via `anim().settle()`. Without it, any screen that fills
+   itself in over a few seconds thumbnails as an empty frame.
+
+`struct.mjs` and `scope.mjs` in the scratchpad check all three across every stage.
+
+**Firestore:** project `day1-wireframe`, paths `boards/main/comments` and `boards/main/edits`. The
+`apiKey` in `live.js` is a public identifier, not a secret. Security rules are in the Firebase
+console under Firestore → Rules; they validate field types, cap text length, require
+`uid == request.auth.uid` on create, allow anyone to reply or resolve, and allow delete only by the
+author.
+
+**Still to do by hand:** paste `firestore.rules` into the console. The comments block is already
+live; the `edits` block is not, so direct edits currently stay in the editor's own browser.
 
 To start a fresh round of review with a clean board, change `BOARD` in `live.js` to `'round-2'`.
 Nothing else needs to change and the old comments stay retrievable.
@@ -82,6 +104,10 @@ two buttons, the arrow keys, or the faded edges of the screen. The one exception
 **One focal element per screen**, carrying the soft-pink fill. Maroon marks only what is live or
 moving. Pink is comments and nothing else. Negative space has been a recurring complaint — content
 should fill the frame.
+
+**Comments work everywhere**, not only on a screen. Anything with `data-anchor` accepts a pin, and
+`meta()` in `comments.js` is the one place that turns an anchor into a name a human reads. A new
+anchor with no entry there shows up as a raw key in the Notes list and in every export.
 
 **Activities announce themselves**: a "Your turn" chip and the primary action promoted to the top of
 the screen. Exercise feedback is an AI coach naming the weak line and asking the question that would

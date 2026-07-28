@@ -113,10 +113,11 @@ const Live = {
       err => cb(null, err));
   },
 
-  async setEdit(path, text, who) {
+  async setEdit(path, text, who, history) {
     const s = this._fns;
     return s.setDoc(s.doc(this._edits, key(path)), {
-      path, text, who: who || 'anonymous', at: new Date().toISOString()
+      path, text, who: who || 'anonymous', at: new Date().toISOString(),
+      history: (history || []).slice(-12)
     });
   },
 

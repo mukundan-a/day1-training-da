@@ -13,12 +13,15 @@
   'use strict';
 
   const LOCAL = 'day1wf.edits.v1';
+  const HIST  = 'day1wf.edithist.v1';
+  const KEEP  = 12;               // how many previous versions to hold per string
 
   const Edits = {
-    map: {}, mode: false, warned: false, source: 'local',
+    map: {}, hist: {}, orig: {}, mode: false, warned: false, source: 'local',
 
     init() {
       try { this.map = JSON.parse(localStorage.getItem(LOCAL) || '{}'); } catch (e) { this.map = {}; }
+      try { this.hist = JSON.parse(localStorage.getItem(HIST) || '{}'); } catch (e) { this.hist = {}; }
       try { this.warned = sessionStorage.getItem('day1wf.editwarn') === '1'; } catch (e) {}
 
       window.addEventListener('live-ready', e => {
@@ -27,7 +30,11 @@
         global.Live.watchEdits((rows, err) => {
           if (err) { this.source = 'local'; return; }
           const m = {};
-          rows.forEach(r => { if (r.path && typeof r.text === 'string') m[r.path] = r.text; });
+          rows.forEach(r => {
+            if (!r.path || typeof r.text !== 'string') return;
+            m[r.path] = r.text;
+            if (Array.isArray(r.history)) this.hist[r.path] = r.history;
+          });
           this.map = m;
           if (document.activeElement && document.activeElement.isContentEditable) {
             Object.keys(m).forEach(k => { if (k !== document.activeElement.dataset.edit) this.paint(k, m[k]); });
@@ -40,6 +47,7 @@
 
     /* the current wording for a path, falling back to what was built in */
     t(path, fallback) {
+      if (typeof fallback === 'string' && !(path in this.orig)) this.orig[path] = fallback;
       const v = this.map[path];
       return (typeof v === 'string' && v.length) ? v : fallback;
     },
@@ -47,9 +55,16 @@
     async set(path, text) {
       const clean = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 3800);
       if (!clean) return;
+      const was = (typeof this.map[path] === 'string') ? this.map[path] : this.orig[path];
+      if (typeof was === 'string' && was !== clean) {
+        const h = (this.hist[path] = this.hist[path] || []);
+        h.push({ text: was, who: global.Notes.who || 'anonymous', at: new Date().toISOString() });
+        if (h.length > KEEP) h.splice(0, h.length - KEEP);
+        try { localStorage.setItem(HIST, JSON.stringify(this.hist)); } catch (e) {}
+      }
       this.map[path] = clean;
       if (this.live()) {
-        try { await global.Live.setEdit(path, clean, global.Notes.who || 'anonymous'); this.paint(path, clean); return; }
+        try { await global.Live.setEdit(path, clean, global.Notes.who || 'anonymous', this.hist[path] || []); this.paint(path, clean); return; }
         catch (e) { global.Notes.flash('Could not share that edit — kept in this browser.'); }
       }
       try { localStorage.setItem(LOCAL, JSON.stringify(this.map)); } catch (e) {}
@@ -82,7 +97,54 @@
       this.rerender();
     },
 
-    count() { return Object.keys(this.map).length; },
+    /* everything that has been changed, newest first */
+    changed() {
+      return Object.keys(this.map)
+        .filter(k => !/\.count$/.test(k))
+        .map(k => ({
+          path: k,
+          now: this.map[k],
+          original: this.orig[k],
+          versions: (this.hist[k] || []).slice().reverse()
+        }));
+    },
+
+    async revert(path, text) {
+      if (text === undefined || text === null) return this.reset(path);
+      return this.set(path, text);
+    },
+
+    count() { return Object.keys(this.map).filter(k => !/\.count$/.test(k)).length; },
+
+    /* a list's current contents, honouring any added or removed lines */
+    list(base, defaults) {
+      const raw = parseInt(this.map[base + '.count'], 10);
+      const len = isNaN(raw) ? defaults.length : Math.max(0, Math.min(24, raw));
+      const out = [];
+      for (let k = 0; k < len; k++) out.push(this.t(base + '.' + k, defaults[k] || 'New line'));
+      return out;
+    },
+
+    async _put(path, text) {
+      this.map[path] = text;
+      if (this.live()) { try { await global.Live.setEdit(path, text, global.Notes.who || 'anonymous'); return; } catch (e) {} }
+      try { localStorage.setItem(LOCAL, JSON.stringify(this.map)); } catch (e) {}
+    },
+
+    async addItem(base, defaults) {
+      const cur = this.list(base, defaults);
+      await this._put(base + '.' + cur.length, 'New line');
+      await this._put(base + '.count', String(cur.length + 1));
+      this.rerender();
+    },
+
+    async removeItem(base, defaults, k) {
+      const cur = this.list(base, defaults);
+      cur.splice(k, 1);
+      for (let i = 0; i < cur.length; i++) await this._put(base + '.' + i, cur[i]);
+      await this._put(base + '.count', String(cur.length));
+      this.rerender();
+    },
 
     toggleMode() {
       if (!this.mode && !this.warned) { this.warn(); return; }

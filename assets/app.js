@@ -107,6 +107,7 @@
       if (this.view !== 'walk') global.Notes.mount();
       if (global.Notes.mode) this.reminder();
       global.Edits.mount($('#root'));
+      this.wireLists();
       this.lockNav();
       if (global.Edits.mode) this.editBar();
     },
@@ -145,8 +146,34 @@
       $$('[data-sheet]').forEach(b => b.onclick = () => this.sheet(b.dataset.sheet));
     },
 
+    /* Screens carry their own small style block. On the walkthrough only one
+       screen exists at a time, but a storyboard holds fourteen at once, so
+       every rule is tied to the screen it belongs to before it goes in. */
+    scoped(html, id) {
+      return String(html).replace(/<style>([\s\S]*?)<\/style>/g, (_, css) =>
+        '<style>' + css.replace(/(^|\})\s*([^{}@]+?)\s*\{/g, (__, close, sel) =>
+          close + sel.split(',').map(x => `[data-anim="${id}"] ${x.trim()}`).join(',') + '{')
+        + '</style>');
+    },
+
+    /* a thumbnail shows the screen with everything on it, not the empty frame
+       it starts from */
+    settleMinis() {
+      $$('[data-mini]').forEach(el => {
+        const s = SCREENS.find(x => x.id === el.dataset.mini);
+        if (s && s.anim && s.anim.settle) { try { s.anim.settle(el); } catch (e) {} }
+      });
+    },
+
     wireLinks() {
+      this.settleMinis();
       $$('[data-jump]').forEach(b => b.onclick = () => this.jump(b.dataset.jump));
+      /* the storyboard rows are not buttons, so give them a button's keyboard */
+      $$('[role="button"][data-jump]').forEach(b => b.onkeydown = e => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        if (global.Edits.mode || global.Notes.mode) return;
+        e.preventDefault(); this.jump(b.dataset.jump);
+      });
       $$('[data-stage]').forEach(b => b.onclick = () => this.setView('sb', +b.dataset.stage));
       $$('[data-back]').forEach(b => b.onclick = () => this.setView('map'));
       $$('[data-view]').forEach(b => b.onclick = () => this.setView(b.dataset.view));
@@ -264,9 +291,9 @@
       const open = global.Notes.openOn(s.id);
 
       return `
-        <div class="walk">
+        <div class="walk pinhost"><div id="pins"></div>
           ${this.tracker()}
-          <div class="walk__head">
+          <div class="walk__head" data-anchor="head-${s.id}">
             <div>
               <div class="walk__eyebrow">
                 <span class="label">${esc(stage.name)}</span><span class="sep">·</span>
@@ -275,8 +302,7 @@
                 ${open ? `<span class="sep">·</span><button class="openflag" data-view="notes">${open} open comment${open > 1 ? 's' : ''}</button>` : ''}
               </div>
               <h1 class="summary ed" ${EA(s.id + '.summary')}>${esc(T(s.id + '.summary', s.summary))}</h1>
-              ${(s.beats && s.beats.length) ? `<ul class="beats">${s.beats.map((b, k) =>
-                `<li class="ed" ${EA(s.id + '.beat.' + k)}>${esc(T(s.id + '.beat.' + k, b))}</li>`).join('')}</ul>` : ''}
+              ${this.editList('beats', s.id + '.beat', s.beats || [], 'li')}
             </div>
           </div>
 
@@ -285,9 +311,8 @@
               ${this.screen(s)}
               <button class="edge edge--l" data-go="-1" ${first ? 'disabled' : ''} aria-label="Previous">${first ? '' : A_L}</button>
               <button class="edge edge--r" data-go="1" ${last ? 'disabled' : ''} aria-label="Next">${last ? '' : A_R}</button>
-              <div id="pins"></div>
             </div>
-            <aside class="specs">${(s.notes || []).map(([tag, spec], k) => {
+            <aside class="specs" ${(s.notes || []).length ? `data-anchor="specs-${s.id}"` : ''}>${(s.notes || []).map(([tag, spec], k) => {
               const path = s.id + '.note.' + k;
               return tag === 'Note'
                 ? `<div class="anno"><span class="anno__tag">Note</span>
@@ -358,9 +383,10 @@
         inner = `<div class="tabs">${t.map((x, k) => `<span class="${k === 0 ? 'on' : ''}">${x.label}</span>`).join('')}</div>
           <div class="scrollzone"><div data-tabbody>${t[0].html}</div></div>`;
       } else inner = s.body();
+      inner = this.scoped(inner, s.id);
 
       return `
-        <div class="screen ${isActivity ? 'is-activity' : ''}" id="screen" data-screen="${s.id}" data-anchor="${s.id}" data-kind="${s.kind}">
+        <div class="screen ${isActivity ? 'is-activity' : ''}" id="screen" data-screen="${s.id}" data-anim="${s.id}" data-anchor="${s.id}" data-kind="${s.kind}">
           <div class="app-top">
             ${isActivity
               ? `<span class="app-top__act">${W.glyph('pin')}Your turn</span>`
@@ -392,32 +418,31 @@
     /* ------------------------ STORYBOARD: STAGES --------------------- */
 
     map() {
-      const rows = STAGES.map(st => {
+      const cards = STAGES.map((st, i) => {
         const items = SCREENS.filter(x => x.stage === st.n);
         const open = global.Notes.openInStage(st.n);
-        return `<button class="track__row" data-stage="${st.n}" data-anchor="stage-${st.n}">
-          <span class="track__n">${st.n === 0 ? '—' : st.n}</span>
-          <span>
-            <span class="track__name">${esc(st.name)}</span>
-            <p class="track__sub ed" ${EA('stage.' + st.n + '.short')}>${esc(T('stage.' + st.n + '.short', st.short))}</p>
-          </span>
-          <span class="track__meta">
-            <span><b>${items.length}</b> screens</span>
-            ${open ? `<span class="track__notes">${open} open comment${open > 1 ? 's' : ''}</span>` : ''}
-          </span>
-          <span class="track__bar">${items.map(x =>
-            `<i class="${global.Notes.openOn(x.id) ? 'note' : SCREENS.indexOf(x) <= this.i ? 'on' : ''}"></i>`).join('')}</span>
-          <span class="track__go">&rarr;</span>
-        </button>`;
+        const mins = st.n >= 1 && st.n <= 5 ? global.CONTENT.MAP5[st.n - 1].mins : '';
+        return `<button class="jcard" data-stage="${st.n}" data-anchor="stage-${st.n}">
+            <span class="jcard__top">
+              <span class="jcard__n">${st.n === 0 ? '·' : st.n}</span>
+              ${open ? `<span class="jcard__notes">${open}</span>` : ''}
+            </span>
+            <span class="jcard__name">${esc(st.name)}</span>
+            <span class="jcard__sub ed" ${EA('stage.' + st.n + '.short')}>${esc(T('stage.' + st.n + '.short', st.short))}</span>
+            <span class="jcard__foot">
+              <span class="jcard__ticks">${items.map(x =>
+                `<i class="${global.Notes.openOn(x.id) ? 'note' : ''}"></i>`).join('')}</span>
+              <span class="jcard__meta">${items.length} screens${mins ? ' · ' + mins : ''}</span>
+            </span>
+          </button>${i < STAGES.length - 1 ? '<span class="jarrow">&rarr;</span>' : ''}`;
       }).join('');
 
       return `<div class="map pinhost"><div id="pins"></div>
-        <div class="map__intro">
-          <h1>The whole training, in ${STAGES.length} parts and ${SCREENS.length} screens.</h1>
-          <p>Open a stage to read what happens in it, what the user puts in, what comes out,
-             and every screen in order.</p>
+        <div class="map__intro" data-anchor="map-intro">
+          ${ED('map.h', `The whole training, in ${STAGES.length} parts and ${SCREENS.length} screens.`, 'h1')}
+          ${ED('map.p', 'Open a stage for what happens in it, what the user puts in, what comes out, and every screen in order.', 'p')}
         </div>
-        <div class="track">${rows}</div>
+        <div class="journey">${cards}</div>
       </div>`;
     },
 
@@ -435,10 +460,12 @@
             <p class="sb__about ed" ${EA('stage.' + st.n + '.about')}>${esc(T('stage.' + st.n + '.about', st.about))}</p>
           </div>
           <div class="io">
-            <div class="io__panel"><h4>What the user puts in</h4>
-              <ul>${st.inputs.map((i, k) => `<li class="ed" ${EA('stage.' + st.n + '.in.' + k)}>${esc(T('stage.' + st.n + '.in.' + k, i))}</li>`).join('')}</ul></div>
-            <div class="io__panel io__panel--out"><h4>What comes out</h4>
-              <ul>${st.outputs.map((i, k) => `<li class="ed" ${EA('stage.' + st.n + '.out.' + k)}>${esc(T('stage.' + st.n + '.out.' + k, i))}</li>`).join('')}</ul></div>
+            <div class="io__panel">
+              <h4 class="ed" ${EA('label.inputs')}>${esc(T('label.inputs', 'What the user puts in'))}</h4>
+              ${this.editList('', 'stage.' + st.n + '.in', st.inputs, 'li')}</div>
+            <div class="io__panel io__panel--out">
+              <h4 class="ed" ${EA('label.outputs')}>${esc(T('label.outputs', 'What comes out'))}</h4>
+              ${this.editList('', 'stage.' + st.n + '.out', st.outputs, 'li')}</div>
           </div>
         </div>
 
@@ -448,15 +475,17 @@
           </div>
           ${items.map((s, k) => {
             const open = global.Notes.openOn(s.id);
-            return `<button class="sb__step" data-jump="${s.id}" data-anchor="sbstep-${s.id}">
+            /* not a <button>: the thumbnail is a real render of the screen and may
+               contain controls of its own, which the parser would not allow inside one */
+            return `<div class="sb__step" role="button" tabindex="0" data-jump="${s.id}" data-anchor="sbstep-${s.id}">
               <span class="sb__n">${k + 1}</span>
-              <span class="sb__thumb">${this.mini(s)}</span>
+              <div class="sb__thumb">${this.miniReal(s)}</div>
               <span class="sb__desc ed" ${EA(s.id + '.summary')}>${esc(T(s.id + '.summary', s.summary))}</span>
               <span class="sb__side">
                 <span class="sb__verb" title="What the five interaction types mean">${s.verb}</span>
                 ${open ? `<span class="sb__pin">${open}</span>` : ''}
               </span>
-            </button>`;
+            </div>`;
           }).join('')}
         </div>
       </div>`;
@@ -512,6 +541,38 @@
       }[app] || `<div style="flex:1;background:var(--fill);border-radius:1px"></div>`;
     },
 
+    /* a real, scaled-down render of the screen rather than an abstraction */
+    miniReal(s) {
+      let inner, wellCls = 'app-well';
+      try {
+        if (s.kind === 'sim') { wellCls = 'app-well app-well--flush'; inner = s.body(); }
+        else if (s.tabsData) {
+          const t = s.tabsData();
+          inner = `<div class="tabs">${t.map((x, k) => `<span class="${k === 0 ? 'on' : ''}">${x.label}</span>`).join('')}</div>
+            <div class="scrollzone"><div>${t[0].html}</div></div>`;
+        } else inner = s.body();
+      } catch (e) { return this.mini(s); }
+      inner = this.scoped(inner, s.id);
+
+      const at = PROGRESS[s.stage];
+      const prog = Array.from({ length: 5 }, (_, k) =>
+        `<i class="${k < at ? 'done' : k === at ? 'here' : ''}"></i>`).join('');
+      const isAct = s.verb === 'DO' || s.verb === 'DECIDE';
+
+      return `<span class="mini" aria-hidden="true"><span class="mini__in">
+        <div class="screen ${isAct ? 'is-activity' : ''}" data-mini="${s.id}" data-anim="${s.id}">
+          <div class="app-top">
+            ${isAct ? `<span class="app-top__act">${W.glyph('pin')}Your turn</span>`
+                    : `<span class="app-top__name">${esc(STAGES[s.stage].name)}</span>`}
+            <span class="app-top__prog">${prog}</span>
+            ${isAct ? `<span class="act act--top">${esc(s.action || 'Check')}</span>` : ''}
+          </div>
+          <div class="${wellCls}">${inner}</div>
+          <div class="app-foot"><span class="carry"></span>
+            ${isAct ? '' : `<span class="act">${esc(s.action || 'Next')}</span>`}</div>
+        </div></span></span>`;
+    },
+
     mini(s) {
       const b = (w, m) => W.bar(w, m);
       const inner = {
@@ -541,7 +602,9 @@
 
     sheet(which) {
       this.closeSheet();
-      const body = which === 'legend' ? this.legendSheet() : global.Notes.exportSheet();
+      const body = which === 'legend' ? this.legendSheet()
+                 : which === 'history' ? this.historySheet()
+                 : global.Notes.exportSheet();
       const el = document.createElement('div');
       el.id = 'sheetwrap';
       el.innerHTML = `<div class="scrim" data-close></div>
@@ -550,10 +613,26 @@
       document.body.appendChild(el);
       $$('[data-close]', el).forEach(b => b.onclick = () => this.closeSheet());
       $$('[data-jump]', el).forEach(b => b.onclick = () => { this.closeSheet(); this.jump(b.dataset.jump); });
+      $$('[data-revert]', el).forEach(b => b.onclick = async () => {
+        const v = b.dataset.v;
+        await global.Edits.revert(b.dataset.revert, v === '__original__' ? undefined : v);
+        this.closeSheet(); this.sheet('history');
+      });
       global.Notes.wireExport(el);
     },
 
     closeSheet() { const s = $('#sheetwrap'); if (s) s.remove(); },
+
+    /* A list whose length can be changed, not only its wording */
+    editList(cls, base, defaults, tag) {
+      const items = global.Edits.list(base, defaults);
+      if (!items.length && !global.Edits.mode) return '';
+      const rows = items.map((v, k) =>
+        `<${tag} class="ed" ${EA(base + '.' + k)}>${esc(v)}<button class="li-x"
+           data-listdel="${base}" data-k="${k}" title="Remove this line">×</button></${tag}>`).join('');
+      return `<ul class="${cls} edlist" data-listbase="${base}">${rows}
+        ${global.Edits.mode ? `<li class="li-add"><button data-listadd="${base}">+ Add a line</button></li>` : ''}</ul>`;
+    },
 
     /* While editing, a click may place a caret and nothing else. Cards, rows and
        thumbnails are all buttons, so this has to be caught before they fire. */
@@ -561,7 +640,7 @@
       const root = $('#root');
       if (!root) return;
       if (this._lock) root.removeEventListener('click', this._lock, true);
-      const NAV_OK = '.nav-btn, .dots button, .trk__tick, .trk__name, .sb__back, [data-back], #edbar, .sheet, #editwarn, .cmtbar';
+      const NAV_OK = '.nav-btn, .dots button, .trk__tick, .trk__name, .sb__back, [data-back], #edbar, .sheet, #editwarn, .cmtbar, [data-listadd], [data-listdel]';
       const fn = e => {
         if (!global.Edits.mode) return;
         if (e.target.closest(NAV_OK)) return;          // Back, Next, dots, tracker still move you
@@ -572,6 +651,20 @@
       this._lock = fn;
     },
 
+    wireLists() {
+      const defs = {};
+      SCREENS.forEach(x => defs[x.id + '.beat'] = x.beats || []);
+      STAGES.forEach(st => { defs['stage.' + st.n + '.in'] = st.inputs; defs['stage.' + st.n + '.out'] = st.outputs; });
+      $$('[data-listadd]').forEach(b => b.onclick = e => {
+        e.preventDefault(); e.stopPropagation();
+        global.Edits.addItem(b.dataset.listadd, defs[b.dataset.listadd] || []);
+      });
+      $$('[data-listdel]').forEach(b => b.onclick = e => {
+        e.preventDefault(); e.stopPropagation();
+        global.Edits.removeItem(b.dataset.listdel, defs[b.dataset.listdel] || [], +b.dataset.k);
+      });
+    },
+
     editBar() {
       const old = $('#edbar'); if (old) old.remove();
       const n = global.Edits.count();
@@ -579,9 +672,11 @@
       el.id = 'edbar'; el.className = 'cmtbar cmtbar--ed';
       el.innerHTML = `<span>Direct edit is on — click any dotted text to change it for everyone.</span>
         ${n ? `<b class="cmtbar__who">${n} edited</b>` : ''}
+        <button data-edhist>History</button>
         <button data-edoff>Turn off</button>`;
       document.body.appendChild(el);
       $('[data-edoff]', el).onclick = () => global.Edits.toggleMode();
+      $('[data-edhist]', el).onclick = () => this.sheet('history');
     },
 
     reminder() {
@@ -605,6 +700,65 @@
         $('[data-go2]', el).onclick = go;
         inp.onkeydown = e => { if (e.key === 'Enter') go(); };
       }
+    },
+
+    historySheet() {
+      const rows = global.Edits.changed();
+      if (!rows.length) return `<h2>Edit history</h2>
+        <p>Nothing has been changed yet. Once someone edits a line, every previous version of it
+           is kept here and can be put back.</p>`;
+
+      return `<h2>Edit history</h2>
+        <p>${rows.length} string${rows.length === 1 ? '' : 's'} changed. The version before each
+           change is kept, so anything can be put back.</p>
+        ${rows.map(r => `<div class="hist">
+          <b class="hist__path">${esc(this.pathLabel(r.path))}</b>
+          <div class="hist__now"><span class="hist__tag">Now</span>${esc(r.now)}</div>
+          ${r.versions.map(v => `<div class="hist__was">
+            <span class="hist__tag">${esc(v.who || 'anonymous')} · ${new Date(v.at).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</span>
+            ${esc(v.text)}
+            <button class="hist__put" data-revert="${esc(r.path)}" data-v="${esc(v.text)}">Put this back</button>
+          </div>`).join('')}
+          ${r.original !== undefined && r.original !== r.now ? `<div class="hist__was hist__was--orig">
+            <span class="hist__tag">Original wording</span>${esc(r.original)}
+            <button class="hist__put" data-revert="${esc(r.path)}" data-v="__original__">Restore original</button>
+          </div>` : ''}
+        </div>`).join('')}`;
+    },
+
+    /* turn an edit path into something a human recognises */
+    pathLabel(path) {
+      const p = String(path);
+      let m = p.match(/^([a-z0-9]+)\.(summary|beat|note)/i);
+      if (m) {
+        const sc = SCREENS.find(x => x.id === m[1]);
+        const kind = m[2] === 'summary' ? 'lead line' : m[2] === 'beat' ? 'bullet' : 'side note';
+        return sc ? `${STAGES[sc.stage].name} · ${sc.label} — ${kind}` : p;
+      }
+      m = p.match(/^stage\.(\d+)\.(about|short|in|out)/);
+      if (m) {
+        const st = STAGES[+m[1]];
+        const kind = { about: 'write-up', short: 'one-liner', in: 'input', out: 'output' }[m[2]];
+        return st ? `${st.name} — ${kind}` : p;
+      }
+      m = p.match(/^recap\.(\d+)\.flag/);
+      if (m) { const r = RECAP[+m[1]]; return r ? `Recap · ${r.activity} — flag` : p; }
+      const PLAIN = {
+        'home.eyebrow': 'Home — line above the title',
+        'home.lede': 'Home — opening line',
+        'home.cmt.h': 'Home — commenting heading',
+        'home.cmt.p': 'Home — commenting note',
+        'recap.h': 'Recap — heading',
+        'recap.p': 'Recap — note under the heading',
+        'label.inputs': 'Shared heading — what the user puts in',
+        'label.outputs': 'Shared heading — what comes out',
+        'map.h': 'Storyboard — heading',
+        'map.p': 'Storyboard — note under the heading'
+      };
+      if (PLAIN[p]) return PLAIN[p];
+      m = p.match(/^home\.(\w+)\.(name|text)$/);
+      if (m) return `Home · ${m[1]} card — ${m[2] === 'name' ? 'title' : 'description'}`;
+      return p;
     },
 
     legendSheet() {

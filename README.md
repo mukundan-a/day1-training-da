@@ -75,9 +75,27 @@ stage — "What the user puts in" and "What comes out" — are edited once and c
 **History** in the edit bar keeps the twelve previous versions of every string, named by whoever
 changed it, plus the original wording. Anything can be put back.
 
-Edits share through the same Firestore project, at `boards/main/edits`. The rules for that
-collection are in `firestore.rules` and need pasting into the Firebase console; until then edits
-stay in the editor's own browser and the comments are unaffected.
+Edits share through the same Firestore project, at `boards/main/edits`.
+
+**Sharing has to be switched on once, in Firebase.** Until the rules in `firestore.rules` are
+deployed, that collection denies reads, the subscription errors, and every edit stays in the
+browser that made it. Deploy them with:
+
+```
+firebase deploy --only firestore:rules      # firebase.json and .firebaserc point at day1-wireframe
+```
+
+or paste `firestore.rules` into Firebase console → Firestore → Rules.
+
+Whether sharing is on is now visible rather than assumed. The edit bar carries the state, turns
+maroon and says so plainly when the board cannot be reached, and the confirmation dialog repeats
+it before anyone starts typing. Edits made while it is unreachable are kept in the browser and
+pushed up automatically the first time the board answers — the board wins wherever both hold the
+same string, so nobody's wording is replaced by a stale copy.
+
+Edits can also be carried by hand: **Export** in the top bar has a Direct edits section that
+downloads them as JSON and loads them back in, which is the way out if the board is unreachable
+and someone needs what you wrote.
 
 ---
 

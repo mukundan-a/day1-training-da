@@ -110,6 +110,18 @@ minutes." This applies to the stage-transition screens, the stage intros and the
 **Durations on screen are `XX`, never a number.** Nobody has timed the real training, and a figure
 on screen would be read as a commitment. `MAP5` in `content.js` is the one place that sets them.
 
+**Never tell someone their change is shared unless it is.** The edit bar used to say "change it
+for everyone" whether or not the shared board could be reached, and the failure was silent — one
+person wrote 156 edits over several sessions believing the team could see them, and nobody could.
+Anything that writes to the shared board states its actual state in the UI, and a write that
+cannot be shared says so at the moment it happens.
+
+**An edit is written to localStorage first, every time.** Sharing can fail; the words must not be
+lost either way. `Edits.local` is the browser's own copy and is always saved, `Edits.remote` is
+the board as last seen, and `Edits.map` is the two merged with the board winning. Local-only
+paths are pushed up the first time the board answers, and only paths the board does not already
+hold, so migration can never overwrite someone else's newer wording.
+
 **Editing must not mark up the page.** Browser spellcheck is off inside editable text, and an edited
 string carries no underline. Both drew red lines under house wording and read as the wireframe
 flagging an error. What changed is findable in the edits list, which holds the original and every

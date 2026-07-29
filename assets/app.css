@@ -1011,6 +1011,18 @@ input, textarea { font: inherit; color: inherit; }
 }
 .pin--done { background: var(--mute-2); }
 
+/* comments whose anchor is gone: still reachable, and honest about why they
+   are not sitting on the thing they were written about */
+.pinlost {
+  position: absolute; top: 8px; right: 8px; z-index: 22;
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end;
+  max-width: 320px; background: var(--paper); border: 1px solid var(--rule);
+  border-radius: var(--radius); padding: 6px 8px; box-shadow: 0 2px 10px rgba(35, 36, 38, .1);
+}
+.pinlost__cap { font-size: 10px; line-height: 1.35; color: var(--mute); text-align: right; }
+.pin--lost { position: static; transform: none; background: var(--mute); }
+.pin--lost:hover { transform: scale(1.15); }
+
 .pop--thread { max-height: 340px; overflow-y: auto; }
 .pop__existing.is-done .pop__text { color: var(--mute); }
 .pop__done { color: var(--mute-2); font-size: 9px; letter-spacing: .06em; text-transform: uppercase; }

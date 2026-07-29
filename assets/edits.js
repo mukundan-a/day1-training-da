@@ -198,7 +198,9 @@
             document.execCommand('insertText', false, t.replace(/\s+/g, ' '));
           };
         }
-        el.spellcheck = true;
+        /* off: the browser's red squiggles under names and house wording
+           looked like the wireframe flagging a mistake */
+        el.spellcheck = false;
         const path = el.dataset.edit;
         const before = el.textContent;
         el.onblur = () => {

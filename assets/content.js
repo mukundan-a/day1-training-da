@@ -61,12 +61,14 @@
 
   /* --- the five product stages, as the learner sees them ---------------- */
 
+  /* Durations are placeholders. Nobody has timed the real thing yet, and a
+     number on screen would be read as a commitment. */
   const MAP5 = [
-    { n: 'Day 0',              why: 'Get set up and take on the context',             mins: '6 min'  },
-    { n: 'Full-team kick-off', why: 'Build a hypothesis tree, agree on the deliverable', mins: '10 min' },
-    { n: 'Core team kick-off', why: 'Ways of working, and early ownership',           mins: '10 min' },
-    { n: 'PD alignment',       why: 'How the two PDs split the project',              mins: '3 min'  },
-    { n: 'Week 1',             why: 'Where today’s outputs end up',                   mins: '2 min'  }
+    { n: 'Day 0',              why: 'You get set up and take on the context before the project starts', mins: 'XX min' },
+    { n: 'Full-team kick-off', why: 'You build a hypothesis tree and agree on what the team is delivering', mins: 'XX min' },
+    { n: 'Core team kick-off', why: 'You agree how the team will work, and who owns which claim', mins: 'XX min' },
+    { n: 'PD alignment',       why: 'You see how the two Partner Directors split the project between them', mins: 'XX min' },
+    { n: 'Week 1',             why: 'You see where the things you made today actually end up', mins: 'XX min' }
   ];
 
   function map5(at) {
@@ -78,9 +80,9 @@
     }).join('');
     return `<div class="map5">${nodes}</div>
       <div class="map5__band">
-        <div style="flex:0 0 calc(20% - 5px)">After staffing note</div>
+        <div style="flex:0 0 calc(20% - 5px)">After the staffing note</div>
         <div style="flex:1">The first couple of days of the project</div>
-        <div style="flex:0 0 calc(20% - 5px)">What comes after</div>
+        <div style="flex:0 0 calc(20% - 5px)">What comes after Day 1</div>
       </div>`;
   }
 
@@ -109,21 +111,23 @@
   {
     id: 's0a', stage: 0, kind: 'splash', verb: 'READ', action: 'Start',
     label: 'The opening screen',
-    summary: 'User arrives and learns what the experience is, roughly how long it takes, and that nothing here is assessed.',
+    summary: 'User arrives and learns what the experience is, what it will leave them able to do, roughly how long it takes, and that nothing here is assessed.',
     beats: [
       'Sets the frame before anything is asked of them.',
       'Makes clear this is a benchmark to observe, not an exercise to pass.',
+      'The objectives are the whole training’s, so the promise is visible before the commitment.',
       'Says it can be left and picked up again, so nobody feels locked in.'
     ],
     notes: [
-      ['Copy', 'Welcome text: what the experience is, roughly how long, and that it is resumable.']
+      ['Copy', 'Welcome text: what the experience is, roughly how long, and that it is resumable.'],
+      ['Note', 'The six objectives are the stage-level ones rolled up. Each stage restates its own on its intro screen.']
     ],
     body: () => `
       <div class="stack">
         <div><h1 class="s-display">Day 1</h1></div>
-        <div class="s-cols" style="flex:1;min-height:0;align-content:start">
-          <div class="panel" style="background:var(--soft)">
-            <div class="s-eyebrow" style="color:var(--maroon);opacity:.75">What this is</div>
+        <div class="s-cols" style="align-content:start">
+          <div class="panel">
+            <div class="s-eyebrow">What this is</div>
             ${list(['An annotated view of what happens, not an exercise',
                     'One successful instance, as a benchmark',
                     'Not assessed, and returnable at any time'])}</div>
@@ -132,6 +136,17 @@
             ${list(['Not a rulebook — projects vary',
                     'Not a substitute for the Craft document',
                     'Not the only training you will get'])}</div>
+        </div>
+        <div class="focus" style="flex:1;min-height:0;justify-content:center">
+          <div class="s-eyebrow">By the end you will be able to</div>
+          <ul class="s-list s-list--split">${
+            ['Say what is expected of you before Day 1 starts',
+             'Turn a hypothesis tree into a dot-dash storyline and a research plan',
+             'Write an SCQ and a problem statement from a proposal and a brief',
+             'Recognise what a finished Day 1 output actually looks like',
+             'Explain what a hypothesis is, and drill a claim into what would have to be true',
+             'Say who to go to for what, and where today’s outputs end up in week one'
+            ].map(i => `<li>${i}</li>`).join('')}</ul>
         </div>
       </div>`
   },
@@ -165,8 +180,8 @@
     summary: 'User sees the whole shape of what is ahead — five stages and how long each takes — so they can judge the commitment before starting.',
     beats: ['Nothing is open yet; this is orientation only.',
             'The same map reappears between stages so progress stays visible.'],
-    body: () => `<div class="stack"><div class="maphead"><h2 class="s-h1">Five stages, about half an hour</h2>
-      <p class="s-cap" style="margin:0">Day 0 happens in your own time. The rest is the first couple of days of the project.</p></div>${map5(-1)}</div>`
+    body: () => `<div class="stack"><div class="maphead"><h2 class="s-h1">Welcome to the Day 1 training. You will go through five stages, and together they should take you about XX minutes.</h2>
+      <p class="s-cap" style="margin:0">Day 0 happens in your own time before the project starts. The four stages after it are the first couple of days of the project itself.</p></div>${map5(-1)}</div>`
   },
 
   /* ------------------------------- DAY 0 -------------------------------- */
@@ -175,7 +190,7 @@
     label: 'Day 0 opens',
     summary: 'User sees the first stage unlock and the remaining four still closed, so progress through the whole experience stays legible.',
     beats: ['A version of this screen sits between every stage.'],
-    body: () => `<div class="stack"><div class="maphead"><h2 class="s-h1">Day 0 is open. Four stages still to come.</h2></div>${map5(0)}</div>`
+    body: () => `<div class="stack"><div class="maphead"><h2 class="s-h1">Day 0 is now open to you. The four stages after it stay closed until you reach them.</h2></div>${map5(0)}</div>`
   },
 
   {
@@ -183,15 +198,15 @@
     label: 'What Day 0 covers',
     summary: 'User learns that Day 0 is everything between being staffed and walking in prepared, and what they will personally have to produce.',
     beats: [
-      'Sets the expectation of about an hour of work spread over a few days.',
+      'Sets the expectation of a set amount of work spread over a few days, with the figure still to be filled in.',
       'Names the outputs they own before the kick-off: an SCQ and a problem statement.'
     ],
     notes: [
-      ['Copy', 'A line saying Day 0 happens in the learner’s own time across a few days, and adds up to about an hour of real work.']
+      ['Copy', 'A line saying Day 0 happens in the learner’s own time across a few days, and adds up to about XX minutes of real work. The real figure goes in once someone has timed it.']
     ],
     body: () => `
       <div class="stack">
-        <div><h2 class="s-h1">Day 0</h2><p class="s-cap" style="margin:0">Between being staffed and walking into the kick-off prepared.</p></div>
+        <div><h2 class="s-h1">Day 0</h2><p class="s-cap" style="margin:0">Everything that happens between being staffed on the project and walking into the kick-off prepared. It runs in your own time across a few days, and adds up to about XX minutes of real work.</p></div>
         ${objectives(
           ['Get staffed, and read what came before you',
            'Explore how a project folder is set up',
@@ -455,7 +470,7 @@
     label: 'Day 0 complete',
     summary: 'User sees the first stage close and the kick-off open, so the sense of progression is maintained.',
     beats: [],
-    body: () => `<div class="stack"><div class="maphead"><h2 class="s-h1">Day 0 done. The kick-off is where the thinking starts.</h2></div>${map5(1)}</div>`
+    body: () => `<div class="stack"><div class="maphead"><h2 class="s-h1">You have finished Day 0. The full-team kick-off is where the project’s thinking actually starts.</h2></div>${map5(1)}</div>`
   },
 
   {
@@ -468,7 +483,7 @@
     ],
     body: () => `
       <div class="stack">
-        <div><h2 class="s-h1">Full-team kick-off</h2><p class="s-cap" style="margin:0">Two hours minimum. Always before any client kick-off.</p></div>
+        <div><h2 class="s-h1">Full-team kick-off</h2><p class="s-cap" style="margin:0">The session runs for at least XX minutes, and it always happens before any kick-off with the client.</p></div>
         ${objectives(
           ['See your SCQ next to your colleagues’ and find they do not match',
            'Find the words in a problem statement nobody has defined',
@@ -896,7 +911,7 @@
     label: 'Two stages complete',
     summary: 'User sees the morning close and the afternoon session open.',
     beats: [],
-    body: () => `<div class="stack"><div class="maphead"><h2 class="s-h1">Two done. The afternoon session belongs to the team.</h2></div>${map5(2)}</div>`
+    body: () => `<div class="stack"><div class="maphead"><h2 class="s-h1">Two stages behind you. The afternoon session belongs to the core team, and the Partner is not in the room for it.</h2></div>${map5(2)}</div>`
   },
 
   {
@@ -909,7 +924,7 @@
     ],
     body: () => `
       <div class="stack">
-        <div><h2 class="s-h1">Core team kick-off</h2><p class="s-cap" style="margin:0">Later the same day. Smaller room. No Partner.</p></div>
+        <div><h2 class="s-h1">Core team kick-off</h2><p class="s-cap" style="margin:0">This one runs later the same day in a smaller room, and the Partner is not in it. It takes about XX minutes.</p></div>
         ${objectives(
           ['Fill in your working preferences before the session',
            'Watch the hypothesis tree become a dot-dash storyline',
@@ -1081,7 +1096,7 @@
     beats: ['The criteria came out of the claims, and the list was built against the criteria.'],
     body: () => `
       <div class="stack">
-        <h2 class="s-h1">28 interviews, three parameters</h2>
+        <h2 class="s-h1">The 28 interviews were chosen against three stated parameters, not by who the team already knew.</h2>
         <div style="flex:1;min-height:0">${claims([
           'Equal representation of Global North and Global South, with perspectives from each continent.',
           'A broad set of stakeholder types — public policy, government, multilaterals, philanthropic funders, NGOs and industry.',
@@ -1233,7 +1248,7 @@
     label: 'Three stages complete',
     summary: 'User sees the next stage open, and that it is the one they are not in.',
     beats: [],
-    body: () => `<div class="stack"><div class="maphead"><h2 class="s-h1">Three done. The next one happens without you.</h2></div>${map5(3)}</div>`
+    body: () => `<div class="stack"><div class="maphead"><h2 class="s-h1">Three stages behind you. The next one happens without you in the room, between the two Partner Directors.</h2></div>${map5(3)}</div>`
   },
 
   {
@@ -1246,7 +1261,7 @@
     ],
     body: () => `
       <div class="stack">
-        <div><h2 class="s-h1">PD alignment on responsibilities</h2><p class="s-cap" style="margin:0">Twenty minutes between two people, at the end of the day.</p></div>
+        <div><h2 class="s-h1">PD alignment on responsibilities</h2><p class="s-cap" style="margin:0">About XX minutes between two people at the end of the day. It is the only part of Day 1 you are not in the room for.</p></div>
         ${objectives(
           ['Tell the PDs what you need from the split before they meet',
            'Read the note they send afterwards',
@@ -1386,7 +1401,7 @@
     label: 'Four stages complete',
     summary: 'User sees the last item open, and that it is a preview rather than a stage.',
     beats: [],
-    body: () => `<div class="stack"><div class="maphead"><h2 class="s-h1">Four done. What is left is a preview, not a stage.</h2></div>${map5(4)}</div>`
+    body: () => `<div class="stack"><div class="maphead"><h2 class="s-h1">Four stages behind you. What is left is a preview of the week that follows, rather than a part of Day 1 itself.</h2></div>${map5(4)}</div>`
   },
 
   {
@@ -1399,18 +1414,71 @@
     ],
     body: () => `
       <div class="stack">
-        <div><h2 class="s-h1">Week 1</h2><p class="s-cap" style="margin:0">Out of scope for Day 1. Included for context.</p></div>
+        <div><h2 class="s-h1">Week 1</h2><p class="s-cap" style="margin:0">This is out of scope for Day 1, and it is included only so you can see where the things you made today actually end up.</p></div>
         ${objectives(
-          ['Watch the four Day 1 artefacts expand across the first week',
+          ['Watch the hypothesis tree become the workplan, the storyline and then the deck',
+           'Watch the four Day 1 artefacts expand across the first week',
            'See what happens when evidence contradicts a claim'],
-          ['Explain why a hypothesis changing is the process working rather than failing'])}
+          ['Explain how the four Day 1 outputs are one object drawn four ways',
+           'Explain why a hypothesis changing is the process working rather than failing'])}
+      </div>`
+  },
+
+  {
+    id: 's5f0', stage: 5, kind: 'exercise', verb: 'WATCH', action: 'Next',
+    label: 'The four artefacts are one object',
+    summary: 'Before the week starts, user watches the hypothesis tree tilt over — every branch becoming a row of the workplan, every row a section of the dot-dash storyline, and every section the lead line at the top of a page of the deck.',
+    beats: [
+      'One object the whole way through, redrawn four times, rather than four separate documents.',
+      'The claim argued about in the morning is the line at the top of the page in week one.',
+      'It runs as a loop, because this is the move people most consistently miss.'
+    ],
+    carry: { read: ['tree'] },
+    notes: [
+      ['Beat', 'The tree stands upright, tips over, and the branches land as workplan rows. Those rows pick up dashes and dots, then open out into pages.'],
+      ['Definition', 'A line naming what stays constant across all four: the claim. The artefact changes around it; the claim does not.'],
+      ['Note', 'This answers the question people ask at the end of Day 1 — why they made four things instead of one. They did not. They made one thing and drew it four ways.']
+    ],
+    anim: anim(12000, [
+      { at: 200,  do: el => mstage(el, 0) },
+      { at: 2600, do: el => mstage(el, 1) },
+      { at: 3900, do: el => mstage(el, 2) },
+      { at: 6600, do: el => mstage(el, 3) },
+      { at: 9200, do: el => mstage(el, 4) }
+    ]),
+    body: () => `
+      <div class="stack">
+        <div class="mrail">
+          ${['Hypothesis tree', 'Workplan', 'Dot-dash storyline', 'Lead lines on the deck'].map((s, i) =>
+            `${i ? '<i class="mrail__a">&rarr;</i>' : ''}<span class="mrail__s">${s}</span>`).join('')}
+        </div>
+        <div class="focus morph" data-phase="0" style="flex:1;min-height:0">
+          <div class="morph__claim">${W.bar('58%', 'strong')}</div>
+          <div class="morph__rows">
+            ${[['72%', '56%', '46%'], ['66%', '52%', '42%'], ['78%', '60%', '48%']].map(w => `
+              <div class="mrow">
+                <span class="mrow__mark"></span>
+                <span class="mrow__main">
+                  ${W.bar(w[0], 'strong')}
+                  <span class="mrow__kids">
+                    <span class="mkid"><i class="mkid__dot"></i>${W.bar(w[1], 'faint')}</span>
+                    <span class="mkid"><i class="mkid__dot"></i>${W.bar(w[2], 'faint')}</span>
+                  </span>
+                </span>
+                <span class="mrow__meta"><i class="mchip"></i><i class="mchip"></i><i class="mspan" style="width:46px"></i></span>
+                <i class="mslide"></i>
+              </div>`).join('')}
+          </div>
+          <div class="mfilm">${Array.from({ length: 10 }, (_, i) =>
+            `<i class="${[1, 4, 7].indexOf(i) > -1 ? 'on' : ''}"></i>`).join('')}</div>
+        </div>
       </div>`
   },
 
   {
     id: 's5f1', stage: 5, kind: 'exercise', verb: 'WATCH', action: 'Next',
     label: 'The artefacts grow, one claim fails',
-    summary: 'Jumping forward a week, user watches the four Day 1 artefacts fill out day by day, and one branch of the hypothesis tree fail.',
+    summary: 'Having seen the four artefacts as one object, user jumps forward a week and watches each of them fill out day by day, and one branch of the hypothesis tree fail.',
     beats: [
       'The storyline becomes a deck with a page count; the plan gets names and dates.',
       'The fact pack thickens as colleagues drop things into it.',
@@ -1536,8 +1604,8 @@
     ],
     body: () => `
       <div class="stack" style="justify-content:center;align-items:center;text-align:center;gap:var(--s3)">
-        <h1 class="s-display">Day 1 complete</h1>
-        <p class="s-cap" style="max-width:44ch;margin:0">Your checklists, templates and record stay available here and on the Hub.</p>
+        <h1 class="s-display">You have reached the end of the Day 1 training.</h1>
+        <p class="s-cap" style="max-width:52ch;margin:0">Your checklists, your templates and your own record of the day stay available here and on the Hub, and you can come back to any of it whenever you want.</p>
       </div>`
   }
 
@@ -1686,6 +1754,14 @@
         </div></div>`).join('');
   }
 
+  /* the same three claims, redrawn as each of the four artefacts in turn.
+     Every phase is a data-phase value; the CSS does the moving. */
+  function mstage(el, p) {
+    const w = $('.morph', el);
+    if (w) w.setAttribute('data-phase', String(p));
+    cls(el, '.mrail__s', 'on', [0, 0, 1, 2, 3][p]);
+  }
+
   function week(el) {
     $$('.wk', el).forEach(c => c.innerHTML = '');
     for (let d = 0; d < 5; d++) {
@@ -1779,9 +1855,9 @@
     },
     {
       n: 5, name: 'Week 1 preview', short: 'Where the Day 1 outputs actually end up',
-      about: 'Not part of Day 1 and not what is being standardised. It is here so the learner can see where the four things they built end up: the storyline becomes a ghost deck with a page count, the research plan fills with names and dates, the fact pack thickens as colleagues drop things in, and one branch of the hypothesis tree turns out to be wrong and gets restructured. The first review lands while the deck is still empty.',
+      about: 'Not part of Day 1 and not what is being standardised. It is here so the learner can see where the four things they built end up. It opens by showing that they are not four things at all: the hypothesis tree tilts over, each branch lands as a row of the workplan, each row becomes a section of the dot-dash storyline, and each section becomes the lead line at the top of a page of the deck. The week then runs, and the artefacts grow — the storyline becomes a ghost deck with a page count, the research plan fills with names and dates, the fact pack thickens as colleagues drop things in, and one branch of the hypothesis tree turns out to be wrong and gets restructured. The first review lands while the deck is still empty.',
       inputs: ['Nothing. This stage is watched.'],
-      outputs: ['An understanding of why a hypothesis changing is the process working', 'A sense of what an early, cheap review looks like']
+      outputs: ['An understanding of how the four Day 1 outputs are one object drawn four ways', 'An understanding of why a hypothesis changing is the process working', 'A sense of what an early, cheap review looks like']
     },
     {
       n: 6, name: 'Close', short: 'The trail, the vault, and what happened next',

@@ -115,8 +115,11 @@
     beats: [
       'Sets the frame before anything is asked of them.',
       'Makes clear this is a benchmark to observe, not an exercise to pass.',
-      'The objectives are the whole training’s, so the promise is visible before the commitment.',
-      'Says it can be left and picked up again, so nobody feels locked in.'
+      'Says it can be left and picked up again, so nobody feels locked in.',
+      /* appended, not inserted: beats are stored as base.0, base.1 … so adding
+         one in the middle would slide every edit made after it onto the wrong
+         line. New beats go on the end. */
+      'The objectives are the whole training’s, so the promise is visible before the commitment.'
     ],
     notes: [
       ['Copy', 'Welcome text: what the experience is, roughly how long, and that it is resumable.'],
@@ -1857,7 +1860,7 @@
       n: 5, name: 'Week 1 preview', short: 'Where the Day 1 outputs actually end up',
       about: 'Not part of Day 1 and not what is being standardised. It is here so the learner can see where the four things they built end up. It opens by showing that they are not four things at all: the hypothesis tree tilts over, each branch lands as a row of the workplan, each row becomes a section of the dot-dash storyline, and each section becomes the lead line at the top of a page of the deck. The week then runs, and the artefacts grow — the storyline becomes a ghost deck with a page count, the research plan fills with names and dates, the fact pack thickens as colleagues drop things in, and one branch of the hypothesis tree turns out to be wrong and gets restructured. The first review lands while the deck is still empty.',
       inputs: ['Nothing. This stage is watched.'],
-      outputs: ['An understanding of how the four Day 1 outputs are one object drawn four ways', 'An understanding of why a hypothesis changing is the process working', 'A sense of what an early, cheap review looks like']
+      outputs: ['An understanding of why a hypothesis changing is the process working', 'A sense of what an early, cheap review looks like', 'An understanding of how the four Day 1 outputs are one object drawn four ways']
     },
     {
       n: 6, name: 'Close', short: 'The trail, the vault, and what happened next',

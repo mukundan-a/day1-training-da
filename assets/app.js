@@ -604,7 +604,7 @@
       this.closeSheet();
       const body = which === 'legend' ? this.legendSheet()
                  : which === 'history' ? this.historySheet()
-                 : global.Notes.exportSheet();
+                 : global.Notes.exportSheet() + this.editsSheet();
       const el = document.createElement('div');
       el.id = 'sheetwrap';
       el.innerHTML = `<div class="scrim" data-close></div>
@@ -619,6 +619,56 @@
         this.closeSheet(); this.sheet('history');
       });
       global.Notes.wireExport(el);
+      this.wireEdits(el);
+    },
+
+    /* Comments have always been exportable. Edits were not, so when the shared
+       board could not be reached there was no way to get them out of the one
+       browser that held them. */
+    editsSheet() {
+      const E = global.Edits, st = E.status(), n = E.count(), stranded = E.unshared();
+      return `<h2>Direct edits</h2>
+        <p><span class="conn ${st.cls}">${esc(st.t)}</span></p>
+        ${E.live()
+          ? `<p>Edits are shared. What anyone changes is what everyone sees, and it arrives without
+             a refresh. The download below is a snapshot for your own records.</p>`
+          : `<p>The shared board could not be reached${E.why ? ' — ' + esc(E.why) : ''}, so edits are
+             being kept in this browser only. Nobody else can see them. Download them and send them on,
+             or load them back in once sharing works.</p>`}
+        <p>${n} string${n === 1 ? '' : 's'} changed${stranded ? `, ${stranded} not shared` : ''}.</p>
+        <div class="btn-row">
+          <button class="btn-out btn-out--primary" data-edl>Download edits</button>
+        </div>
+        <h3>Load edits back in</h3>
+        <p>Drop a file exported from here.${E.live()
+          ? ' They go onto the shared board, so everyone gets them.'
+          : ' They are added to this browser.'} Anything already set to the same wording is skipped.</p>
+        <div class="drop" data-eddrop>Drop a JSON file, or click to choose
+          <input type="file" accept="application/json,.json" data-edfile hidden></div>
+        <p class="sheet__msg" data-edmsg></p>`;
+    },
+
+    wireEdits(root) {
+      const dl = $('[data-edl]', root);
+      if (dl) dl.onclick = () => global.Edits.exportFile();
+
+      const drop = $('[data-eddrop]', root), file = $('[data-edfile]', root),
+            msg = $('[data-edmsg]', root);
+      if (!drop) return;
+      const take = async files => {
+        if (!files.length) return;
+        const text = await files[0].text();
+        const r = await global.Edits.importText(text);
+        if (!msg) return;
+        msg.textContent = r.error ? r.error
+          : `${r.added} loaded, ${r.skipped} already the same` +
+            (r.added ? (r.shared ? ' — shared with everyone.' : ' — kept in this browser.') : '.');
+      };
+      drop.onclick = () => file.click();
+      drop.ondragover = e => { e.preventDefault(); drop.classList.add('over'); };
+      drop.ondragleave = () => drop.classList.remove('over');
+      drop.ondrop = e => { e.preventDefault(); drop.classList.remove('over'); take(Array.from(e.dataTransfer.files)); };
+      file.onchange = () => take(Array.from(file.files));
     },
 
     closeSheet() { const s = $('#sheetwrap'); if (s) s.remove(); },
@@ -667,16 +717,26 @@
 
     editBar() {
       const old = $('#edbar'); if (old) old.remove();
-      const n = global.Edits.count();
+      const E = global.Edits, n = E.count(), st = E.status(), shared = E.live();
+      const stranded = E.unshared();
       const el = document.createElement('div');
-      el.id = 'edbar'; el.className = 'cmtbar cmtbar--ed';
-      el.innerHTML = `<span>Direct edit is on — click any dotted text to change it for everyone.</span>
+      el.id = 'edbar'; el.className = 'cmtbar cmtbar--ed' + (shared ? '' : ' cmtbar--warn');
+      /* The bar used to promise "change it for everyone" whether or not the
+         shared board was reachable. When it is not, say so here — this is the
+         only place anyone would find out. */
+      el.innerHTML = `<span>${shared
+          ? 'Direct edit is on — click any dotted text to change it for everyone.'
+          : 'Direct edit is on, but the shared board cannot be reached. Changes stay in this browser and nobody else sees them.'}</span>
+        <span class="conn ${st.cls}">${esc(st.t)}</span>
         ${n ? `<b class="cmtbar__who">${n} edited</b>` : ''}
+        ${!shared && stranded ? `<button data-edexport>Export ${stranded}</button>` : ''}
         <button data-edhist>History</button>
         <button data-edoff>Turn off</button>`;
       document.body.appendChild(el);
       $('[data-edoff]', el).onclick = () => global.Edits.toggleMode();
       $('[data-edhist]', el).onclick = () => this.sheet('history');
+      const ex = $('[data-edexport]', el);
+      if (ex) ex.onclick = () => global.Edits.exportFile();
     },
 
     reminder() {

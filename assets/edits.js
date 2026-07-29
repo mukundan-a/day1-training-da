@@ -126,11 +126,19 @@
 
     refreshBar() { if (this.mode && global.App && global.App.editBar) global.App.editBar(); },
 
-    /* the current wording for a path, falling back to what was built in */
+    /* The wording on a path right now. Four layers, highest first: the shared
+       board, this browser's own unshared edits, the seed carried by the build,
+       and last the string the screen was written with. */
+    raw(path) {
+      const v = this.map[path];
+      if (typeof v === 'string' && v.length) return v;
+      return seed(path);
+    },
+
     t(path, fallback) {
       if (typeof fallback === 'string' && !(path in this.orig)) this.orig[path] = fallback;
-      const v = this.map[path];
-      return (typeof v === 'string' && v.length) ? v : fallback;
+      const v = this.raw(path);
+      return v === undefined ? fallback : v;
     },
 
     async set(path, text) {
@@ -213,8 +221,8 @@
 
     /* a list's current contents, honouring any added or removed lines */
     list(base, defaults) {
-      const raw = parseInt(this.map[base + '.count'], 10);
-      const len = isNaN(raw) ? defaults.length : Math.max(0, Math.min(24, raw));
+      const n = parseInt(this.raw(base + '.count'), 10);
+      const len = isNaN(n) ? defaults.length : Math.max(0, Math.min(24, n));
       const out = [];
       for (let k = 0; k < len; k++) out.push(this.t(base + '.' + k, defaults[k] || 'New line'));
       return out;
@@ -375,6 +383,14 @@
     const copy = el.cloneNode(true);
     Array.from(copy.querySelectorAll('.li-x')).forEach(b => b.remove());
     return copy.textContent;
+  }
+
+  /* Read lazily rather than at load, so this does not depend on seed.js
+     having been parsed before this file. */
+  function seed(path) {
+    const s = global.EDIT_SEED;
+    const v = s && s[path];
+    return (typeof v === 'string' && v.length) ? v : undefined;
   }
 
   function clean(text) {

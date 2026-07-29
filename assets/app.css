@@ -768,9 +768,11 @@ input, textarea { font: inherit; color: inherit; }
   font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
   color: var(--mute-2); margin: 0 0 var(--s3);
 }
+/* runs the full width of the card grid beneath it rather than a narrow column
+   of its own, so the page opens on one line of type the width of the page */
 .home__lede {
   font-family: var(--font-display); font-size: 33px; line-height: 1.25; font-weight: 700;
-  color: var(--maroon); margin: 0 0 var(--s6); max-width: 26ch; text-wrap: balance;
+  color: var(--maroon); margin: 0 0 var(--s6); max-width: none; text-wrap: balance;
 }
 
 .home__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s3); margin-bottom: var(--s7); }

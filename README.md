@@ -1,7 +1,7 @@
 # Day 1 — interactive wireframe
 
 A click-through of the Day 1 Craft training, built from the storyboard deck so the team can respond
-to **the concept** rather than to prose or pixels. 55 screens across seven parts.
+to **the concept** rather than to prose or pixels. 56 screens across seven parts.
 
 Static site. No build step, no dependencies, no backend.
 
@@ -164,7 +164,7 @@ assets/
   app.css           design system and every component
   live.js           Firestore board + anonymous sign-in (ES module)
   chrome.js         simulated Outlook / Teams / SharePoint / PowerPoint / Excel / Forms
-  content.js        the 55 screens, the stage write-ups, and the recap table
+  content.js        the 56 screens, the stage write-ups, and the recap table
   comments.js       comment layer, replies, resolve, export, round-trip import
   edits.js          direct edits to the wording, shared, with version history
   app.js            render, navigate, animate, all five views
@@ -201,7 +201,8 @@ Flagged in the wireframe rather than silently fixed:
 - The core team kick-off shows the morning's agenda, contradicting the three outcomes the PM names
   on the same screen
 - "Six stages" in the intro against five boxes on the map
-- Every duration reads `X mins`; the map here uses the numbers from each stage intro (6 / 10 / 10 / 3 / 2)
+- Every duration reads `X mins`. Nothing here has been timed, so every duration on screen is now the
+  placeholder `XX min` rather than the numbers the deck happened to carry (6 / 10 / 10 / 3 / 2)
 - Every per-stage intro screen is titled "Stage 0 screen", whatever the stage
 
 ## Not yet built

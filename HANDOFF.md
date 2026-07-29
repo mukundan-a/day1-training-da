@@ -24,7 +24,7 @@ internet from the build sandbox, so a browser test was not possible here):
 
 The test comment was deleted; the board is empty.
 
-All 55 screens and 7 storyboard views have been driven headless with the animation loops running:
+All 56 screens and 7 storyboard views have been driven headless with the animation loops running:
 no JavaScript errors, nothing clipped outside intended scroll regions.
 
 **Not yet checked in a real browser:** the live Firestore listener updating one person's screen when
@@ -45,7 +45,7 @@ assets/
   app.css           the whole design system
   live.js           ES module — Firestore + anonymous auth. Config is inline.
   chrome.js         simulated Outlook / Teams / SharePoint / PowerPoint / Excel / Forms
-  content.js        55 screens, 7 stage write-ups, the recap table. Almost all edits go here.
+  content.js        56 screens, 7 stage write-ups, the recap table. Almost all edits go here.
   comments.js       comments, replies, resolve, export, round-trip import
   edits.js          direct edits to the wording, shared, with version history
   app.js            render, navigate, animate, all five views
@@ -100,6 +100,20 @@ learning objectives — are kept, compressed.
 
 **Nothing inside the panel is clickable.** Anything interactive plays as a loop. Navigation is the
 two buttons, the arrow keys, or the faded edges of the screen. The one exception is comment mode.
+
+**On-screen copy is written out, not clipped.** "Five stages, about half an hour" and "Day 0 done.
+The kick-off is where the thinking starts" were both rejected as product-marketing shorthand. Every
+heading and caption is a full sentence in the same descriptive register as the lead lines: "Welcome
+to the Day 1 training. You will go through five stages, and together they should take you about XX
+minutes." This applies to the stage-transition screens, the stage intros and the close.
+
+**Durations on screen are `XX`, never a number.** Nobody has timed the real training, and a figure
+on screen would be read as a commitment. `MAP5` in `content.js` is the one place that sets them.
+
+**Editing must not mark up the page.** Browser spellcheck is off inside editable text, and an edited
+string carries no underline. Both drew red lines under house wording and read as the wireframe
+flagging an error. What changed is findable in the edits list, which holds the original and every
+previous version.
 
 **One focal element per screen**, carrying the soft-pink fill. Maroon marks only what is live or
 moving. Pink is comments and nothing else. Negative space has been a recurring complaint — content

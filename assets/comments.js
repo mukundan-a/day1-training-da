@@ -109,9 +109,13 @@
 
       // every pin hangs off a keyed element, so it survives reflow and resizing
       const mine = this.items.filter(n => (n.view || 'walk') === view);
-      host.innerHTML = mine.map((n, i) => {
+      const lost = [];
+      const placed = mine.map((n, i) => {
         const el = wrap.querySelector('[data-anchor="' + cssEsc(n.anchor || n.screen) + '"]');
-        if (!el) return '';
+        /* A comment whose anchor no longer exists used to return '' here and
+           vanish — visible in the notes list, invisible on the screen, with
+           nothing to say why. Collect them instead. */
+        if (!el) { lost.push({ n: n, i: i }); return ''; }
         const a = el.getBoundingClientRect(), w = wrap.getBoundingClientRect();
         const left = (a.left - w.left) + (n.x / 100) * a.width;
         const top = (a.top - w.top) + (n.y / 100) * a.height;
@@ -121,6 +125,18 @@
              n.resolved ? '✓' : (i + 1)}${
              (n.replies && n.replies.length) ? `<em>${n.replies.length}</em>` : ''}</button>`;
       }).join('');
+
+      const tray = lost.length ? `<div class="pinlost" style="pointer-events:auto">
+          <span class="pinlost__cap">${lost.length === 1
+            ? 'One comment points at a part of this screen that no longer exists'
+            : lost.length + ' comments point at parts of this screen that no longer exist'}</span>
+          ${lost.map(({ n, i }) => `<button class="pin pin--lost ${n.resolved ? 'pin--done' : ''}"
+             data-pin-id="${n.id}" title="${esc(n.who || 'anonymous')} · was pinned to
+             ${esc(n.anchor || n.screen)}, which is not on this build">${
+               n.resolved ? '✓' : (i + 1)}</button>`).join('')}
+        </div>` : '';
+
+      host.innerHTML = placed + tray;
 
       $$('[data-pin-id]', host).forEach(b => b.onclick = e => {
         e.stopPropagation(); this.openThread(b.dataset.pinId);
@@ -473,7 +489,10 @@
 
     ingest(files, root) {
       const seen = new Set(this.items.map(n => (n.who || '') + '|' + n.screen + '|' + n.text));
-      const valid = new Set(global.CONTENT.SCREENS.map(s => s.id));
+      /* Every key the app can pin to, not only screen ids: a comment dropped
+         on a storyboard card or a stage header carries that anchor as its
+         screen, and checking screen ids alone threw all of them away. */
+      const valid = anchorKeys();
       let queue = [], skipped = 0, orphan = 0, names = [], pending = files.length;
       if (!pending) return;
 
@@ -485,12 +504,14 @@
             const arr = Array.isArray(parsed) ? parsed : (parsed.notes || []);
             arr.forEach(n => {
               if (!n || !n.screen || !n.text) return;
-              if (!valid.has(n.screen)) { orphan++; return; }
+              if (!valid.has(n.anchor || n.screen)) { orphan++; return; }
               const key = (n.who || '') + '|' + n.screen + '|' + n.text;
               if (seen.has(key)) { skipped++; return; }
               seen.add(key);
               queue.push({
                 screen: n.screen,
+                anchor: n.anchor || n.screen,
+                view: n.view || 'walk',
                 x: typeof n.x === 'number' ? n.x : 50,
                 y: typeof n.y === 'number' ? n.y : 50,
                 type: TYPES.some(t => t.k === n.type) ? n.type : 'concept',
@@ -548,7 +569,10 @@
             const m = meta(n);
             return {
               screen: n.screen, screenIndex: m.no, stage: m.stage, screenLabel: m.label,
-              x: n.x, y: n.y, anchor: 'percent-of-screen-box',
+              /* the real anchor, not a description of it — the file claims to
+                 put every pin back where it was, and without this it cannot */
+              anchor: n.anchor || n.screen, view: n.view || 'walk',
+              x: n.x, y: n.y, coords: 'percent-of-anchor-box',
               type: n.type, text: n.text, who: n.who || 'anonymous', at: n.at,
               resolved: !!n.resolved, replies: n.replies || []
             };
@@ -666,6 +690,19 @@
   function typeLabel(k) {
     const t = TYPES.find(x => x.k === k);
     return t ? t.label : k;
+  }
+
+  /* Every data-anchor the app renders, across all views. Kept next to nothing
+     else on purpose: if a renderer gains an anchor, it belongs in here too, or
+     comments pinned to it cannot be imported back. */
+  function anchorKeys() {
+    const S = global.CONTENT.SCREENS, ST = global.CONTENT.STAGES, R = global.CONTENT.RECAP || [];
+    const keys = new Set(['home-comment', 'map-intro', 'recap-diffs']);
+    ['recap', 'map', 'walk', 'notes'].forEach(k => keys.add('home-' + k));
+    R.forEach((_, ri) => keys.add('recap-' + ri));
+    S.forEach(s => { keys.add(s.id); keys.add('head-' + s.id); keys.add('specs-' + s.id); keys.add('sbstep-' + s.id); });
+    ST.forEach(st => { keys.add('stage-' + st.n); keys.add('sbhead-' + st.n); });
+    return keys;
   }
 
   function blob(text, name, mime) {

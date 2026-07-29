@@ -71,6 +71,11 @@ const Live = {
     const s = this._fns;
     return s.addDoc(this._col, {
       screen: note.screen,
+      /* Both of these used to be dropped here, so a comment lost its pin the
+         moment it came back from the board: without a view it defaulted to the
+         walkthrough, and a pin dropped on the storyboard had nowhere to hang. */
+      anchor: note.anchor || note.screen,
+      view: note.view || 'walk',
       x: note.x, y: note.y,
       type: note.type,
       text: note.text,

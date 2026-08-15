@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Reveal, StaggerGroup, StaggerItem, BeatHead, FenSlot, ScaffoldSlot } from '../components/ui.jsx';
 import { Scene, useUI } from '../components/frame.jsx';
 import { StageOverview, ChecklistStrip, ZoomOut } from '../components/templates.jsx';
 import { BranchActivity } from '../components/activities.jsx';
+import { GhostBranch } from '../components/sim.jsx';
 import { HeroB } from '../components/heroes.jsx';
 import { useStore } from '../store.jsx';
 import { spring, dur, ease } from '../motion.js';
@@ -76,9 +77,16 @@ export function F3() {
 /* F4 — build a branch */
 export function F4() {
   const { openSource } = useUI();
+  const [mode, setMode] = useState('demo');
   return (
     <Scene id="F4">
-      <div style={{ marginTop: 24 }}><BranchActivity onOpenSource={openSource} /></div>
+      <Reveal><h2 className="lead" style={{ marginTop: 24, maxWidth: '22ch' }}>{mode === 'demo' ? 'First, watch someone drill a branch down.' : 'Your turn. Drill your branch down.'}</h2></Reveal>
+      <Reveal><p className="body mt16">{mode === 'demo'
+        ? <>You take one branch and ask: <strong>for this to be true, what has to be true underneath?</strong> Each answer is a sub-claim. The coach checks whether they are testable, not whether they are right. Watch.</>
+        : <>Same thing, now with your hands on it. Add as many sub-claims as you need.</>}</p></Reveal>
+      <div style={{ marginTop: 24 }}>
+        {mode === 'demo' ? <GhostBranch onTryIt={() => setMode('live')} /> : <BranchActivity onOpenSource={openSource} />}
+      </div>
     </Scene>
   );
 }

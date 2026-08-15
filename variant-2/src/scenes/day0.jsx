@@ -4,6 +4,7 @@ import { Reveal, StaggerGroup, StaggerItem, BeatHead, FenSlot, ScaffoldSlot, Art
 import { Scene, useUI } from '../components/frame.jsx';
 import { StageOverview, Checklist } from '../components/templates.jsx';
 import { SCQActivity } from '../components/activities.jsx';
+import { GhostSCQ } from '../components/sim.jsx';
 import { useStore } from '../store.jsx';
 
 export function D1() {
@@ -77,17 +78,22 @@ export function D3() {
         <Reveal><p className="body">On a real project, each person writes a rough SCQ and problem statement on their own, before anyone meets. Not to get it right. To do the thinking, and to arrive with questions.</p></Reveal>
       </div>
       <div className="beat">
-        <BeatHead n="2" eyebrow="The three parts" title="What’s an SCQ?" />
-        <Reveal><p className="body">A three-part frame for stating a problem so everyone agrees what it is before anyone tries to solve it.</p></Reveal>
-        <StaggerGroup style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 20 }} s={0.14}>
-          {parts.map(([L, name, desc]) => (
-            <StaggerItem key={L} style={{ display: 'flex', gap: 18, alignItems: 'flex-start' }}>
-              <span style={{ fontFamily: 'var(--display)', fontSize: 40, color: 'var(--maroon)', lineHeight: 1, width: 44, flexShrink: 0 }}>{L}</span>
-              <div><div style={{ fontSize: 19, fontWeight: 700, color: 'var(--grey)' }}>{name}</div><div className="body" style={{ marginTop: 4 }}>{desc}</div></div>
-            </StaggerItem>
-          ))}
-        </StaggerGroup>
-        <Reveal><p className="body mt24">Together they resolve into a <strong>problem statement</strong>: one or two sentences naming the problem the work exists to solve.</p></Reveal>
+        <BeatHead n="2" title="What’s an SCQ?" />
+        <Reveal><p className="body">A three-part frame for stating a problem so <strong>everyone agrees what it is</strong> before anyone tries to solve it.</p></Reveal>
+        <Reveal className="mt24">
+          <div className="flow">
+            {parts.map(([L, name, desc], i) => (
+              <React.Fragment key={L}>
+                <div className="flow__card"><div className="flow__L">{L}</div><div className="flow__nm">{name}</div><div className="flow__d">{desc}</div></div>
+                {i < 2 && <Icon n="right" size={22} className="flow__arrow" />}
+              </React.Fragment>
+            ))}
+          </div>
+          <div className="flow__eq">
+            <span className="lab">Problem statement</span>
+            <span className="body" style={{ fontSize: 15, margin: 0 }}>One or two sentences naming the problem the work exists to solve. <strong>Everything downstream points back to it.</strong></span>
+          </div>
+        </Reveal>
       </div>
       <Reveal><p className="muted" style={{ fontSize: 15 }}>This is about generating thinking, not polish. Rough is the point. <FenSlot inline tag="FEN">links to past SCQ trainings</FenSlot></p></Reveal>
     </Scene>
@@ -97,9 +103,16 @@ export function D3() {
 /* D4 — draft your SCQ */
 export function D4() {
   const { openSource } = useUI();
+  const [mode, setMode] = useState('demo');
   return (
     <Scene id="D4">
-      <div style={{ marginTop: 24 }}><SCQActivity onOpenSource={openSource} /></div>
+      <Reveal><h2 className="lead" style={{ marginTop: 24, maxWidth: '20ch' }}>{mode === 'demo' ? 'First, watch someone draft one.' : 'Your turn. Draft it.'}</h2></Reveal>
+      <Reveal><p className="body mt16">{mode === 'demo'
+        ? <>You put bullets under <strong>Situation</strong>, <strong>Complication</strong> and <strong>Question</strong>, write a problem statement, and check it. The coach reads it and pushes back until it holds. Watch.</>
+        : <>Same thing, now with your hands on it. A couple of bullets are filled in to get you moving. Rough is the point.</>}</p></Reveal>
+      <div style={{ marginTop: 24 }}>
+        {mode === 'demo' ? <GhostSCQ onTryIt={() => setMode('live')} /> : <SCQActivity onOpenSource={openSource} />}
+      </div>
     </Scene>
   );
 }

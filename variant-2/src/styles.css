@@ -27,16 +27,16 @@
   --font: "Aptos", "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --display: "Aptos Display", "Aptos", "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 
-  --t-hero: 52px;
-  --t-content-display: 40px;
-  --t-objective: 28px;
-  --t-h1: 32px;
-  --t-h2: 24px;
-  --t-h3: 19px;
+  --t-hero: 58px;
+  --t-content-display: 44px;
+  --t-objective: 30px;
+  --t-h1: 34px;
+  --t-h2: 25px;
+  --t-h3: 18px;
   --t-body: 18px;
-  --t-body-lg: 20px;
+  --t-body-lg: 21px;
   --t-checklist: 21px;
-  --t-tag: 14px;
+  --t-tag: 13px;
   --t-shell-tab: 13px;
   --t-shell-rail: 12px;
 
@@ -44,7 +44,7 @@
   --read: 680px;
   --stage: 960px;
   --hero: 1120px;
-  --gap-beat: 112px;
+  --gap-beat: 52px;
   --gap-card: 24px;
   --pad-card: 32px;
 
@@ -142,7 +142,7 @@ svg { display: inline-block; vertical-align: middle; }
 /* ============================================================================
    BEAT DIVIDER SYSTEM (§3.5)
    ============================================================================ */
-.beat { padding: 56px 0; scroll-margin-top: 80px; }
+.beat { padding: 32px 0; scroll-margin-top: 80px; }
 .beat + .beat { margin-top: var(--gap-beat); }
 .beathead { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 28px; }
 .beathead__num { flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--maroon); color: var(--maroon); font-family: var(--display); font-size: 17px; display: grid; place-items: center; }
@@ -203,7 +203,11 @@ svg { display: inline-block; vertical-align: middle; }
 .overview__why { font-family: var(--display); font-size: var(--t-body-lg); color: var(--grey); max-width: 52ch; line-height: 1.4; margin-top: 20px; }
 .panels { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap-card); margin-top: 40px; }
 @media (max-width: 700px){ .panels { grid-template-columns: 1fr; } }
-.panel { background: var(--soft); border-radius: var(--r); padding: var(--pad-card); box-shadow: var(--shadow); }
+/* fill discipline: panels are white + hairline by default. Soft-pink fill is
+   reserved for the single focal object on a screen (.panel--soft). */
+.panel { background: var(--white); border: 1px solid var(--hair); border-radius: var(--r); padding: var(--pad-card); }
+.panel--soft { background: var(--soft); border-color: transparent; box-shadow: var(--shadow); }
+.panel--have { border-top: 3px solid var(--maroon); }
 .panel h3 { font-family: var(--display); font-size: var(--t-h2); color: var(--maroon); margin-bottom: 18px; }
 .panel ol, .panel ul { list-style: none; margin: 0; padding: 0; counter-reset: p; display: flex; flex-direction: column; gap: 16px; }
 .panel li { font-size: var(--t-body); color: var(--grey); line-height: 1.4; padding-left: 34px; position: relative; }
@@ -222,7 +226,7 @@ svg { display: inline-block; vertical-align: middle; }
 .slot__tag { position: absolute; top: 8px; right: 10px; font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--maroon); opacity: .7; }
 
 /* B — scaffold slot: real structure, greeked lines, reads finished */
-.scaffold { background: var(--soft-wash); border-radius: var(--r-sm); padding: 22px 24px 20px; box-shadow: var(--shadow-card); }
+.scaffold { background: var(--white); border: 1px solid var(--hair); border-radius: var(--r-sm); padding: 22px 24px 20px; }
 .scaffold .greek { height: 12px; border-radius: 4px; background: var(--soft); margin: 10px 0; }
 .scaffold .greek.w90 { width: 90%; } .scaffold .greek.w70 { width: 70%; } .scaffold .greek.w80 { width: 80%; } .scaffold .greek.w55 { width: 55%; } .scaffold .greek.w100 { width: 100%; }
 
@@ -387,7 +391,7 @@ svg { display: inline-block; vertical-align: middle; }
 /* norms */
 .norms { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 @media (max-width: 680px){ .norms { grid-template-columns: 1fr; } }
-.norm { background: var(--soft); border-radius: var(--r); padding: 24px; }
+.norm { background: var(--white); border: 1px solid var(--hair); border-radius: var(--r); padding: 24px; }
 .norm h4 { font-family: var(--display); font-size: var(--t-h3); color: var(--maroon); margin-bottom: 8px; }
 .norm p { font-size: 15px; color: var(--grey); }
 
@@ -467,6 +471,17 @@ svg { display: inline-block; vertical-align: middle; }
 /* comment pins */
 .cpin { position: absolute; z-index: 30; width: 26px; height: 26px; cursor: pointer; }
 .cpin svg { width: 26px; height: 26px; color: var(--pink); filter: drop-shadow(0 2px 3px rgba(65,2,30,.3)); }
+
+/* S -> C -> Q flow (D3 explanation) */
+.flow { display: flex; align-items: stretch; gap: 10px; }
+.flow__card { flex: 1; background: var(--white); border: 1px solid var(--hair); border-radius: var(--r); padding: 22px 20px; }
+.flow__L { font-family: var(--display); font-size: 46px; color: var(--maroon); line-height: 0.9; }
+.flow__nm { font-size: var(--t-h3); font-weight: 700; color: var(--grey); margin-top: 8px; }
+.flow__d { font-size: 15px; color: var(--grey); margin-top: 8px; line-height: 1.4; }
+.flow__arrow { align-self: center; color: var(--pink); flex-shrink: 0; }
+.flow__eq { margin-top: 14px; background: var(--soft); border-radius: var(--r); padding: 20px 24px; display: flex; align-items: center; gap: 16px; }
+.flow__eq .lab { font-family: var(--display); font-size: var(--t-h3); color: var(--maroon); white-space: nowrap; }
+@media (max-width: 720px){ .flow { flex-direction: column; } .flow__arrow { transform: rotate(90deg); } }
 
 .center { text-align: center; }
 .mt8{margin-top:8px} .mt16{margin-top:16px} .mt24{margin-top:24px} .mt32{margin-top:32px} .mt48{margin-top:48px}

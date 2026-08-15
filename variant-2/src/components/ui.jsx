@@ -29,8 +29,8 @@ const ICONS = {
   map: <path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14" />,
   close: <path d="M6 6l12 12M18 6L6 18" />,
 };
-export const Icon = ({ n, size = 18, fill = 'none', style }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke={fill === 'none' ? 'currentColor' : 'none'}
+export const Icon = ({ n, size = 18, fill = 'none', style, className }) => (
+  <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke={fill === 'none' ? 'currentColor' : 'none'}
     strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={style} aria-hidden>
     {ICONS[n]}
   </svg>
@@ -67,12 +67,11 @@ export const StaggerItem = ({ children, className, style, as = 'div' }) => {
   return <M className={className} style={style} variants={riseChild}>{children}</M>;
 };
 
-/* Beat header — the divider that tells a cold viewer what a screen is (§3.5) */
-export const BeatHead = ({ n, eyebrow, title, maroon }) => (
+/* Beat header — a numbered divider. No eyebrow; the title carries the beat. */
+export const BeatHead = ({ n, title, maroon }) => (
   <Reveal className="beathead">
     {n != null && <div className="beathead__num">{n}</div>}
     <div className="beathead__t">
-      <div className="beathead__eye">{eyebrow}</div>
       <div className={'beathead__title' + (maroon ? ' maroon' : '')}>{title}</div>
       <div className="beathead__rule" />
     </div>

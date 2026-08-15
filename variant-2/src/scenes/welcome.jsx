@@ -20,7 +20,6 @@ export function W1() {
           ))}
         </div>
 
-        <Reveal><div className="eyebrow center">Your first day</div></Reveal>
         <motion.h1 className="display center" style={{ margin: '12px auto 0', maxWidth: '16ch' }}
           initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: dur.slow, ease: ease.entrance }}>
           It’s your first day on the Food-Energy Nexus project.

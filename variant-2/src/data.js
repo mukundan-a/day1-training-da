@@ -2,11 +2,11 @@
 // components; this is the ordered spine, stage metadata, docs, and checklist rows.
 
 export const STAGES = [
-  { key: 'welcome', name: 'Welcome', railName: 'Welcome', purpose: 'What this is and what you will get.', time: '~3 min' },
-  { key: 'day0', name: 'Day 0', railName: 'Day 0', purpose: 'Getting set up before the project starts. You draft your first SCQ.', time: '~8 min' },
-  { key: 'kickoff', name: 'Full-team kick-off', railName: 'Full-team', purpose: 'Where the thinking starts. You build out a branch of the hypothesis tree.', time: '~7 min' },
-  { key: 'coreteam', name: 'Core-team kick-off', railName: 'Core-team', purpose: 'Turning Day 1 into a plan you can start on tomorrow.', time: '~5 min' },
-  { key: 'close', name: 'Close', railName: 'Close', purpose: 'Everything you made, and where the real project ended up.', time: '~2 min' },
+  { key: 'welcome', name: 'Welcome', railName: 'Welcome', purpose: 'What this is and what you will get.', time: '2 min' },
+  { key: 'day0', name: 'Day 0', railName: 'Day 0', purpose: 'Getting set up before the project starts. You draft your first SCQ.', time: '9 min' },
+  { key: 'kickoff', name: 'Full-team kick-off', railName: 'Full-team', purpose: 'Where the thinking starts. You build out a branch of the hypothesis tree.', time: '8 min' },
+  { key: 'coreteam', name: 'Core-team kick-off', railName: 'Core-team', purpose: 'Turning Day 1 into a plan you can start on tomorrow.', time: '6 min' },
+  { key: 'close', name: 'Close', railName: 'Close', purpose: 'Everything you made, and where the real project ended up.', time: '2 min' },
 ];
 
 // chip: 'Watch' | 'Read' | 'Hands-on' | 'Recap'

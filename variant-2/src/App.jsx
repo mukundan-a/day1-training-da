@@ -4,6 +4,7 @@ import { StoreProvider, useStore } from './store.jsx';
 import { SCENES, STAGES, sceneIndex, stageOf } from './data.js';
 import { TopRail, RightRail, MapOverlay, NotchWipe, Spine } from './components/shell.jsx';
 import { UI } from './components/frame.jsx';
+import { Boot } from './components/boot.jsx';
 import { SCENE_COMPONENTS } from './scenes/index.jsx';
 import { ease, dur } from './motion.js';
 
@@ -13,6 +14,8 @@ function AppInner() {
   const [mapOpen, setMapOpen] = useState(false);
   const [wipe, setWipe] = useState(false);
   const [commentMode, setCommentMode] = useState(false);
+  const [booted, setBooted] = useState(() => { try { return sessionStorage.getItem('day1.booted') === '1'; } catch { return false; } });
+  const begin = () => { try { sessionStorage.setItem('day1.booted', '1'); } catch {}; setBooted(true); };
 
   const id = state.currentSceneId;
   const idx = sceneIndex(id);
@@ -93,6 +96,7 @@ function AppInner() {
 
         <AnimatePresence>{mapOpen && <MapOverlay open onClose={() => setMapOpen(false)} onJump={jumpStage} />}</AnimatePresence>
         <NotchWipe show={wipe} />
+        <AnimatePresence>{!booted && <Boot onBegin={begin} />}</AnimatePresence>
       </div>
     </UI.Provider>
   );

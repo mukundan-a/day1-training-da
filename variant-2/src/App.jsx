@@ -12,6 +12,7 @@ function AppInner() {
   const [drawer, setDrawer] = useState(null);
   const [mapOpen, setMapOpen] = useState(false);
   const [wipe, setWipe] = useState(false);
+  const [commentMode, setCommentMode] = useState(false);
 
   const id = state.currentSceneId;
   const idx = sceneIndex(id);
@@ -67,10 +68,10 @@ function AppInner() {
   const variantClass = scene.chip === 'Watch' ? 'scene scene--hero' : (['W2', 'D3'].includes(id) ? 'scene scene--read' : 'scene');
 
   return (
-    <UI.Provider value={{ onMap: () => setMapOpen(true), openSource, nav }}>
+    <UI.Provider value={{ onMap: () => setMapOpen(true), openSource, nav, commentMode }}>
       <div className="app">
         <TopRail onJump={jumpStage} onMap={() => setMapOpen(true)} />
-        <RightRail mode={drawer} setMode={setDrawer} onOpenDoc={() => setDrawer('docs')} />
+        <RightRail mode={drawer} setMode={setDrawer} onOpenDoc={() => setDrawer('docs')} commentMode={commentMode} setCommentMode={setCommentMode} />
 
         <div className={variantClass}>
           <AnimatePresence mode="wait">

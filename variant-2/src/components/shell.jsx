@@ -119,7 +119,7 @@ export function MapOverlay({ open, onClose, onJump }) {
 }
 
 // Right-edge strip + drawer (Docs / Notes / Comments) — one open at a time
-export function RightRail({ mode, setMode, onOpenDoc }) {
+export function RightRail({ mode, setMode, onOpenDoc, commentMode, setCommentMode }) {
   const { state, dispatch } = useStore();
   const [note, setNote] = useState('');
   return (
@@ -162,7 +162,19 @@ export function RightRail({ mode, setMode, onOpenDoc }) {
                 </>
               )}
               {mode === 'comments' && (
-                <p className="muted" style={{ fontSize: 14 }}>Reviewer comments. Hover any block and click the pink dot to leave a note on the storyline itself. (Comment mode is off by default so it never blocks the walk-through.)</p>
+                <>
+                  <p className="muted" style={{ fontSize: 14, marginBottom: 12 }}>Leave feedback on the storyline itself. Turn on comment mode, then click anywhere on a scene to drop a pin.</p>
+                  <button className="continue" style={{ width: '100%', justifyContent: 'center', borderRadius: 10, background: commentMode ? 'var(--pink)' : 'var(--maroon)' }}
+                    onClick={() => setCommentMode(!commentMode)}>{commentMode ? 'Comment mode is on' : 'Turn on comment mode'}</button>
+                  <div style={{ marginTop: 16 }}>
+                    {state.comments.length === 0 && <p className="muted" style={{ fontSize: 14, fontStyle: 'italic' }}>No comments yet.</p>}
+                    {state.comments.map(c => (
+                      <div key={c.id} className="notechip" style={{ opacity: c.resolved ? 0.55 : 1 }}>
+                        <span><b style={{ color: 'var(--pink)' }}>{c.sceneId}</b> {c.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
           </motion.aside>

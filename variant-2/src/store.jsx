@@ -61,6 +61,8 @@ function reducer(state, action) {
       return { ...state, comments: [...state.comments, action.comment] };
     case 'updateComment':
       return { ...state, comments: state.comments.map(c => c.id === action.id ? { ...c, ...action.patch } : c) };
+    case 'removeComment':
+      return { ...state, comments: state.comments.filter(c => c.id !== action.id) };
     case 'reset':
       return initial();
     default:

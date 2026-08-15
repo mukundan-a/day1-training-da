@@ -1,63 +1,51 @@
-# Day 1 Craft — storyline mockup (Variant 2)
+# Day 1 Craft — interactive training (Variant 2)
 
-A clickable walk through the Day 1 Craft training storyline, for internal
-alignment. Dalberg **Stage** register. Built to the uploaded `PROMPT.md` +
-storyline sheet.
+A real React + Framer Motion build of the Day 1 Craft training storyline,
+built to the storyline sheet. Twenty scenes across five stages, two hands-on
+exercises with a faked coach, and two hero films built on one shape-shifting
+object (the hypothesis tree becomes a workplan, then a table of contents).
+
+## Run and build
 
 ```
+cd variant-2
+npm install
+npm run build        # bundles src/ into app.js + app.css (committed, static)
 python3 -m http.server 8899   # http://localhost:8899/variant-2/
 ```
-Static site. No build, no dependencies. Opens from disk too.
 
-## How it reads
+Netlify serves the committed bundle statically; no build runs on deploy.
+`node_modules` is gitignored.
 
-- A **cover** orients anyone cold: what this is, who you are, the five stages.
-- Then each stage is **3 to 5 screens** of two kinds:
-  - **Info screens** club several beats into one scannable scroll.
-  - **Activity screens** hold the two exercises.
-- **Learning objectives** open the training; each stage ends on its **checklist**.
-  The real-project **zoom-out folds into that checklist screen**.
-- **Motion plays itself** on arrival. Scrolling carries you through; clicks are few.
+## What it is
 
-## Principles held
+- **Cover** that opens cold on the Analyst's desk, not an LMS splash.
+- **Five stages**, 20 scenes, of two kinds: scannable reading scenes and full
+  hands-on activities. Learning objectives open; each stage ends on its
+  checklist; the real-project zoom-outs fold in.
+- **Two hero films**, auto-playing on view: the shared problem statement
+  becomes the L1 hypothesis (F3), and the tree tips into a workplan then a
+  table of contents (C3), proving they are one object drawn three ways.
+- **Two exercises** with a deterministic, faked coach that reacts to your own
+  words and passes you by the second check (D4 SCQ, F4 branch).
+- **Persistent shell**: journey rail, Docs and Notes drawers, comment mode,
+  keyboard nav, and local persistence so your SCQ, branch and notes carry
+  across scenes and resurface at the close.
 
-- **Placeholders only.** No content is invented. Every problem statement, SCQ
-  bullet, L1 hypothesis, branch, workplan row, norm and checklist item is a
-  bracketed placeholder. The mockup shows the shape.
-- **Sparse copy.** Terse labels, no em dashes, signposts in the gutter, never
-  inside the mock.
-- **Comments anywhere.** Turn on Comment, click any screen, pin a note. Reply,
-  resolve, export to JSON / CSV / Markdown. Persisted locally.
-- **Stage register.** Soft-pink fills, rounded cards, quiet shadows, pill
-  buttons, the notch, Aptos. Palette and tokens from the Dalberg brand system.
+## Content boundary
 
-## Files
+No FEN content is invented. Structural and instructional copy is written in
+full; anything project-specific (the real SCQ, L1 hypothesis, problem
+statement, branches, workplan, checklist items, reports) is a clearly marked
+placeholder slot. The build spec lives at `docs/BUILD_SPEC.md`.
+
+## Source layout
 
 ```
-index.html      shell
-assets/
-  app.css       Stage design system, chaptered scroll, auto-play reveals
-  data.js       stages, scenes, docs, checklists (structure only)
-  coach.js      faked coach (reacts to your own words, no model)
-  comments.js   local comments + JSON/CSV/MD export
-  app.js        render, navigate, drawers, comments, animations
+src/
+  main.jsx App.jsx store.jsx        entry, shell, state + persistence
+  motion.js coach.js data.js        motion tokens, faked coach, scene registry
+  styles.css                        design system (type scale, dividers, Stage register)
+  components/  ui shell frame templates activities heroes
+  scenes/      welcome day0 kickoff coreteam close
 ```
-
-## Faked, on purpose
-
-- **The coach** reads what you typed and passes you once the draft is good
-  enough. No model, stamped "faked".
-- **Every artefact** is a captioned placeholder frame (PDF, deck, tables).
-
-## Judgment calls
-
-- Comments are local, not the Firestore board from variant 1; same UX, the live
-  layer can drop in behind the same `Comments` API.
-- State (SCQ, tree branch, notes) persists in `localStorage` and resurfaces in
-  later scenes. Clear site data to reset.
-- Durations read `XX min`. Nothing is timed.
-
-## Open questions (shown in the gutter, not decided)
-
-One SCQ or several · whether the checklist lives on the Hub · where the vault
-lives.

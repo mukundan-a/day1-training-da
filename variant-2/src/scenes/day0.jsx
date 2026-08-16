@@ -26,28 +26,43 @@ export function D2() {
   const [doc, setDoc] = useState('proposal');
   const [note, setNote] = useState('');
   const notes = state.notes;
+  const title = doc === 'proposal' ? 'Proposal' : doc === 'brief' ? 'Context brief' : 'PD note';
   return (
     <Scene id="D2">
       <div className="beat" style={{ paddingTop: 24 }}>
-        <BeatHead n="1" title="The documents that arrive before the project starts" maroon />
-        <Reveal><p className="body">Before a project begins, a small set of documents lands with you. Here that is the proposal, and a couple of days later the PD’s context brief. Each opens in a reader with the passages that matter already highlighted, so your attention goes to the right places. Anything you note here returns when you draft your SCQ.</p></Reveal>
+        <BeatHead n="1" title="You are staffed onto the Food-Energy Nexus project" maroon />
+        <Reveal><p className="body">This is the project the training follows: the Food-Energy Nexus, or FEN. Before it officially begins, a small set of documents lands with you. The proposal comes first, then a couple of days later the PD’s context brief. The PDs also send you a note in which they outline how each of them will distribute their responsibilities. Each opens in a reader with the passages that matter already highlighted, so your attention goes to the right places. Anything you note here returns when you draft your SCQ.</p></Reveal>
       </div>
 
-      <Reveal style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        {[['proposal', 'Proposal'], ['brief', 'Context brief']].map(([k, l]) => (
+      <Reveal style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+        {[['proposal', 'Proposal'], ['brief', 'Context brief'], ['pdnote', 'PD note']].map(([k, l]) => (
           <button key={k} className="chip" aria-pressed={doc === k} onClick={() => setDoc(k)}
             style={doc === k ? { background: 'var(--maroon)', color: '#fff', borderColor: 'var(--maroon)' } : null}>{l}</button>
         ))}
       </Reveal>
 
       <div className="reading">
+        {doc === 'pdnote' ? (
+          <div className="page">
+            <h5>PD note<FenSlot inline tag="FEN"> how the two PDs split the project</FenSlot></h5>
+            <p className="muted" style={{ fontSize: 14, margin: '4px 0 14px' }}>The two Project Directors outline how each of them will distribute their responsibilities, so you know who to go to for what.</p>
+            {[['Content lead', 'who leads content review'], ['Client lead', 'who leads the client relationship'], ['Coaching and development', 'how the PDs split coaching the team']].map(([h, s]) => (
+              <div key={h} style={{ padding: '10px 0', borderTop: '1px solid var(--hair-2)' }}>
+                <div style={{ fontWeight: 700, color: 'var(--maroon)', fontSize: 15 }}>{h}</div>
+                <FenSlot tag="FEN">{s}</FenSlot>
+              </div>
+            ))}
+            <p className="muted" style={{ fontSize: 14, marginTop: 14 }}>Every project divides this differently. It is worth finding out early who owns what on yours.</p>
+          </div>
+        ) : (
         <div className="page">
-          <h5>{doc === 'proposal' ? 'Proposal' : 'Context brief'}<FenSlot inline tag="FEN"> real PDF, key passages highlighted</FenSlot></h5>
+          <h5>{title}<FenSlot inline tag="FEN"> real PDF, key passages highlighted</FenSlot></h5>
           {[100, 90, 70, 85, 60, 78, 92, 66].map((w, i) => (
             <div key={i} className={'line' + (i === 1 ? ' mark' : i === 4 ? ' hl' : '')} style={{ width: w + '%' }} />
           ))}
           <p className="muted" style={{ fontSize: 14, marginTop: 14 }}>The highlights mark what the PDs think matters most. If a line reads like a Situation, a Complication or a Question, it is worth a note.</p>
         </div>
+        )}
         <div className="notescol">
           <h4>Your notes</h4>
           <div className="hint">Notes you take here are kept, and appear as sources when you draft your SCQ.</div>
@@ -137,19 +152,6 @@ export function D5() {
           </Reveal>
         </div>
         <Reveal><p className="body mt24">These are not a right answer and a wrong one. They are two drafts that framed the same problem differently. That is what Day 0 gives you: a point of view to walk in with, rather than a blank one to fill in the room.</p></Reveal>
-      </div>
-
-      <div className="beat band band--pink" style={{ padding: '40px 0' }}>
-        <BeatHead n="2" title="How the two PDs divide the project" maroon />
-        <Reveal><p className="body">Most of the time you are not in the room when the two Project Directors divide the work. It still helps to know the split, so you know who to go to for what. On the FEN project it was agreed like this.</p></Reveal>
-        <StaggerGroup className="panels" style={{ marginTop: 24 }}>
-          {[['Content lead', 'who leads content review'], ['Client lead', 'who leads the client relationship'], ['Coaching and development', 'how the PDs split coaching the team']].map(([h, s]) => (
-            <StaggerItem key={h} className="panel">
-              <h3 style={{ fontSize: 19 }}>{h}</h3><FenSlot tag="FEN">{s}</FenSlot>
-            </StaggerItem>
-          ))}
-        </StaggerGroup>
-        <Reveal><p className="muted" style={{ fontSize: 15, marginTop: 16 }}>Every project divides this differently. It is worth finding out early who owns what on yours.</p></Reveal>
       </div>
 
       <div className="beat">

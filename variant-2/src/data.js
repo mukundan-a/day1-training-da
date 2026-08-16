@@ -11,7 +11,7 @@ export const STAGES = [
 
 // chip: 'Watch' | 'Read' | 'Hands-on' | 'Recap'
 export const SCENES = [
-  { id: 'W1', stageKey: 'welcome', chip: 'Watch', title: 'Your first day on FEN' },
+  { id: 'W1', stageKey: 'welcome', chip: 'Watch', title: 'A guided simulation of a Dalberg project' },
   { id: 'W2', stageKey: 'welcome', chip: 'Read', title: 'Why Day 1, and what you’ll get' },
   { id: 'W3', stageKey: 'welcome', chip: 'Read', title: 'The five stages' },
 
@@ -30,7 +30,7 @@ export const SCENES = [
 
   { id: 'C1', stageKey: 'coreteam', chip: 'Read', title: 'Core-team overview' },
   { id: 'C2', stageKey: 'coreteam', chip: 'Read', title: 'The kick-off deck' },
-  { id: 'C3', stageKey: 'coreteam', chip: 'Watch', title: 'One object, three ways' },
+  { id: 'C3', stageKey: 'coreteam', chip: 'Watch', title: 'Tree, workplan, contents' },
   { id: 'C4', stageKey: 'coreteam', chip: 'Read', title: 'How the team sets its norms' },
   { id: 'C5', stageKey: 'coreteam', chip: 'Recap', title: 'Core-team close' },
 
@@ -44,7 +44,7 @@ export const DOCS = [
   { id: 'proposal', name: 'Proposal', kind: 'pdf', desc: 'The pitch the client signed off on.' },
   { id: 'brief', name: 'Context brief', kind: 'pdf', desc: 'The PD’s read on the topic, client and people.' },
   { id: 'iko', name: 'Kick-off deck', kind: 'ppt', desc: 'The standard norms deck.' },
-  { id: 'pdsplit', name: 'PD split note', kind: 'doc', desc: 'Who leads what.' },
+  { id: 'pdsplit', name: 'PD note', kind: 'doc', desc: 'How the two PDs split their responsibilities.' },
 ];
 
 export const ROLES = ['All', 'Core team', 'PM', 'PD'];

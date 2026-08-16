@@ -28,6 +28,7 @@ const ICONS = {
   download: <path d="M12 4v12M7 12l5 5 5-5M5 20h14" />,
   map: <path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14" />,
   close: <path d="M6 6l12 12M18 6L6 18" />,
+  down: <path d="M12 5v14M6 13l6 6 6-6" />,
 };
 export const Icon = ({ n, size = 18, fill = 'none', style, className }) => (
   <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke={fill === 'none' ? 'currentColor' : 'none'}

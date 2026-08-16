@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { StoreProvider, useStore } from './store.jsx';
 import { SCENES, STAGES, sceneIndex, stageOf } from './data.js';
 import { TopRail, RightRail, MapOverlay, NotchWipe, Spine } from './components/shell.jsx';
+import { ReviewDock } from './components/comments.jsx';
 import { UI } from './components/frame.jsx';
 import { Boot } from './components/boot.jsx';
 import { SCENE_COMPONENTS } from './scenes/index.jsx';
@@ -45,15 +46,19 @@ function AppInner() {
 
   // opening a document from the Docs tab jumps to its reader scene
   const openDoc = useCallback((docId) => {
-    const map = { proposal: 'D2', brief: 'D2', iko: 'C2', pdsplit: 'D5' };
+    const map = { proposal: 'D2', brief: 'D2', iko: 'C2', pdsplit: 'D2' };
     const target = map[docId];
     if (target) { setDrawer(null); nav(target); }
   }, [nav]);
+
+  // comment mode dims/marks the whole app; expose it for cursor + banner
+  useEffect(() => { document.body.classList.toggle('commenting', commentMode); }, [commentMode]);
 
   // keyboard (§4.6) — suppressed while typing
   useEffect(() => {
     const h = (e) => {
       if (e.target.matches('input, textarea')) return;
+      if (commentMode && e.key === 'Escape') return setCommentMode(false);
       if (mapOpen && e.key === 'Escape') return setMapOpen(false);
       if (drawer && e.key === 'Escape') return setDrawer(null);
       if (e.key === 'ArrowRight') { const n = SCENES[idx + 1]; if (n && !nextDisabled) nav(n.id); }
@@ -77,7 +82,8 @@ function AppInner() {
     <UI.Provider value={{ onMap: () => setMapOpen(true), openSource, nav, commentMode }}>
       <div className="app">
         <TopRail onJump={jumpStage} onMap={() => setMapOpen(true)} />
-        <RightRail mode={drawer} setMode={setDrawer} onOpenDoc={openDoc} commentMode={commentMode} setCommentMode={setCommentMode} nav={nav} />
+        <RightRail mode={drawer} setMode={setDrawer} onOpenDoc={openDoc} nav={nav} />
+        <ReviewDock commentMode={commentMode} setCommentMode={setCommentMode} nav={nav} />
 
         <div className={variantClass}>
           <AnimatePresence mode="wait">

@@ -4,7 +4,7 @@ import { Reveal, StaggerGroup, StaggerItem, BeatHead, FenSlot, ScaffoldSlot } fr
 import { Scene, useUI } from '../components/frame.jsx';
 import { StageOverview, ChecklistStrip, ZoomOut } from '../components/templates.jsx';
 import { BranchExercise } from '../components/exercise.jsx';
-import { HeroB } from '../components/heroes.jsx';
+import { HeroB, HypTree } from '../components/heroes.jsx';
 import { useStore } from '../store.jsx';
 import { spring, dur, ease } from '../motion.js';
 

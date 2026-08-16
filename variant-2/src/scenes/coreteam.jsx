@@ -63,7 +63,7 @@ export function C2() {
   );
 }
 
-/* C3 — one object, three ways */
+/* C3 — tree becomes workplan becomes contents */
 export function C3() {
   const { state } = useStore();
   const hasBranch = state.branch.subclaims.filter(Boolean).length > 0 && !state.branch.skipped;
@@ -71,21 +71,21 @@ export function C3() {
     <Scene id="C3" variant="hero">
       <Reveal><h2 className="lead center" style={{ margin: '24px auto 0', maxWidth: '26ch' }}>Turned on its side, the hypothesis tree becomes the week-1 workplan.</h2></Reveal>
       <Reveal><p className="body center" style={{ margin: '16px auto 0', maxWidth: '58ch' }}>
-        In the sequence below, each branch of the tree lands as a row of the workplan. An owner column then fills in as the PM assigns who does what, taking two of the workstreams herself alongside running the team.
+        In the sequence below, each branch of the tree lands as a row of the workplan. The PM then fills in who owns each workstream and where its evidence will come from, taking a workstream or two herself alongside running the team.
       </p></Reveal>
 
       <HeroA userBranchLabel={hasBranch ? 'Your branch' : null} />
 
       <Reveal><p className="body center" style={{ margin: '0 auto', maxWidth: '58ch' }}>
-        The same object also reads as the deliverable’s table of contents. Each workstream becomes a section, and the analyses under it become what that section has to show.
+        The same rows then read as the deliverable’s table of contents. Each workstream becomes a section, and what its evidence has to show becomes what that section has to say.
       </p></Reveal>
       <Reveal className="center" style={{ maxWidth: 660, margin: '24px auto 0' }}>
         <p className="body-lg" style={{ color: 'var(--maroon)', fontFamily: 'var(--display)' }}>
-          The tree, the workplan and the table of contents are one object drawn three ways. The claim the team argued about in the kick-off is now a section heading in the report.
+          Tree, workplan and contents are the same thinking in three forms. The claim the team argued about in the kick-off is now a section heading in the report.
         </p>
       </Reveal>
       <Reveal className="foldnote" style={{ margin: '24px auto 0' }}>
-        The first week continues the same object once more. The workplan becomes an executive summary, and then a set of slides, which is the shape of week one.
+        The first week carries it one step further. The workplan becomes an executive summary, and then a set of slides, which is the shape of week one.
       </Reveal>
     </Scene>
   );

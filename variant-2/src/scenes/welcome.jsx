@@ -20,23 +20,16 @@ export function W1() {
           ))}
         </div>
 
-        <motion.h1 className="display center" style={{ margin: '12px auto 0', maxWidth: '20ch' }}
+        <motion.h1 className="display center" style={{ margin: '12px auto 0', maxWidth: '22ch' }}
           initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: dur.slow, ease: ease.entrance }}>
-          You are the analyst joining the Food-Energy Nexus project on its first day.
+          You are about to enter a guided simulation of a Dalberg project.
         </motion.h1>
-        <Reveal amount={0.2}><p className="body center" style={{ margin: '20px auto 0', maxWidth: '54ch' }}>
-          The proposal, the context brief, and the question the client has asked are already on your desk. The training follows that question through the first day of the project.
+        <Reveal amount={0.2}><p className="body center" style={{ margin: '20px auto 0', maxWidth: '56ch' }}>
+          You will go through the first day of a real project from the analyst’s seat: the same documents, the same meetings, and the same thinking, in the order they actually happened. The project it is drawn from is named once you are staffed onto it.
         </p></Reveal>
 
-        <Reveal amount={0.2} className="mt32" style={{ maxWidth: 620, margin: '32px auto 0' }}>
-          <div className="claim" style={{ margin: '0 auto' }}>
-            <div className="k">The question the client has asked</div>
-            <div className="tx"><FenSlot inline tag="FEN">the core question the FEN project had to answer</FenSlot></div>
-          </div>
-        </Reveal>
-
         <Reveal amount={0.2}><p className="body center" style={{ margin: '32px auto 0', maxWidth: '56ch' }}>
-          Over the next half hour, you will watch that question become a claim, a plan, and a deliverable. The short sequence below shows the shape of what you will build. It is one object, and it takes several forms across the day.
+          By the end of the day, one starting question will have become a claim, a plan, and a deliverable. The short sequence below shows the shape of what you will build, the same thinking taking several forms across the day.
         </p></Reveal>
 
         <div className="mt24">

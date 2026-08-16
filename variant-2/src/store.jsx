@@ -11,7 +11,9 @@ const initial = () => {
     v: 1,
     currentSceneId: 'W1',
     frontierSceneId: 'W1',
-    unlockedStages: ['welcome'],
+    // reviewers can reach any stage; the stepper still shows done / current by
+    // position, but nothing is locked.
+    unlockedStages: STAGES_ORDER.slice(),
     visited: { W1: true },
     notes: [],
     scq: { S: [], C: [], Q: [], problem: '', coachRead: '', skipped: false, checkCount: 0 },
@@ -23,6 +25,7 @@ const initial = () => {
     const saved = JSON.parse(localStorage.getItem(KEY));
     if (saved && saved.v === 1) s = { ...base, ...saved, scq: { ...base.scq, ...saved.scq }, branch: { ...base.branch, ...saved.branch } };
   } catch {}
+  s.unlockedStages = STAGES_ORDER.slice(); // never lock a stage for reviewers
   // the hash is authoritative for the current scene on boot (§7.2)
   const h = location.hash.match(/#\/scene\/(\w+)/);
   if (h && ORDER.includes(h[1])) {

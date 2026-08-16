@@ -4,6 +4,8 @@ import { StoreProvider, useStore } from './store.jsx';
 import { SCENES, STAGES, sceneIndex, stageOf } from './data.js';
 import { TopRail, RightRail, MapOverlay, NotchWipe, Spine } from './components/shell.jsx';
 import { ReviewDock } from './components/comments.jsx';
+import { TextEditLayer } from './components/edits.jsx';
+import { CommentsProvider, useComments } from './comments-store.jsx';
 import { UI } from './components/frame.jsx';
 import { Boot } from './components/boot.jsx';
 import { SCENE_COMPONENTS } from './scenes/index.jsx';
@@ -11,6 +13,7 @@ import { ease, dur } from './motion.js';
 
 function AppInner() {
   const { state, dispatch } = useStore();
+  const { editMode, setEditMode } = useComments();
   const [drawer, setDrawer] = useState(null);
   const [mapOpen, setMapOpen] = useState(false);
   const [wipe, setWipe] = useState(false);
@@ -57,7 +60,8 @@ function AppInner() {
   // keyboard (§4.6) — suppressed while typing
   useEffect(() => {
     const h = (e) => {
-      if (e.target.matches('input, textarea')) return;
+      if (e.target.matches('input, textarea') || e.target.isContentEditable) return;
+      if (editMode && e.key === 'Escape') return setEditMode(false);
       if (commentMode && e.key === 'Escape') return setCommentMode(false);
       if (mapOpen && e.key === 'Escape') return setMapOpen(false);
       if (drawer && e.key === 'Escape') return setDrawer(null);
@@ -84,6 +88,7 @@ function AppInner() {
         <TopRail onJump={jumpStage} onMap={() => setMapOpen(true)} />
         <RightRail mode={drawer} setMode={setDrawer} onOpenDoc={openDoc} nav={nav} />
         <ReviewDock commentMode={commentMode} setCommentMode={setCommentMode} nav={nav} />
+        <TextEditLayer sceneId={id} />
 
         <div className={variantClass}>
           <AnimatePresence mode="wait">
@@ -112,5 +117,5 @@ function AppInner() {
 }
 
 export default function App() {
-  return <StoreProvider><AppInner /></StoreProvider>;
+  return <StoreProvider><CommentsProvider><AppInner /></CommentsProvider></StoreProvider>;
 }

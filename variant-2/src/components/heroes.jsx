@@ -114,27 +114,31 @@ export function HeroA({ compact = false, silent = false, userBranchLabel }) {
   const branches = [0, 1, 2];
   const label = (i) => i === 1 && userBranchLabel ? userBranchLabel : `Branch ${i + 1}`;
 
-  if (reduce) return <ReducedHeroA ref={ref} userBranchLabel={userBranchLabel} />;
+  // Under reduced motion we keep the sequence but drop large transforms: the
+  // phases cross-fade instead of the boxes flying and morphing. Everyone still
+  // sees the film play; nobody gets a dead static grid.
+  const lid = (name) => (reduce ? undefined : name);
+  const soft = { duration: 0.4, ease: ease.standard };
 
   return (
     <div className="herostage" ref={ref} style={{ minHeight: compact ? 300 : 460 }}>
       {!silent && <button className="replay" onClick={run}><Icon n="replay" size={14} /> Replay</button>}
       <LayoutGroup>
-        <motion.div layout style={{ width: '100%', maxWidth: 860, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}
-          animate={{ scale: phase === 'plan' ? [1, 1.03, 1] : 1 }} transition={{ duration: dur.slow, ease: ease.standard }}>
+        <motion.div layout={!reduce} style={{ width: '100%', maxWidth: 860, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}
+          animate={{ scale: !reduce && phase === 'plan' ? [1, 1.03, 1] : 1 }} transition={{ duration: dur.slow, ease: ease.standard }}>
 
           {/* the root claim rides through every phase */}
-          <motion.div layout layoutId="heroA-l1" className="tree__l1" style={{ fontSize: phase === 'tree' ? 15 : 13, padding: phase === 'tree' ? '11px 22px' : '7px 16px' }}>
+          <motion.div layout={!reduce} layoutId={lid('heroA-l1')} className="tree__l1" style={{ fontSize: phase === 'tree' ? 15 : 13, padding: phase === 'tree' ? '11px 22px' : '7px 16px' }}>
             {phase === 'toc' ? 'Report title' : 'L1 hypothesis'}
           </motion.div>
 
           {phase === 'tree' && (
             <>
-              <VFork n={3} />
+              <VFork n={3} reduce={reduce} />
               <motion.div className="tree__branches" style={{ maxWidth: 720 }}>
                 {branches.map(i => (
-                  <motion.div key={i} layoutId={`ws-${i}`} className={'branchcard' + (i === 1 ? ' mine' : '')}
-                    initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring.land, delay: 0.35 + i * 0.14 }}>
+                  <motion.div key={i} layoutId={lid(`ws-${i}`)} className={'branchcard' + (i === 1 ? ' mine' : '')}
+                    initial={{ opacity: 0, y: reduce ? 0 : -12 }} animate={{ opacity: 1, y: 0 }} transition={reduce ? soft : { ...spring.land, delay: 0.35 + i * 0.14 }}>
                     <div className="branchcard__h">{label(i)}</div>
                     <ul><li><Greek w="85%" c="var(--soft-wash)" /></li><li><Greek w="60%" c="var(--soft-wash)" /></li></ul>
                   </motion.div>
@@ -144,17 +148,17 @@ export function HeroA({ compact = false, silent = false, userBranchLabel }) {
           )}
 
           {phase === 'plan' && (
-            <motion.div className="wptable wp-plan" layout>
+            <motion.div className="wptable wp-plan" layout={!reduce} initial={reduce ? { opacity: 0 } : false} animate={reduce ? { opacity: 1 } : {}} transition={soft}>
               <div className="wprow head"><span>Workstream</span><span>Owner</span><span>Source of insight</span></div>
               {branches.map(i => (
-                <motion.div key={i} className="wprow" layout initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring.land, delay: i * 0.08 }}>
-                  <motion.div layoutId={`ws-${i}`} className="cell" style={{ fontWeight: 700, color: 'var(--maroon)' }}>{label(i)}</motion.div>
+                <motion.div key={i} className="wprow" layout={!reduce} initial={{ opacity: 0, y: reduce ? 0 : -10 }} animate={{ opacity: 1, y: 0 }} transition={reduce ? soft : { ...spring.land, delay: i * 0.08 }}>
+                  <motion.div layoutId={lid(`ws-${i}`)} className="cell" style={{ fontWeight: 700, color: 'var(--maroon)' }}>{label(i)}</motion.div>
                   <div className="cell">
                     <AnimatePresence>
                       {owners && (
-                        <motion.span className="owner" initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }}
-                          transition={{ ...spring.land, delay: [0.18, 0.42, 0][i] }}>
-                          <motion.span className="av" animate={i === 2 ? { boxShadow: ['0 0 0 0 rgba(211,97,143,0)', '0 0 0 6px rgba(211,97,143,.35)', '0 0 0 0 rgba(211,97,143,0)'] } : {}} transition={{ duration: 1 }}>
+                        <motion.span className="owner" initial={{ opacity: 0, scale: reduce ? 1 : 0.7 }} animate={{ opacity: 1, scale: 1 }}
+                          transition={reduce ? soft : { ...spring.land, delay: [0.18, 0.42, 0][i] }}>
+                          <motion.span className="av" animate={!reduce && i === 2 ? { boxShadow: ['0 0 0 0 rgba(211,97,143,0)', '0 0 0 6px rgba(211,97,143,.35)', '0 0 0 0 rgba(211,97,143,0)'] } : {}} transition={{ duration: 1 }}>
                             {i === 2 ? 'PM' : '?'}
                           </motion.span>
                           <span style={{ fontSize: 12, color: i === 2 ? 'var(--pink)' : 'var(--grey-3)', fontStyle: 'italic' }}>{i === 2 ? 'PM takes it' : 'a teammate'}</span>
@@ -169,12 +173,12 @@ export function HeroA({ compact = false, silent = false, userBranchLabel }) {
           )}
 
           {phase === 'toc' && (
-            <motion.div className="wptable wp-toc" layout>
+            <motion.div className="wptable wp-toc" layout={!reduce} initial={reduce ? { opacity: 0 } : false} animate={reduce ? { opacity: 1 } : {}} transition={soft}>
               <div className="wprow head"><span>§</span><span>Section</span><span>What it shows</span></div>
               {branches.map(i => (
-                <motion.div key={i} className="wprow" layout initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring.land, delay: i * 0.08 }}>
-                  <motion.span className="secn" initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ ...spring.land, delay: i * 0.08 + 0.15 }}>{i + 1}</motion.span>
-                  <motion.div layoutId={`ws-${i}`} className="cell" style={{ fontWeight: 700, color: 'var(--maroon)', fontFamily: 'var(--display)', fontSize: 16 }}>
+                <motion.div key={i} className="wprow" layout={!reduce} initial={{ opacity: 0, y: reduce ? 0 : -10 }} animate={{ opacity: 1, y: 0 }} transition={reduce ? soft : { ...spring.land, delay: i * 0.08 }}>
+                  <motion.span className="secn" initial={{ scale: reduce ? 1 : 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={reduce ? soft : { ...spring.land, delay: i * 0.08 + 0.15 }}>{i + 1}</motion.span>
+                  <motion.div layoutId={lid(`ws-${i}`)} className="cell" style={{ fontWeight: 700, color: 'var(--maroon)', fontFamily: 'var(--display)', fontSize: 16 }}>
                     {i === 1 && userBranchLabel ? userBranchLabel : `Section ${i + 1}`}
                   </motion.div>
                   <div className="cell"><Greek w="85%" /></div>
@@ -185,13 +189,13 @@ export function HeroA({ compact = false, silent = false, userBranchLabel }) {
         </motion.div>
       </LayoutGroup>
 
-      {!silent && <motion.div className="herocap" key={caption} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: dur.base, ease: ease.entrance }}>{caption}</motion.div>}
+      {!silent && <motion.div className="herocap" key={caption} initial={{ opacity: 0, y: reduce ? 0 : 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: dur.base, ease: ease.entrance }}>{caption}</motion.div>}
     </div>
   );
 }
 
 /* a small vertical fork: one point on top forks down to n points */
-function VFork({ n = 3, width = 320 }) {
+function VFork({ n = 3, width = 320, reduce = false }) {
   const xs = Array.from({ length: n }, (_, i) => ((i + 0.5) / n) * 100);
   const spine = n > 1 ? `M${xs[0]},24 H${xs[n - 1]} ` : '';
   const stubs = xs.map(x => `M${x},24 V60`).join(' ');
@@ -199,24 +203,10 @@ function VFork({ n = 3, width = 320 }) {
   return (
     <svg width={width} height="30" viewBox="0 0 100 60" preserveAspectRatio="none" style={{ maxWidth: width, margin: '-2px 0' }} aria-hidden>
       <motion.path d={d} stroke="var(--pink)" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round"
-        initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 0.9 }} transition={{ duration: 0.5, ease: ease.standard }} />
+        initial={reduce ? { opacity: 0.9 } : { pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 0.9 }} transition={{ duration: reduce ? 0 : 0.5, ease: ease.standard }} />
     </svg>
   );
 }
-
-const ReducedHeroA = React.forwardRef(({ userBranchLabel }, ref) => (
-  <div ref={ref} className="herostage">
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, width: '100%' }}>
-      {['Hypothesis tree', 'Week-1 workplan', 'Deliverable contents'].map((t, k) => (
-        <div key={k} style={{ border: '1px solid var(--hair)', borderRadius: 10, padding: 16 }}>
-          <div className="eyebrow" style={{ marginBottom: 10 }}>{t}</div>
-          {[0, 1, 2].map(i => <div key={i} className="branchcard" style={{ marginBottom: 8 }}><div className="branchcard__h">{k === 0 ? `Branch ${i + 1}` : k === 1 ? 'Workstream' : `Section ${i + 1}`}</div></div>)}
-        </div>
-      ))}
-    </div>
-    <div className="herocap">The same object, drawn three ways.</div>
-  </div>
-));
 
 /* ------------------------------------------------------------------ HERO B
    The problem statement becomes the top-level hypothesis, then the tree grows. */

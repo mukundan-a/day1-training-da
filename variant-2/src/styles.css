@@ -533,6 +533,7 @@ svg { display: inline-block; vertical-align: middle; }
 .cpop { pointer-events: auto; }
 .cpop__cat { font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--pink); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
 .cpop__res { color: var(--grey-3); background: var(--hair-2); border-radius: 10px; padding: 1px 7px; font-size: 9px; }
+.cpop__who { color: var(--pink); font-size: 9px; }
 .cpop__tx { font-size: 14px; color: var(--grey); line-height: 1.45; }
 .cpop__on { font-size: 11px; color: var(--grey-3); margin-bottom: 6px; }
 .cthread { font-size: 13px; color: var(--grey); background: var(--soft-wash); border-radius: 8px; padding: 7px 10px; margin-top: 8px; }
@@ -546,22 +547,31 @@ svg { display: inline-block; vertical-align: middle; }
 .cpop__row button:hover { color: var(--maroon); }
 body.commenting .scene__inner { }
 
-/* reviewer dock (bottom-left) — tooling, not part of the product */
-.reviewdock { position: fixed; left: 20px; bottom: 92px; z-index: 65; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+/* reviewer dock (top-right) — tooling, not part of the product */
+.reviewdock { position: fixed; right: 60px; top: calc(var(--rail-h) + 10px); z-index: 65; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
 .reviewfab { display: inline-flex; align-items: center; gap: 8px; background: #fff; color: var(--grey-2); font-weight: 700; font-size: 13px; padding: 9px 15px; border-radius: 24px; border: 1.5px dashed var(--grey-3); box-shadow: var(--shadow); position: relative; }
 .reviewfab:hover { border-color: var(--maroon); color: var(--maroon); }
 .reviewfab.active { border-style: solid; border-color: var(--pink); color: var(--pink); }
 .reviewfab__badge { min-width: 16px; height: 16px; border-radius: 8px; background: var(--pink); color: #fff; font-size: 9px; font-weight: 700; display: grid; place-items: center; padding: 0 4px; }
-.reviewpanel { width: 320px; max-width: calc(100vw - 40px); background: #fff; border: 1.5px dashed var(--grey-3); border-radius: 14px; box-shadow: 0 18px 50px rgba(65,2,30,.18); padding: 14px; }
-.reviewpanel__h { display: flex; align-items: center; margin-bottom: 8px; }
+.reviewpanel { width: 328px; max-width: calc(100vw - 40px); background: #fff; border: 1.5px dashed var(--grey-3); border-radius: 14px; box-shadow: 0 18px 50px rgba(65,2,30,.18); padding: 14px; }
+.reviewpanel__h { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .reviewpanel__tag { font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--grey-3); }
+.reviewpanel__src { font-size: 9px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 2px 8px; border-radius: 10px; }
+.reviewpanel__src.live { color: #1f7a3f; background: #E6F4EB; }
+.reviewpanel__src.local { color: var(--maroon); background: var(--soft); }
+.reviewpanel__src.connecting { color: var(--grey-3); background: var(--hair-2); }
 .reviewpanel__x { margin-left: auto; color: var(--grey-3); display: grid; place-items: center; width: 24px; height: 24px; border-radius: 6px; }
 .reviewpanel__x:hover { background: var(--soft-wash); color: var(--maroon); }
 .reviewpanel__note { font-size: 12px; color: var(--grey-3); line-height: 1.45; margin-bottom: 10px; }
+.reviewpanel__name { width: 100%; border: 1px solid var(--hair); border-radius: 9px; padding: 8px 10px; font-size: 13px; margin-bottom: 10px; }
+.reviewpanel__name:focus { outline: none; border-color: var(--maroon); }
 .reviewpanel__toggle { width: 100%; text-align: center; padding: 10px; border-radius: 10px; background: var(--maroon); color: #fff; font-weight: 700; font-size: 13px; }
 .reviewpanel__toggle.on { background: var(--pink); }
+.reviewpanel__save { margin-top: 12px; background: var(--soft-wash); border: 1px solid var(--soft); border-radius: 10px; padding: 11px 12px; }
+.reviewpanel__saveh { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; color: var(--maroon); }
+.reviewpanel__save p { font-size: 12px; color: var(--grey-2); line-height: 1.45; margin: 6px 0 0; }
 .reviewpanel__exp { display: flex; gap: 6px; margin-top: 10px; }
-.reviewpanel__list { margin-top: 12px; max-height: 40vh; overflow-y: auto; }
+.reviewpanel__list { margin-top: 12px; max-height: 34vh; overflow-y: auto; }
 .reviewpanel__stage { font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--grey-3); margin-bottom: 6px; }
 .reviewpanel__row { display: block; text-align: left; width: 100%; border: 1px solid var(--hair); border-radius: 8px; padding: 8px 10px; margin-bottom: 7px; background: #fff; }
 .reviewpanel__row:hover { border-color: var(--maroon); }
@@ -575,7 +585,25 @@ body.commenting .scene__inner { }
 .reviewbanner__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
 .reviewbanner button { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,.16); color: #fff; font-weight: 700; padding: 6px 12px; border-radius: 16px; flex-shrink: 0; }
 .reviewbanner button:hover { background: rgba(255,255,255,.28); }
+.reviewbanner--edit { background: var(--pink); }
 @media (max-width: 620px){ .reviewbanner span:not(.reviewbanner__dot) { display: none; } }
+
+/* review panel: mode toggles + edits list */
+.reviewpanel__modes { display: flex; gap: 8px; }
+.reviewpanel__modes .reviewpanel__toggle { flex: 1; padding: 9px 8px; font-size: 12px; }
+.reviewpanel__toggle.edit { background: #fff; color: var(--maroon); border: 1.5px solid var(--maroon); }
+.reviewpanel__toggle.edit.on { background: var(--pink); color: #fff; border-color: var(--pink); }
+.reviewpanel__edits { margin-top: 12px; max-height: 22vh; overflow-y: auto; }
+.reviewpanel__erow { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid var(--hair-2); }
+.reviewpanel__etx { flex: 1; font-size: 12px; color: var(--grey); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.reviewpanel__erow button { font-size: 11px; color: var(--grey-3); flex-shrink: 0; }
+.reviewpanel__erow button:hover { color: var(--maroon); }
+
+/* editable text targets */
+body.editing-mode .ed-target { cursor: text; border-radius: 4px; box-shadow: inset 0 0 0 1px var(--soft); transition: box-shadow .15s; }
+body.editing-mode .ed-target:hover { box-shadow: inset 0 0 0 1px var(--pink); background: rgba(211,97,143,.05); }
+body.editing-mode .ed-target:focus { outline: none; box-shadow: inset 0 0 0 2px var(--pink); background: rgba(211,97,143,.06); }
+body.editing-mode [data-edited="1"] { background: rgba(246,223,233,.5); border-radius: 3px; }
 
 /* S -> C -> Q flow (D3 explanation) */
 .flow { display: flex; align-items: stretch; gap: 10px; }

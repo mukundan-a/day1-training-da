@@ -150,15 +150,50 @@ drafts to real state so the work carries to the stage close.
 
 ---
 
-## 7. Reviewer commenting (`CommentLayer` + `ReviewDock`)
+## 7. Reviewer tooling — comments + shared text edits
 
 Kept deliberately separate from Docs and Notes (which simulate what a real learner
-sees). The **ReviewDock** is a dashed, bottom-left control marked "Reviewer tools";
-it toggles comment mode, lists every note grouped by stage, and exports JSON/CSV.
-In comment mode a top banner states the mode and the exit ("Done (Esc)"), and the
-body gets a `commenting` class. Pins are draggable, open into a short reply thread,
-and can be resolved or deleted. Each comment stores stage, scene, nearest heading,
-category, position and timestamp. `Escape` exits comment mode / closes popovers.
+sees). The **ReviewDock** is a dashed, **top-right** control marked "Reviewer
+tools". It holds the reviewer's name, two mutually exclusive modes (Comment /
+Edit text), the edited-strings list, and the export buttons.
+
+**Shared board (Firestore).** Both comments and text edits live on the same
+Firestore project variant 1 uses (`day1-wireframe`), on board **`variant2`** (a
+separate board from variant 1's `main`, so the two storylines never mix). Anonymous
+auth gives each browser a stable identity; the security rules
+(`firestore.rules` at the repo root) accept any board id, require comment `type` in
+`[concept|flow|screen|copy]` (mapped from the four display categories in
+`comments-store.jsx`), and only let comment updates touch `resolved`/`replies` — so
+**moving a pin is delete+recreate**, not an update. If Firebase can't load
+(offline, blocked), everything falls back to this browser's `localStorage` and the
+JSON/CSV export still carries the work out. The panel shows a **Shared / This
+device only** status pill, and reminds reviewers to **download JSON at the end of
+every session** while cloud fidelity is still being hardened.
+
+- `src/live.js` — the Firestore adapter (comments + edits collections, dynamic
+  `import()` of the Firebase SDK from gstatic, so it stays external to the bundle).
+- `src/comments-store.jsx` — `CommentsProvider`: subscribes to both collections,
+  merges local + remote (remote wins), exposes comments, edits, mutators, reviewer
+  name, `source`, and `editMode`.
+- `src/components/comments.jsx` — `CommentLayer` (per-scene pins, drag, threads,
+  resolve/delete) + `ReviewDock`.
+- Comment metadata: stage, scene, nearest heading, category, who, position,
+  timestamp, replies.
+
+**Shared text editing** (`src/components/edits.jsx`, `TextEditLayer`). Edit mode
+makes the narration text on a scene editable in place; a change is stored against a
+**hash of the authored text** (`sceneId::<hash>`, stable across re-renders and
+reordering — not a fragile positional index) and applied over the built-in wording
+on every render, so one person's change is what everyone sees. It observes a stable
+container (`.scene`, not the per-scene `.scene__inner`, which is swapped on every
+nav) and re-applies overrides after React re-renders. Dynamic/animated regions
+(hero films, exercises, checklists, the tree) are excluded via the `SKIP` selector.
+`Escape` exits; the edited-strings list in the panel offers per-edit **reset**.
+
+**Visibility.** `node variant-2/tools/live-dump.mjs` signs in anonymously and
+prints the current comments and edits on the board — use it to see review state
+(and any live text edits) from outside the app. It honours `HTTPS_PROXY` +
+`NODE_EXTRA_CA_CERTS` in a proxied sandbox, and works directly on a normal machine.
 
 ---
 
@@ -183,6 +218,19 @@ All of the following were requested together and are done in this branch:
   documents; removed from the D5 close.
 - Comment tool moved to the reviewer-only ReviewDock, made draggable, with a clear
   on/off banner and threads.
+
+### Follow-up round (also in this branch)
+
+- Opening film no longer falls to a dead static grid under reduced motion: it plays
+  the same tree → workplan → contents sequence with gentle cross-fades, and the
+  "drawn three ways" phrase is gone.
+- Comments moved onto the shared Firestore board (see §7), with local fallback,
+  reviewer name, live/local status, and a session-end JSON export reminder.
+- Review control moved to the top-right.
+- In-place shared text editing added (see §7), with the `live-dump` visibility tool.
+- `index.html` assets carry a `?v=` cache-buster so a normal refresh always picks up
+  a new deploy (bump the token when you ship). Netlify serves the repo root; the app
+  lives at **`/variant-2/`** (the bare domain is variant 1).
 
 ### Known follow-ups / ideas (not yet done)
 

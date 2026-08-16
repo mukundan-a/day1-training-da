@@ -9,7 +9,7 @@ import { spring, ease, dur } from '../motion.js';
 /* T1 — stage overview two-panel */
 export function StageOverview({ name, why, doItems, haveItems, note }) {
   return (
-    <div>
+    <div style={{ minHeight: 'calc(100vh - 170px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingBottom: 24 }}>
       <Reveal><h2 className="display">{name}</h2></Reveal>
       {note && <Reveal><p className="muted" style={{ fontSize: 15, marginTop: 8 }}>{note}</p></Reveal>}
       <Reveal><p className="overview__why">{why}</p></Reveal>
@@ -27,41 +27,63 @@ export function StageOverview({ name, why, doItems, haveItems, note }) {
   );
 }
 
-/* T4 — full checklist */
+/* T4 — full checklist, real items, filterable by role */
+const inRole = (r, role) => role === 'All' || r.role === role || (role !== 'All' && r.role === 'All');
+
 function ChecklistRows({ setKey, role }) {
   const data = CHECKLISTS[setKey];
-  const filt = (rows) => rows.filter(r => role === 'Everyone' || r.role === role || r.role === 'Everyone');
-  const Group = ({ label, rows }) => (
-    <div className="checkgroup">
-      <h3>{label}</h3>
-      <div className="checkgroup__rule" />
-      <AnimatePresence mode="popLayout">
-        {filt(rows).map((r, i) => (
-          <motion.div key={label + i} layout className={'checkrow' + (r.shown ? ' done' : '')}
-            initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} transition={spring.ui}>
-            <span className="checkrow__box" />
-            <span className="checkrow__item"><span className="line" style={{ width: r.w + '%', display: 'inline-block', height: 12, verticalAlign: 'middle', background: 'var(--hair-2)', borderRadius: 4 }} /></span>
-            {r.shown && <span className="checkrow__cov">Covered</span>}
-            <span className="checkrow__role">{r.role}</span>
-          </motion.div>
-        ))}
-      </AnimatePresence>
-    </div>
-  );
+  const Group = ({ label, rows }) => {
+    const shown = rows.filter(r => inRole(r, role));
+    if (!shown.length) return null;
+    return (
+      <div className="checkgroup">
+        <h3>{label}</h3>
+        <div className="checkgroup__rule" />
+        <AnimatePresence mode="popLayout">
+          {shown.map((r, i) => (
+            <motion.div key={r.t} layout className={'checkrow' + (r.shown ? ' done' : '')}
+              initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} transition={spring.ui}>
+              <span className="checkrow__box" />
+              <span className="checkrow__item">{r.t}</span>
+              {r.shown && <span className="checkrow__cov">Shown here</span>}
+              <span className="checkrow__role">{r.role}</span>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+    );
+  };
   return (<><Group label="Process" rows={data.process} /><Group label="Content" rows={data.content} /></>);
 }
 
+function Outputs({ setKey }) {
+  const data = CHECKLISTS[setKey];
+  return (
+    <Reveal className="outputs">
+      <div className="outputs__h">What this session produces</div>
+      <StaggerGroup className="outputs__grid" s={0.07}>
+        {data.outputs.map((o, i) => (
+          <StaggerItem key={i} className="outputs__item"><span className="outputs__n">{i + 1}</span><span>{o}</span></StaggerItem>
+        ))}
+      </StaggerGroup>
+    </Reveal>
+  );
+}
+
 export function Checklist({ setKey, title, framing }) {
-  const [role, setRole] = useState('Everyone');
+  const [role, setRole] = useState('All');
   return (
     <div>
-      <BeatHead eyebrow="What this stage covers" title={title} maroon />
+      <BeatHead title={title} maroon />
       <Reveal><p className="body">{framing}</p></Reveal>
-      <Reveal style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
+      <Outputs setKey={setKey} />
+      <Reveal className="checkbar">
+        <span className="checkbar__lab">Filter to your role</span>
         <div className="rolefilter">{ROLES.map(r => <button key={r} aria-pressed={role === r} onClick={() => setRole(r)}>{r}</button>)}</div>
       </Reveal>
       <ChecklistRows setKey={setKey} role={role} />
-      <div style={{ marginTop: 24 }}><DownloadButton label="Download this checklist" /></div>
+      <Reveal><p className="checkwhy">{CHECKLISTS[setKey].why}</p></Reveal>
+      <div style={{ marginTop: 20 }}><DownloadButton label="Download this checklist" /></div>
     </div>
   );
 }
@@ -69,7 +91,7 @@ export function Checklist({ setKey, title, framing }) {
 /* T4-strip — collapsed checklist */
 export function ChecklistStrip({ setKey, label }) {
   const [open, setOpen] = useState(false);
-  const [role, setRole] = useState('Everyone');
+  const [role, setRole] = useState('All');
   return (
     <Reveal className={'checkstrip' + (open ? ' open' : '')}>
       <button className="checkstrip__bar" onClick={() => setOpen(o => !o)}>
@@ -79,7 +101,8 @@ export function ChecklistStrip({ setKey, label }) {
         {open && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: dur.base, ease: ease.standard }} style={{ overflow: 'hidden' }}>
             <div className="checkstrip__body">
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+              <div className="checkbar">
+                <span className="checkbar__lab">Filter to your role</span>
                 <div className="rolefilter">{ROLES.map(r => <button key={r} aria-pressed={role === r} onClick={() => setRole(r)}>{r}</button>)}</div>
               </div>
               <ChecklistRows setKey={setKey} role={role} />

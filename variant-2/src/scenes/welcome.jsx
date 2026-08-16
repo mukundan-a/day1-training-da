@@ -6,7 +6,7 @@ import { HeroA } from '../components/heroes.jsx';
 import { STAGES } from '../data.js';
 import { spring, ease, dur } from '../motion.js';
 
-/* W1 — cold open (no header; opens like a film) */
+/* W1 — cold open */
 export function W1() {
   return (
     <Scene id="W1" variant="wide" hideHeader>
@@ -20,47 +20,46 @@ export function W1() {
           ))}
         </div>
 
-        <motion.h1 className="display center" style={{ margin: '12px auto 0', maxWidth: '16ch' }}
+        <motion.h1 className="display center" style={{ margin: '12px auto 0', maxWidth: '20ch' }}
           initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: dur.slow, ease: ease.entrance }}>
-          It’s your first day on the Food-Energy Nexus project.
+          You are the analyst joining the Food-Energy Nexus project on its first day.
         </motion.h1>
-        <Reveal amount={0.2}><p className="body center" style={{ margin: '20px auto 0', maxWidth: '52ch' }}>
-          This is what’s on your desk. A proposal, a brief, and a question the client is paying to answer.
+        <Reveal amount={0.2}><p className="body center" style={{ margin: '20px auto 0', maxWidth: '54ch' }}>
+          The proposal, the context brief, and the question the client has asked are already on your desk. The training follows that question through the first day of the project.
         </p></Reveal>
 
         <Reveal amount={0.2} className="mt32" style={{ maxWidth: 620, margin: '32px auto 0' }}>
           <div className="claim" style={{ margin: '0 auto' }}>
-            <div className="k">The question on the table</div>
+            <div className="k">The question the client has asked</div>
             <div className="tx"><FenSlot inline tag="FEN">the core question the FEN project had to answer</FenSlot></div>
           </div>
         </Reveal>
 
-        <Reveal amount={0.2}><p className="body center" style={{ margin: '32px auto 0', maxWidth: '54ch' }}>
-          Over the next 25 minutes you’ll take that question and turn it into a claim, a plan, and a deliverable. It’s all one piece of work. Watch.
+        <Reveal amount={0.2}><p className="body center" style={{ margin: '32px auto 0', maxWidth: '56ch' }}>
+          Over the next half hour, you will watch that question become a claim, a plan, and a deliverable. The short sequence below shows the shape of what you will build. It is one object, and it takes several forms across the day.
         </p></Reveal>
 
         <div className="mt24">
           <HeroA compact silent />
-          <p className="muted center" style={{ fontSize: 15, marginTop: 4 }}>One shape, three forms. You’ll build it yourself.</p>
         </div>
       </div>
     </Scene>
   );
 }
 
-/* W2 — why Day 1, and what you'll get */
+/* W2 — why Day 1, and the objectives (real, from the codification deck) */
 export function W2() {
   const reasons = [
-    ['Get your expertise into the room.', 'The people who know the most walk in on Day 1. If your thinking isn’t in the room then, it’s harder to get in later.', 'staff quote on expertise in the room'],
-    ['Be faster, and more deliberate, in the research.', 'A sharp hypothesis on Day 1 tells you what to look for and what to ignore. You spend the weeks that follow testing a claim, not wandering.', 'staff quote on sharper research'],
-    ['Set the team up to work well, and to grow.', 'Owners, norms and development goals get set on Day 1 or they drift. The team you name on the first day is the team you actually run in week four.', 'staff quote on team and development'],
+    ['The team’s expertise belongs in the room on the first day.', 'The people who know the most are there at the start. If their thinking is not in the room then, it is harder to bring in later.', 'staff quote on expertise in the room'],
+    ['A hypothesis set early makes the research faster and more deliberate.', 'A sharp hypothesis tells the team what to look for and what to set aside, so the following weeks test a claim rather than gather everything.', 'staff quote on sharper research'],
+    ['The first day sets up how the team works, and how it develops.', 'Owners, norms and development goals are agreed on the first day, or they drift. The team named on the first day is the team the project actually runs on.', 'staff quote on team and development'],
   ];
   return (
     <Scene id="W2" variant="read">
-      <Reveal><h2 className="lead" style={{ maxWidth: '20ch', marginTop: 24 }}>A good first day pays for itself for the rest of the project.</h2></Reveal>
+      <Reveal><h2 className="lead" style={{ maxWidth: '22ch', marginTop: 24 }}>A well-run first day sets up the whole project, so the training treats it as its own piece of craft.</h2></Reveal>
 
       <div className="beat">
-        <BeatHead n="1" eyebrow="Why Day 1 matters" title="Three reasons teams treat Day 1 as its own craft" />
+        <BeatHead n="1" title="Why the first day matters" />
         {reasons.map(([claim, body, quote], i) => (
           <Reveal key={i} className="reason">
             <div className="reason__claim">{claim}</div>
@@ -74,35 +73,32 @@ export function W2() {
       </div>
 
       <div className="beat">
-        <BeatHead n="2" eyebrow="What this is, and isn’t" title="Set your expectations" />
+        <BeatHead n="2" title="What the training is, and what it is not" />
         <Reveal className="twocol">
-          <div><h4>What this is</h4><ul>
+          <div><h4>What it is</h4><ul>
             <li>A guided walk through the first day of a real Dalberg project.</li>
-            <li>Two hands-on exercises where you do the thinking and get feedback.</li>
-            <li>Templates and checklists you keep and use on your own projects.</li>
+            <li>Two exercises where you do the thinking and receive feedback.</li>
+            <li>Templates and checklists you keep and reuse on your own projects.</li>
           </ul></div>
-          <div><h4>What it isn’t</h4><ul>
-            <li>A simulation of every meeting and message. We cut the staffing back-and-forth to what matters.</li>
-            <li>A test. No score, no badge, no pass mark.</li>
-            <li>The polished final version. You’ll see the real Day 1 output with its rough edges left in.</li>
+          <div><h4>What it is not</h4><ul>
+            <li>A competence-specific training.</li>
+            <li>A scored assessment. There is no mark and no badge.</li>
+            <li>A simulation of every meeting and message; the staffing back-and-forth is left out.</li>
           </ul></div>
         </Reveal>
       </div>
 
       <div className="beat">
-        <BeatHead n="3" eyebrow="What you’ll be able to do" title="By the end" maroon />
-        <Reveal><span className="draft-tag">Working draft</span></Reveal>
+        <BeatHead n="3" title="What you will be able to do by the end" maroon />
         <StaggerGroup>
           <ol className="objectives">
             {[
-              'Draft a rough SCQ and problem statement from a proposal, before the kick-off.',
-              'Take a top-level hypothesis and break it into claims that evidence could prove wrong.',
-              'Read a hypothesis tree as a workplan and a deliverable, and see they’re the same object.',
-              'Walk into a core-team kick-off knowing what to set: owners, a table of contents, and team norms.',
+              'Experience the Day 1 process from end to end, and see how it sets a project up for success.',
+              'Understand what is expected of you at each stage of the first day.',
+              'Understand what you should expect from your PDs and PMs at each stage.',
             ].map((t, i) => <StaggerItem as="li" key={i}>{t}</StaggerItem>)}
           </ol>
         </StaggerGroup>
-        <Reveal><div style={{ marginTop: 16 }}><FenSlot tag="FEN">final objectives, signed off by the Craft group</FenSlot></div></Reveal>
       </div>
     </Scene>
   );
@@ -112,13 +108,13 @@ export function W2() {
 export function W3() {
   return (
     <Scene id="W3" variant="wide">
-      <Reveal><h2 className="lead" style={{ maxWidth: '22ch', marginTop: 24 }}>Five stages. About 25 minutes, at your pace.</h2></Reveal>
-      <Reveal><p className="body mt16" style={{ maxWidth: '60ch' }}>
-        You can stop and come back to any of this. If you’re running it live with your team, slow down on the two exercises. That’s where most of the value is.
+      <Reveal><h2 className="lead" style={{ maxWidth: '24ch', marginTop: 24 }}>The training runs across five stages, and takes about half an hour at your own pace.</h2></Reveal>
+      <Reveal><p className="body mt16" style={{ maxWidth: '62ch' }}>
+        You can stop and return to any stage. If you are running it live with your team, it is worth slowing down on the two exercises, which is where most of the value sits.
       </p></Reveal>
-      <StaggerGroup className="mt32" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }} s={0.08}>
+      <StaggerGroup className="mt32" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }} s={0.09}>
         {STAGES.map((s, i) => (
-          <StaggerItem key={s.key} className="mapstage" style={{ minHeight: 168 }}>
+          <StaggerItem key={s.key} className="mapstage" style={{ minHeight: 176 }}>
             <div className="mn">Stage {i + 1}</div>
             <div className="mt">{s.name}</div>
             <div className="mp">{s.purpose}</div>

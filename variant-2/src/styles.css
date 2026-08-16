@@ -126,7 +126,7 @@ svg { display: inline-block; vertical-align: middle; }
 /* ============================================================================
    SCENE FRAME + HEADER (§4.2)
    ============================================================================ */
-.scene { padding-top: var(--rail-h); padding-right: 46px; min-height: 100vh; padding-bottom: 140px; }
+.scene { padding-top: var(--rail-h); padding-right: 46px; min-height: 100vh; padding-bottom: 104px; }
 .scene__inner { max-width: var(--stage); margin: 0 auto; padding: 0 32px; }
 .scene--read .scene__inner { max-width: 760px; }
 .scene--hero .scene__inner { max-width: var(--hero); }
@@ -276,19 +276,33 @@ svg { display: inline-block; vertical-align: middle; }
 /* ============================================================================
    CHECKLIST (T4 + strip)
    ============================================================================ */
+/* key outputs band — the one fill on a checklist scene (the stage's reward) */
+.outputs { background: var(--soft); border-radius: var(--r); padding: 24px 28px; margin: 24px 0; }
+.outputs__h { font-size: 13px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--maroon); margin-bottom: 16px; }
+.outputs__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 32px; }
+@media (max-width: 640px){ .outputs__grid { grid-template-columns: 1fr; } }
+.outputs__item { display: flex; gap: 12px; align-items: flex-start; font-size: 16px; color: var(--grey); line-height: 1.35; }
+.outputs__n { flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; background: #fff; color: var(--maroon); font-size: 13px; font-weight: 700; display: grid; place-items: center; }
+
+.checkbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 28px 0 4px; flex-wrap: wrap; }
+.checkbar__lab { font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--grey-3); }
+.checkwhy { font-size: 16px; color: var(--grey-2); line-height: 1.5; margin-top: 20px; padding-left: 16px; border-left: 2px solid var(--soft); max-width: 68ch; }
+
 .rolefilter { display: inline-flex; gap: 4px; padding: 4px; background: var(--soft-wash); border-radius: 24px; }
 .rolefilter button { font-size: 13px; font-weight: 600; color: var(--grey-2); padding: 7px 16px; border-radius: 20px; transition: all .2s; }
 .rolefilter button[aria-pressed="true"] { background: var(--maroon); color: #fff; }
 .checkgroup { margin-top: 32px; }
 .checkgroup h3 { font-family: var(--display); font-size: var(--t-h2); color: var(--maroon); }
 .checkgroup__rule { height: 1px; background: var(--hair); margin: 12px 0 4px; }
-.checkrow { display: flex; align-items: center; gap: 16px; min-height: 56px; padding: 8px 0; border-bottom: 1px solid var(--hair-2); }
-.checkrow__box { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--maroon); flex-shrink: 0; position: relative; }
+.checkrow { display: flex; align-items: flex-start; gap: 16px; min-height: 52px; padding: 13px 0; border-bottom: 1px solid var(--hair-2); }
+.checkrow__box { width: 21px; height: 21px; border-radius: 6px; border: 2px solid var(--maroon); flex-shrink: 0; position: relative; margin-top: 1px; }
 .checkrow.done .checkrow__box { background: var(--maroon); }
-.checkrow.done .checkrow__box::after { content: ""; position: absolute; left: 6px; top: 2px; width: 6px; height: 11px; border-right: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(42deg); }
-.checkrow__item { font-size: var(--t-checklist); color: var(--grey); flex: 1; }
-.checkrow__cov { font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--maroon); background: var(--soft); border-radius: 4px; padding: 3px 8px; }
-.checkrow__role { font-size: 12px; color: var(--grey-3); text-transform: uppercase; letter-spacing: .04em; }
+.checkrow.done .checkrow__box::after { content: ""; position: absolute; left: 5px; top: 1px; width: 6px; height: 11px; border-right: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(42deg); }
+.checkrow:not(.done) .checkrow__box { border-color: var(--mute); }
+.checkrow__item { font-size: 17px; line-height: 1.4; color: var(--grey); flex: 1; }
+.checkrow:not(.done) .checkrow__item { color: var(--grey-2); }
+.checkrow__cov { font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--maroon); background: var(--soft); border-radius: 4px; padding: 3px 8px; flex-shrink: 0; margin-top: 2px; }
+.checkrow__role { font-size: 11px; color: var(--grey-3); text-transform: uppercase; letter-spacing: .04em; flex-shrink: 0; margin-top: 3px; width: 74px; text-align: right; }
 .checkstrip { border: 1px solid var(--hair); border-radius: var(--r-sm); overflow: hidden; }
 .checkstrip__bar { width: 100%; text-align: left; display: flex; align-items: center; gap: 12px; padding: 20px 24px; font-family: var(--display); font-size: var(--t-h3); color: var(--maroon); }
 .checkstrip__bar .chev { margin-left: auto; transition: transform .3s; }
@@ -319,6 +333,10 @@ svg { display: inline-block; vertical-align: middle; }
 .problem h4 { font-size: var(--t-h3); color: var(--maroon); margin-bottom: 10px; }
 .problem textarea { width: 100%; border: 1px solid var(--soft); border-radius: var(--r-xs); padding: 12px; font-size: 16px; resize: vertical; min-height: 56px; background: #fff; }
 .problem textarea:focus { outline: none; border-color: var(--maroon); }
+
+/* focus glow during the exercise demo (shows where attention is) */
+.glow { box-shadow: 0 0 0 3px var(--soft), 0 0 0 5px rgba(211,97,143,.5) !important; transition: box-shadow .3s; }
+.scqcell.glow, .problem.glow, .scqlist.glow { border-radius: 12px; }
 
 .sources { border: 1px solid var(--hair); border-radius: var(--r-sm); padding: 18px; height: fit-content; position: sticky; top: 80px; }
 .sources h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--grey-3); margin-bottom: 12px; }
@@ -471,6 +489,7 @@ svg { display: inline-block; vertical-align: middle; }
 /* comment pins */
 .cpin { position: absolute; z-index: 30; width: 26px; height: 26px; cursor: pointer; }
 .cpin svg { width: 26px; height: 26px; color: var(--pink); filter: drop-shadow(0 2px 3px rgba(65,2,30,.3)); }
+.cpin__n { position: absolute; top: 2px; left: 0; right: 5px; text-align: center; font-size: 10px; font-weight: 700; color: #fff; z-index: 1; }
 
 /* S -> C -> Q flow (D3 explanation) */
 .flow { display: flex; align-items: stretch; gap: 10px; }

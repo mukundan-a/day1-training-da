@@ -57,11 +57,7 @@ function AppInner() {
     return () => window.removeEventListener('keydown', h);
   });
 
-  // gating for the two exercises
-  let nextDisabled = false;
-  if (id === 'D4') nextDisabled = !(state.scq.coachRead || state.scq.skipped);
-  if (id === 'F4') nextDisabled = !(state.branch.coachRead || state.branch.skipped);
-
+  const nextDisabled = false; // reviewers are never blocked; the exercises demo themselves
   const next = SCENES[idx + 1];
   const crossing = next && next.stageKey !== scene.stageKey;
   const nextSub = next ? (crossing ? STAGES.find(s => s.key === next.stageKey).name : `${next.chip} next`) : null;
@@ -74,7 +70,7 @@ function AppInner() {
     <UI.Provider value={{ onMap: () => setMapOpen(true), openSource, nav, commentMode }}>
       <div className="app">
         <TopRail onJump={jumpStage} onMap={() => setMapOpen(true)} />
-        <RightRail mode={drawer} setMode={setDrawer} onOpenDoc={() => setDrawer('docs')} commentMode={commentMode} setCommentMode={setCommentMode} />
+        <RightRail mode={drawer} setMode={setDrawer} onOpenDoc={() => setDrawer('docs')} commentMode={commentMode} setCommentMode={setCommentMode} nav={nav} />
 
         <div className={variantClass}>
           <AnimatePresence mode="wait">

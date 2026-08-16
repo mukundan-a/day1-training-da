@@ -47,28 +47,63 @@ export const DOCS = [
   { id: 'pdsplit', name: 'PD split note', kind: 'doc', desc: 'Who leads what.' },
 ];
 
-export const ROLES = ['Everyone', 'AN', 'Consultant', 'PM', 'AP/P'];
+export const ROLES = ['All', 'Core team', 'PM', 'PD'];
 
-// checklist structure is real (role, process/content, whether we showed it);
-// item text is a scaffold line (we do not have the real checklists yet).
+// The real Day 1 codification checklists, from the codification deck (2607
+// Mission Day). Split by role and by process / content, with the items this
+// training actually walks through flagged `shown`. Each stage also carries its
+// real key outputs and the reason it matters.
 export const CHECKLISTS = {
   day0: {
+    outputs: ['The project folder', 'A sense of the client context, the problem statement, the proposed approach and the key stakeholders'],
+    why: 'It gets the team up to speed quickly, and it lets the kick-off stay focused on content and brainstorming, rather than the PDs talking the team up to speed in the room.',
     process: [
-      { role: 'Everyone', w: 90, shown: true }, { role: 'Everyone', w: 70, shown: true },
-      { role: 'PM', w: 80 }, { role: 'PM', w: 65, shown: true }, { role: 'AN', w: 75 },
-      { role: 'PD', w: 60, shown: true }, { role: 'PM', w: 70 },
+      { role: 'PM', t: 'Set up the project folder on OneDrive.' },
+      { role: 'PM', t: 'Download the relevant client documents, such as the proposal and previous deliverables.', shown: true },
+      { role: 'PM', t: 'Run a quick literature review, both AI-driven and direct.' },
+      { role: 'PM', t: 'Set up the initial meetings, such as the kick-off and the Day 1 problem-solving session.' },
+      { role: 'PD', t: 'Prepare the Day 0 brief, with the context, client notes and tensions.', shown: true },
+      { role: 'PD', t: 'Hold a 30-minute call between the co-PDs to divide the project.', shown: true },
+      { role: 'PD', t: 'Agree what role each PD will play, such as content review or client lead.', shown: true },
+      { role: 'PD', t: 'Communicate those expectations to the team.' },
+      { role: 'Core team', t: 'Read the proposal and any additional client materials.', shown: true },
+      { role: 'Core team', t: 'Read the Day 0 brief from the PDs.', shown: true },
+      { role: 'Core team', t: 'Review the knowledge base for similar Dalberg projects, and consider speaking with teams that have worked in the same sector or with the same client.' },
+      { role: 'Core team', t: 'Come up with early questions, using issue trees or the Day 1 bot.' },
+      { role: 'Core team', t: 'Develop your individual hypothesis tree.' },
+      { role: 'Core team', t: 'Collate a fact pack for the project.' },
     ],
     content: [
-      { role: 'Everyone', w: 85, shown: true }, { role: 'AN', w: 60 },
-      { role: 'PD', w: 78, shown: true }, { role: 'Consultant', w: 66 },
+      { role: 'Core team', t: 'Build an understanding of the client context, and draft your own SCQ.', shown: true },
     ],
   },
   kickoff: {
-    process: [{ role: 'PD', w: 70 }, { role: 'PM', w: 62 }, { role: 'AN', w: 75, shown: true }],
-    content: [{ role: 'Everyone', w: 88, shown: true }, { role: 'Everyone', w: 64, shown: true }, { role: 'PD', w: 72, shown: true }, { role: 'AN', w: 58 }],
+    outputs: ['A clearly articulated problem statement', 'The Day 1 hypothesis tree', 'A sense of the workstreams and the final deliverable, as a table of contents'],
+    why: 'It helps the team decide which analyses to prioritise or set aside, and it avoids churn by establishing early what the workstreams look like and what kind of analysis is expected.',
+    process: [
+      { role: 'PD', t: 'Lead the content brainstorm, by bringing an exec summary or hypothesis tree, building one with the team in the room, or reviewing the PM and team’s first tree.', shown: true },
+      { role: 'PD', t: 'Communicate any additional client context and early thoughts to the team.' },
+      { role: 'Core team', t: 'Discuss and align on the Day 1 hypothesis tree.', shown: true },
+      { role: 'Core team', t: 'Refine and articulate a clear problem statement.', shown: true },
+      { role: 'Core team', t: 'Align with the PD on the deliverable format and table of contents.' },
+    ],
+    content: [
+      { role: 'All', t: 'Reach alignment across the team on the deliverable.', shown: true },
+    ],
   },
   core: {
-    process: [{ role: 'PM', w: 72, shown: true }, { role: 'Everyone', w: 60, shown: true }, { role: 'AN', w: 68 }],
-    content: [{ role: 'Everyone', w: 82, shown: true }, { role: 'Everyone', w: 76, shown: true }, { role: 'PM', w: 64, shown: true }, { role: 'AN', w: 55 }],
+    outputs: ['A dot-dash storyline, or exec summary', 'A preliminary research plan', 'Ownership of the workstreams', 'The team’s working and work-life-balance norms'],
+    why: 'It sets out the expectations and preferences across the team, so everyone knows what they own, what the deliverable is, and how the team will work.',
+    process: [
+      { role: 'PM', t: 'Schedule the one-hour kick-off.', shown: true },
+      { role: 'PM', t: 'Schedule the daily check-ins.' },
+      { role: 'PM', t: 'Fill out the work-life-balance norms, working styles and personal development goals.', shown: true },
+      { role: 'Core team', t: 'Based on the aligned hypothesis tree, lay out what needs proving, how, and by whom.', shown: true },
+      { role: 'Core team', t: 'Discuss the working and work-life-balance norms; the PDs may join for these.', shown: true },
+      { role: 'PM', t: 'Begin the week-1 storyline: a skeleton deck where the exec summary forms the lead line and the workplan forms the body of each slide.' },
+    ],
+    content: [
+      { role: 'All', t: 'Reach clarity over the workstreams and the research plan.', shown: true },
+    ],
   },
 };

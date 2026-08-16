@@ -11,7 +11,7 @@ export function X1() {
   const row = (what, kept, detail) => (
     <div className="trailcard">
       <span className="what">{what}</span>
-      <span className="body" style={{ fontSize: 15 }}>{kept ? detail : 'Skipped. You can go back any time and do it.'}</span>
+      <span className="body" style={{ fontSize: 15 }}>{kept ? detail : 'Not taken this time. You can return to it at any point.'}</span>
       <span className={'stat ' + (kept ? 'kept' : 'skip')}>{kept ? 'kept' : 'skipped'}</span>
     </div>
   );
@@ -19,23 +19,23 @@ export function X1() {
     ['Day 0', ['SCQ template', 'Day 0 checklist']],
     ['Full-team kick-off', ['Hypothesis tree template', 'Kick-off checklist']],
     ['Core-team kick-off', ['Workplan template', 'Deliverable TOC template', 'Norms template', 'Checklist']],
-    ['By role', ['AN checklist', 'PM checklist', 'PD checklist']],
+    ['By role', ['Core-team checklist', 'PM checklist', 'PD checklist']],
   ];
   return (
     <Scene id="X1">
       <div className="beat" style={{ paddingTop: 24 }}>
-        <BeatHead n="1" eyebrow="Everything you made on Day 1" title="Here’s what you made" maroon />
-        <Reveal><p className="body">Your notes, your SCQ, and the branch you built. Anything you skipped is marked, not hidden.</p></Reveal>
+        <BeatHead n="1" title="What you produced across the training" maroon />
+        <Reveal><p className="body">These are the notes you kept, the SCQ you drafted, and the branch you built. Anything you skipped is marked rather than hidden.</p></Reveal>
         <StaggerGroup className="trail mt24" s={0.1}>
           <StaggerItem>{row('Your notes', notesN > 0, notesN + ' note' + (notesN === 1 ? '' : 's') + ' kept')}</StaggerItem>
-          <StaggerItem>{row('Your SCQ', scqN > 0 && !state.scq.skipped, scqN + ' bullets, plus a problem statement')}</StaggerItem>
+          <StaggerItem>{row('Your SCQ', scqN > 0 && !state.scq.skipped, scqN + ' bullets, with a problem statement')}</StaggerItem>
           <StaggerItem>{row('Your hypothesis branch', brN > 0 && !state.branch.skipped, brN + ' sub-claim' + (brN === 1 ? '' : 's'))}</StaggerItem>
         </StaggerGroup>
       </div>
 
-      <div className="beat band band--pink" style={{ padding: '56px 0' }}>
-        <BeatHead n="2" eyebrow="Your vault" title="This part stays. Take it to a real project." maroon />
-        <Reveal><p className="body">Every template, format and checklist you saw is here, sorted by stage and by role. Download what’s useful. It’s built for the actual first day of an actual project, not just for today.</p></Reveal>
+      <div className="beat band band--pink" style={{ padding: '40px 0' }}>
+        <BeatHead n="2" title="The templates and checklists remain available for a real project" maroon />
+        <Reveal><p className="body">Every template, format and checklist from the training is here, sorted by stage and by role. It is built for the first day of an actual project, not only for today, so you can download what is useful and take it with you.</p></Reveal>
         <StaggerGroup className="vault mt24" s={0.08}>
           {vault.map(([h, items]) => (
             <StaggerItem key={h} className="vaultgrp">
@@ -48,8 +48,8 @@ export function X1() {
       </div>
 
       <div className="beat">
-        <BeatHead n="3" eyebrow="Where the project landed" title="The thinking you just walked through became this" maroon />
-        <Reveal><p className="body">Everything in this training came from one real project. The SCQ, the hypothesis, the tree you built a branch of: they turned into published work. Here’s where it landed.</p></Reveal>
+        <BeatHead n="3" title="Where the FEN project’s thinking eventually landed" maroon />
+        <Reveal><p className="body">Everything in this training came from one real project. The SCQ, the hypothesis, and the tree you drilled a branch of became published work. This is where it ended up.</p></Reveal>
         <StaggerGroup className="reports mt24">
           {[1, 2].map(k => (
             <StaggerItem key={k}>
@@ -61,8 +61,8 @@ export function X1() {
         </StaggerGroup>
         <Reveal className="mt48" style={{ textAlign: 'center' }}>
           <Notch style={{ transform: 'scaleX(-1)' }} />
-          <p className="body-lg" style={{ margin: '16px auto 0', maxWidth: '46ch' }}>
-            That’s it. You’re done. No score, no badge, none of that, because we didn’t promise any. Everything you made and everything in your vault stays here. Come back to it whenever a project’s first day is coming up.
+          <p className="body-lg" style={{ margin: '16px auto 0', maxWidth: '52ch' }}>
+            That brings the training to a close. There is no score and no badge, since none were promised at the start. Everything you made, and everything in the vault, stays here for whenever a project’s first day is coming up.
           </p>
         </Reveal>
       </div>

@@ -13,24 +13,24 @@ export function C1() {
       <StageOverview
         name="Core-team kick-off"
         note="Run by the PM, without the PDs."
-        why="Same thinking, now turned into a plan with names on it."
-        doItems={['Watch the hypothesis tree become a workplan, then a table of contents.', 'See how the team sets its norms.']}
-        haveItems={['A workplan with a named owner on every line.', 'A table of contents for the deliverable.', 'A shared set of working and work-life-balance commitments.']}
+        why="The core-team kick-off turns the hypothesis tree into a plan the team can start on, with an owner on every line. It is where the thinking from the morning becomes work the team can begin the next day."
+        doItems={['See the hypothesis tree become a workplan, and then a table of contents.', 'See how the team agrees its working norms.']}
+        haveItems={['A workplan with a named owner on every line.', 'A table of contents for the deliverable.', 'A shared set of working and work-life-balance norms.']}
       />
     </Scene>
   );
 }
 
-/* C2 — the kick-off deck (flippable) */
+/* C2 — the kick-off deck */
 export function C2() {
   const [i, setI] = useState(0);
-  const slides = ['Agenda', 'Why norms', 'Ways of working', 'Review & feedback', 'Work-life balance', 'Next steps'];
+  const slides = ['Agenda', 'Why norms', 'Ways of working', 'Review and feedback', 'Work-life balance', 'Next steps'];
   return (
     <Scene id="C2">
-      <Reveal><h2 className="lead" style={{ maxWidth: '24ch', marginTop: 24 }}>This is the deck the team runs the session from.</h2></Reveal>
-      <Reveal><p className="body mt16">Flip through it. This is the standard core-team kick-off deck, where the team sets its rules and works out how to work with each other. We’ve kept it simple: no live fill-in, just the format so you know it when you see it.</p></Reveal>
+      <Reveal><h2 className="lead" style={{ maxWidth: '26ch', marginTop: 24 }}>The team runs the session from a standard kick-off deck.</h2></Reveal>
+      <Reveal><p className="body mt16">The deck sets out how the team will work together and how people will work with one another. This training keeps it simple and shows the format rather than filling it in live, so that you recognise the deck when you see it on a project.</p></Reveal>
       <Reveal className="mt32" style={{ maxWidth: 760, margin: '32px auto 0' }}>
-        <ArtefactFrame name="Kick-off deck" cap="Placeholder: the Dalberg IKO norms deck, with a filled-in example.">
+        <ArtefactFrame name="Kick-off deck" cap="Placeholder: the Dalberg kick-off norms deck, with a filled-in example.">
           <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr', gap: 16, minHeight: 220 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {slides.map((s, k) => (
@@ -61,29 +61,29 @@ export function C2() {
   );
 }
 
-/* C3 — one object, three ways (Hero A) */
+/* C3 — one object, three ways */
 export function C3() {
   const { state } = useStore();
   const hasBranch = state.branch.subclaims.filter(Boolean).length > 0 && !state.branch.skipped;
   return (
     <Scene id="C3" variant="hero">
-      <Reveal><h2 className="lead center" style={{ margin: '24px auto 0', maxWidth: '22ch' }}>Tip the tree on its side and it’s a workplan.</h2></Reveal>
-      <Reveal><p className="body center" style={{ margin: '16px auto 0', maxWidth: '56ch' }}>
-        Watch it happen. Each branch of the hypothesis tree lands as a row. Then an owner column fills in as the PM assigns who does what, taking two workstreams herself alongside running the team.
+      <Reveal><h2 className="lead center" style={{ margin: '24px auto 0', maxWidth: '26ch' }}>Turned on its side, the hypothesis tree becomes the week-1 workplan.</h2></Reveal>
+      <Reveal><p className="body center" style={{ margin: '16px auto 0', maxWidth: '58ch' }}>
+        In the sequence below, each branch of the tree lands as a row of the workplan. An owner column then fills in as the PM assigns who does what, taking two of the workstreams herself alongside running the team.
       </p></Reveal>
 
       <HeroA userBranchLabel={hasBranch ? 'Your branch' : null} />
 
-      <Reveal><p className="body center" style={{ margin: '0 auto', maxWidth: '56ch' }}>
-        Then read the same object as a document. Each workstream becomes a section. The analyses under it become what that section has to show. Same object, drawn a third way.
+      <Reveal><p className="body center" style={{ margin: '0 auto', maxWidth: '58ch' }}>
+        The same object also reads as the deliverable’s table of contents. Each workstream becomes a section, and the analyses under it become what that section has to show.
       </p></Reveal>
-      <Reveal className="center" style={{ maxWidth: 640, margin: '24px auto 0' }}>
+      <Reveal className="center" style={{ maxWidth: 660, margin: '24px auto 0' }}>
         <p className="body-lg" style={{ color: 'var(--maroon)', fontFamily: 'var(--display)' }}>
-          The tree, the workplan and the table of contents are one object drawn three ways. The claim you argued about in the kick-off is now a section heading in the report.
+          The tree, the workplan and the table of contents are one object drawn three ways. The claim the team argued about in the kick-off is now a section heading in the report.
         </p>
       </Reveal>
       <Reveal className="foldnote" style={{ margin: '24px auto 0' }}>
-        <strong>What’s week one?</strong> Turning this workplan into an executive summary, and then into slides. That’s the shape of the first week. Same object again, one more time.
+        The first week continues the same object once more. The workplan becomes an executive summary, and then a set of slides, which is the shape of week one.
       </Reveal>
     </Scene>
   );
@@ -92,24 +92,24 @@ export function C3() {
 /* C4 — norms */
 export function C4() {
   const norms = [
-    ['Meeting cadence', 'How often you meet, when, and what each meeting is for.'],
-    ['Review and feedback', 'How work gets reviewed, and how feedback gets given and taken.'],
-    ['Response times', 'What’s a reasonable time to reply, and what counts as urgent.'],
-    ['Work-life balance', 'Protected time, no-go hours, and how you cover for each other.'],
+    ['Meeting cadence', 'How often the team meets, when, and what each meeting is for.'],
+    ['Review and feedback', 'How work is reviewed, and how feedback is given and taken.'],
+    ['Response times', 'What counts as a reasonable time to reply, and what counts as urgent.'],
+    ['Work-life balance', 'Protected time, hours that are off-limits, and how people cover for each other.'],
   ];
   return (
     <Scene id="C4">
       <div className="beat" style={{ paddingTop: 24 }}>
-        <BeatHead n="1" eyebrow="Worked example" title="The norms the team agrees to, out loud, on Day 1" maroon />
-        <Reveal><p className="body">Not a personality exercise. A short, concrete set of agreements about how you’ll work together, so nobody’s guessing in week three. Here’s the kind of thing a team lands on.</p></Reveal>
+        <BeatHead n="1" title="The team agrees its working norms, out loud, on the first day" maroon />
+        <Reveal><p className="body">The team agrees a short, concrete set of norms for how it will work together, so that nobody is guessing in week three. The example below shows the kind of norms a team settles on.</p></Reveal>
         <StaggerGroup className="norms mt32" s={0.1}>
           {norms.map(([h, d]) => (
             <StaggerItem key={h} className="norm"><h4>{h}</h4><p>{d}</p><div style={{ marginTop: 10 }}><FenSlot tag="example">a realistic filled-in example</FenSlot></div></StaggerItem>
           ))}
         </StaggerGroup>
       </div>
-      <Reveal className="center" style={{ maxWidth: 640, margin: '0 auto' }}>
-        <p className="body-lg" style={{ color: 'var(--maroon)', fontFamily: 'var(--display)' }}>Norms you name on Day 1 are norms you can point to in week four. Norms nobody named don’t exist.</p>
+      <Reveal className="center" style={{ maxWidth: 660, margin: '0 auto' }}>
+        <p className="body-lg" style={{ color: 'var(--maroon)', fontFamily: 'var(--display)' }}>When the team names its norms on the first day, it can hold itself to them later. Norms that are never named tend not to hold.</p>
       </Reveal>
     </Scene>
   );
@@ -117,14 +117,14 @@ export function C4() {
 
 /* C5 — core-team close */
 export function C5() {
-  const items = [['Workplan', 'a plan with owners'], ['Table of contents', 'the shape of the deliverable'], ['Norms', 'how the team runs']];
+  const items = [['A workplan', 'with a named owner on every line'], ['A table of contents', 'that sets the shape of the deliverable'], ['Working norms', 'that say how the team will run']];
   return (
     <Scene id="C5">
       <div className="beat" style={{ paddingTop: 24 }}>
-        <BeatHead n="1" eyebrow="Conclusion" title="Day 1 is now a plan you could start tomorrow" maroon />
-        <Reveal><p className="body">In one session, the tree turned into a workplan with owners, the workplan turned into a table of contents, and the team agreed how it would work. Nobody leaves wondering what they own, what the deliverable is, or how the team runs. Each one came from the same tree.</p></Reveal>
+        <BeatHead n="1" title="By the end of the session, Day 1 has become a plan the team could start on the next morning" maroon />
+        <Reveal><p className="body">In a single session, the tree became a workplan with owners, the workplan became a table of contents, and the team agreed how it would work. Nobody leaves wondering what they own, what the deliverable is, or how the team runs, and each of those came from the same tree.</p></Reveal>
         <StaggerGroup className="panels" style={{ gridTemplateColumns: '1fr 1fr 1fr', marginTop: 24 }} s={0.1}>
-          {items.map(([h, s]) => <StaggerItem key={h} className="panel" style={{ background: '#fff', border: '1px solid var(--hair)' }}><h3 style={{ fontSize: 18 }}>{h}</h3><p className="body" style={{ fontSize: 15 }}>{s}</p></StaggerItem>)}
+          {items.map(([h, s]) => <StaggerItem key={h} className="panel"><h3 style={{ fontSize: 18 }}>{h}</h3><p className="body" style={{ fontSize: 15 }}>{s}</p></StaggerItem>)}
         </StaggerGroup>
       </div>
       <div className="beat">

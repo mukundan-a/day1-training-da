@@ -120,7 +120,7 @@ svg { display: inline-block; vertical-align: middle; }
 .railstrip button { width: 38px; height: 38px; border-radius: 10px; color: var(--grey-3); display: grid; place-items: center; position: relative; transition: all .2s; }
 .railstrip button:hover { color: var(--maroon); background: var(--soft-wash); }
 .railstrip button svg { width: 18px; height: 18px; }
-.railstrip .lbl { font-size: 8px; letter-spacing: .05em; text-transform: uppercase; margin-top: 2px; }
+.railstrip .lbl { font-size: 7px; letter-spacing: .03em; text-transform: uppercase; margin-top: 2px; white-space: nowrap; }
 .railstrip .badge { position: absolute; top: 2px; right: 2px; min-width: 15px; height: 15px; border-radius: 8px; background: var(--pink); color: #fff; font-size: 9px; font-weight: 700; display: grid; place-items: center; padding: 0 3px; }
 
 /* ============================================================================
@@ -253,6 +253,8 @@ svg { display: inline-block; vertical-align: middle; }
    ============================================================================ */
 .reading { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
 @media (max-width: 780px){ .reading { grid-template-columns: 1fr; } }
+.exlayout { display: grid; grid-template-columns: 1fr 210px; gap: 24px; align-items: start; }
+@media (max-width: 760px){ .exlayout { grid-template-columns: 1fr; } }
 .page { background: #fff; border: 1px solid var(--hair); border-radius: var(--r-sm); padding: 30px 34px; box-shadow: var(--shadow); }
 .page h5 { font-family: var(--display); font-size: 17px; color: var(--maroon); margin-bottom: 16px; }
 .line { height: 11px; border-radius: 4px; background: var(--hair-2); margin-bottom: 11px; }
@@ -501,6 +503,24 @@ svg { display: inline-block; vertical-align: middle; }
 .flow__eq { margin-top: 14px; background: var(--soft); border-radius: var(--r); padding: 20px 24px; display: flex; align-items: center; gap: 16px; }
 .flow__eq .lab { font-family: var(--display); font-size: var(--t-h3); color: var(--maroon); white-space: nowrap; }
 @media (max-width: 720px){ .flow { flex-direction: column; } .flow__arrow { transform: rotate(90deg); } }
+
+/* micro-interactions — a quiet lift on cards, so the surfaces feel alive */
+.panel, .norm, .flow__card, .vaultgrp, .trailcard, .mapstage, .reason {
+  transition: box-shadow .28s var(--ease), transform .28s var(--ease), border-color .2s;
+}
+.panel:hover, .norm:hover, .flow__card:hover, .vaultgrp:hover, .trailcard:hover {
+  transform: translateY(-3px); box-shadow: var(--shadow-lift);
+}
+.panel--soft:hover { box-shadow: var(--shadow-lift); }
+.docrow, .sources button, .vgrp button, .checkstrip__bar { transition: all .22s var(--ease); }
+.report:hover .report__cov, .report__cov { transition: transform .3s var(--ease); }
+.report:hover .report__cov { transform: translateY(-3px) scale(1.01); }
+
+/* flow arrow draw-in (D3) */
+.flow__arrow { transform-origin: left center; }
+
+/* vertically centre a short scene so it reads as composed, not top-heavy */
+.vcenter { min-height: calc(100vh - 168px); display: flex; flex-direction: column; justify-content: center; padding: 24px 0; }
 
 .center { text-align: center; }
 .mt8{margin-top:8px} .mt16{margin-top:16px} .mt24{margin-top:24px} .mt32{margin-top:32px} .mt48{margin-top:48px}

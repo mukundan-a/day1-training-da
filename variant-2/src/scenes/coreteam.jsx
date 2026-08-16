@@ -27,9 +27,10 @@ export function C2() {
   const slides = ['Agenda', 'Why norms', 'Ways of working', 'Review and feedback', 'Work-life balance', 'Next steps'];
   return (
     <Scene id="C2">
-      <Reveal><h2 className="lead" style={{ maxWidth: '26ch', marginTop: 24 }}>The team runs the session from a standard kick-off deck.</h2></Reveal>
+      <div className="vcenter">
+      <Reveal><h2 className="lead" style={{ maxWidth: '26ch' }}>The team runs the session from a standard kick-off deck.</h2></Reveal>
       <Reveal><p className="body mt16">The deck sets out how the team will work together and how people will work with one another. This training keeps it simple and shows the format rather than filling it in live, so that you recognise the deck when you see it on a project.</p></Reveal>
-      <Reveal className="mt32" style={{ maxWidth: 760, margin: '32px auto 0' }}>
+      <Reveal className="mt32" style={{ maxWidth: 760, margin: '32px auto 0', width: '100%' }}>
         <ArtefactFrame name="Kick-off deck" cap="Placeholder: the Dalberg kick-off norms deck, with a filled-in example.">
           <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr', gap: 16, minHeight: 220 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -57,6 +58,7 @@ export function C2() {
           </div>
         </ArtefactFrame>
       </Reveal>
+      </div>
     </Scene>
   );
 }

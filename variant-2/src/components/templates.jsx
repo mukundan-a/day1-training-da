@@ -42,7 +42,7 @@ function ChecklistRows({ setKey, role }) {
         <AnimatePresence mode="popLayout">
           {shown.map((r, i) => (
             <motion.div key={r.t} layout className={'checkrow' + (r.shown ? ' done' : '')}
-              initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} transition={spring.ui}>
+              initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} transition={{ ...spring.ui, delay: Math.min(i * 0.035, 0.3) }}>
               <span className="checkrow__box" />
               <span className="checkrow__item">{r.t}</span>
               {r.shown && <span className="checkrow__cov">Shown here</span>}
@@ -118,7 +118,7 @@ export function ChecklistStrip({ setKey, label }) {
 /* T5 — zoom-out frame */
 export function ZoomOut({ heading, body, name, flag, cap }) {
   return (
-    <div>
+    <div className="vcenter">
       <Reveal><h2 className="lead" style={{ maxWidth: '22ch' }}>{heading}</h2></Reveal>
       <Reveal><p className="body mt16">{body}</p></Reveal>
       <Reveal className="mt32" style={{ maxWidth: 760, margin: '32px auto 0' }}>

@@ -126,7 +126,7 @@ export function RightRail({ mode, setMode, onOpenDoc, commentMode, setCommentMod
   return (
     <>
       <div className="railstrip">
-        {[['docs', 'doc', 'Docs', DOCS.length], ['notes', 'notes', 'Notes', state.notes.length], ['comments', 'chat', 'Talk', state.comments.length]].map(([k, ic, lbl, badge]) => (
+        {[['docs', 'doc', 'Docs', DOCS.length], ['notes', 'notes', 'Notes', state.notes.length], ['comments', 'chat', 'Comment', state.comments.length]].map(([k, ic, lbl, badge]) => (
           <button key={k} onClick={() => setMode(mode === k ? null : k)} aria-pressed={mode === k}
             style={mode === k ? { color: 'var(--maroon)', background: 'var(--soft-wash)' } : null}>
             <Icon n={ic} size={18} />

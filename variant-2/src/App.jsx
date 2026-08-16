@@ -43,6 +43,13 @@ function AppInner() {
     else setDrawer('docs');
   }, []);
 
+  // opening a document from the Docs tab jumps to its reader scene
+  const openDoc = useCallback((docId) => {
+    const map = { proposal: 'D2', brief: 'D2', iko: 'C2', pdsplit: 'D5' };
+    const target = map[docId];
+    if (target) { setDrawer(null); nav(target); }
+  }, [nav]);
+
   // keyboard (§4.6) — suppressed while typing
   useEffect(() => {
     const h = (e) => {
@@ -70,7 +77,7 @@ function AppInner() {
     <UI.Provider value={{ onMap: () => setMapOpen(true), openSource, nav, commentMode }}>
       <div className="app">
         <TopRail onJump={jumpStage} onMap={() => setMapOpen(true)} />
-        <RightRail mode={drawer} setMode={setDrawer} onOpenDoc={() => setDrawer('docs')} commentMode={commentMode} setCommentMode={setCommentMode} nav={nav} />
+        <RightRail mode={drawer} setMode={setDrawer} onOpenDoc={openDoc} commentMode={commentMode} setCommentMode={setCommentMode} nav={nav} />
 
         <div className={variantClass}>
           <AnimatePresence mode="wait">

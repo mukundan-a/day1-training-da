@@ -172,8 +172,8 @@ export function HeroB() {
       <AnimatePresence>
         {showDef && (
           <motion.div className="def" initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: dur.base, ease: ease.editorial }}>
-            <h4>What’s a hypothesis?</h4>
-            <p>Your best answer to the client’s question, written before the research, and specific enough that evidence could prove it wrong. If nothing could disprove it, it’s an opinion, not a hypothesis.</p>
+            <h4>What a hypothesis is</h4>
+            <p>A hypothesis is the team’s best answer to the client’s question, written before the research and stated precisely enough that evidence could prove it wrong. If nothing could disprove it, it is an opinion rather than a hypothesis.</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -187,8 +187,8 @@ export function HeroB() {
           </motion.div>
         ))}
       </div>
-      {stubs && <motion.p className="muted center" style={{ fontSize: 15, maxWidth: 480 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-        For this to be true, a few things underneath it have to hold. Those are the branches. You’re about to build one.
+      {stubs && <motion.p className="muted center" style={{ fontSize: 15, maxWidth: 520 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        For the hypothesis to hold, the claims underneath it have to hold as well. Those claims are the branches, and the next screen drills one of them down.
       </motion.p>}
     </div>
   );

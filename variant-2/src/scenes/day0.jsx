@@ -79,19 +79,19 @@ export function D3() {
       <div className="beat">
         <BeatHead n="2" title="The SCQ frame, in three parts" />
         <Reveal><p className="body">An SCQ is a simple frame for setting out a problem, so that everyone agrees what the problem is before anyone tries to solve it.</p></Reveal>
-        <Reveal className="mt24">
-          <div className="flow">
-            {parts.map(([L, name, desc], i) => (
-              <React.Fragment key={L}>
-                <div className="flow__card"><div className="flow__L">{L}</div><div className="flow__nm">{name}</div><div className="flow__d">{desc}</div></div>
-                {i < 2 && <Icon n="right" size={22} className="flow__arrow" />}
-              </React.Fragment>
-            ))}
-          </div>
-          <div className="flow__eq">
-            <span className="lab">Problem statement</span>
-            <span className="body" style={{ fontSize: 15, margin: 0 }}>The three parts resolve into one or two sentences naming the problem the work exists to solve. Everything that follows points back to it.</span>
-          </div>
+        <StaggerGroup className="flow mt24" s={0.16}>
+          {parts.map(([L, name, desc], i) => (
+            <React.Fragment key={L}>
+              <motion.div className="flow__card" variants={{ hidden: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } } }}>
+                <div className="flow__L">{L}</div><div className="flow__nm">{name}</div><div className="flow__d">{desc}</div>
+              </motion.div>
+              {i < 2 && <motion.span className="flow__arrow" style={{ display: 'inline-flex' }} variants={{ hidden: { opacity: 0, scaleX: 0 }, show: { opacity: 1, scaleX: 1, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } } }}><Icon n="right" size={22} /></motion.span>}
+            </React.Fragment>
+          ))}
+        </StaggerGroup>
+        <Reveal className="flow__eq" style={{ marginTop: 14 }}>
+          <span className="lab">Problem statement</span>
+          <span className="body" style={{ fontSize: 15, margin: 0 }}>The three parts resolve into one or two sentences naming the problem the work exists to solve. Everything that follows points back to it.</span>
         </Reveal>
       </div>
     </Scene>

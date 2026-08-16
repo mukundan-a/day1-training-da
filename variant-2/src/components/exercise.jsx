@@ -110,7 +110,7 @@ export function SCQExercise({ onOpenSource }) {
   return (
     <div ref={wrap} style={{ position: 'relative' }}>
       <Sticker playing={playing} onReplay={demo} />
-      <div className="reading" style={{ gridTemplateColumns: '1fr 210px', alignItems: 'start' }}>
+      <div className="exlayout">
         <div>
           <div className="scqgrid"><Cell f="S" word="Situation" /><Cell f="C" word="Complication" /><Cell f="Q" word="Question" /></div>
           <div className={'problem' + (glow === 'P' ? ' glow' : '')}>

@@ -11,6 +11,15 @@ const Greek = ({ w = '80%', c = 'var(--soft)' }) => (
   <div style={{ height: 10, borderRadius: 4, background: c, width: w }} />
 );
 
+// three-pronged connector from the L1 claim down to the branches; draws itself
+const TreeConnectors = ({ color = 'var(--pink)' }) => (
+  <svg width="100%" height="30" viewBox="0 0 900 30" preserveAspectRatio="none" style={{ maxWidth: 900, margin: '-6px 0' }} aria-hidden>
+    <motion.path d="M450 0 L450 14 M150 14 L750 14 M150 14 L150 30 M450 14 L450 30 M750 14 L750 30"
+      stroke={color} strokeWidth="2" fill="none" strokeLinecap="round"
+      initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 0.75 }} transition={{ duration: 0.6, ease: ease.standard }} />
+  </svg>
+);
+
 /* ------------------------------------------------------------------ HERO A */
 export function HeroA({ compact = false, silent = false, userBranchLabel }) {
   const ref = useRef(null);
@@ -51,6 +60,7 @@ export function HeroA({ compact = false, silent = false, userBranchLabel }) {
             {phase === 'toc' ? 'Report title' : userBranchLabel ? 'L1 hypothesis' : 'L1 hypothesis'}
           </motion.div>
 
+          {phase === 'tree' && <TreeConnectors />}
           {phase === 'tree' && (
             <motion.div className="tree__branches" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: dur.base, ease: ease.entrance }}>
               {branches.map(i => (

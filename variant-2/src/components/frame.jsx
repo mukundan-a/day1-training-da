@@ -6,7 +6,7 @@ import { CommentLayer } from './comments.jsx';
 export const UI = createContext({ onMap: () => {}, openSource: () => {}, nav: () => {}, commentMode: false });
 export const useUI = () => useContext(UI);
 
-const WIDTHS = { read: 760, stage: 960, hero: 1160, wide: 980 };
+const WIDTHS = { read: 860, stage: 1080, hero: 1240, wide: 1100 };
 
 // The scene owns its own single H1 (no overline, no chip, no eyebrows). Stage
 // context lives only in the quiet top rail.

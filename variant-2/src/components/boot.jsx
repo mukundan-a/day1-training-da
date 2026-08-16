@@ -1,6 +1,7 @@
-// Cinematic boot (a "sexy laptop boot" for Day 1 Craft). One core object morphs
-// through the whole pipeline on Dalberg burgundy, resolves into the notch mark
-// and wordmark, then reveals Begin. Skippable. Plays once per session.
+// Cinematic boot (a "sexy laptop boot" for Day 1 Craft). The screen powers on
+// from black, a core object is drawn through the whole pipeline on Dalberg
+// burgundy, resolves into the notch mark and wordmark, then reveals Begin.
+// Skippable. Plays once per session.
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Notch } from './ui.jsx';
@@ -9,7 +10,7 @@ import { ease, spring } from '../motion.js';
 const W = '#F6DFE9';           // soft line on burgundy
 const line = (props) => ({ stroke: W, strokeWidth: 2.4, fill: 'none', strokeLinecap: 'round', ...props });
 
-// each form is a tiny white line-glyph; they morph in sequence
+// each form is a tiny white line-glyph; they are drawn in sequence
 const GLYPHS = [
   { label: 'A question', el: (
     <svg width="120" height="120" viewBox="0 0 120 120"><circle cx="60" cy="60" r="40" style={line()} />
@@ -18,7 +19,7 @@ const GLYPHS = [
     <svg width="150" height="120" viewBox="0 0 150 120">{[30, 60, 90].map((y, i) => <g key={i}><rect x="20" y={y - 12} width="110" height="20" rx="5" style={line()} /><text x="30" y={y + 3} fill={W} fontSize="13" fontFamily="serif">{'SCQ'[i]}</text></g>)}</svg>) },
   { label: 'A problem statement', el: (
     <svg width="160" height="120" viewBox="0 0 160 120"><rect x="20" y="46" width="120" height="28" rx="8" style={line({ fill: 'rgba(246,223,233,0.12)' })} /><line x1="34" y1="60" x2="126" y2="60" style={line({ strokeWidth: 1.6 })} /></svg>) },
-  { label: 'A hypothesis', el: (
+  { label: 'A hypothesis tree', el: (
     <svg width="170" height="120" viewBox="0 0 170 120"><rect x="55" y="16" width="60" height="20" rx="6" style={line({ fill: 'rgba(246,223,233,0.15)' })} />
       <path d="M85 36v18M85 54H40v14M85 54h45v14M85 54v14" style={line({ strokeWidth: 1.8 })} />
       {[40, 85, 130].map(x => <rect key={x} x={x - 16} y="70" width="32" height="18" rx="5" style={line()} />)}</svg>) },
@@ -33,63 +34,92 @@ const GLYPHS = [
 ];
 
 export function Boot({ onBegin }) {
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(-1);   // -1 = power-on beat
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    if (step >= GLYPHS.length) { const t = setTimeout(() => setDone(true), 500); return () => clearTimeout(t); }
-    const t = setTimeout(() => setStep(s => s + 1), step === 0 ? 700 : 760);
+    if (step === -1) { const t = setTimeout(() => setStep(0), 900); return () => clearTimeout(t); }
+    if (step >= GLYPHS.length) { const t = setTimeout(() => setDone(true), 650); return () => clearTimeout(t); }
+    const t = setTimeout(() => setStep(s => s + 1), 900);
     return () => clearTimeout(t);
   }, [step]);
 
-  return (
-    <motion.div className="boot" exit={{ opacity: 0, filter: 'blur(6px)' }} transition={{ duration: 0.6 }}
-      style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'var(--maroon-deep)', display: 'grid', placeItems: 'center', overflow: 'hidden' }}>
-      {/* subtle burgundy gradient wash */}
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(120% 90% at 50% 30%, #6a0f35 0%, #41021E 70%)' }} />
+  const gi = Math.min(Math.max(step, 0), GLYPHS.length - 1);
 
-      <div style={{ position: 'relative', textAlign: 'center', width: 360 }}>
-        <div style={{ height: 150, display: 'grid', placeItems: 'center' }}>
+  return (
+    <motion.div className="boot" exit={{ opacity: 0, filter: 'blur(8px)' }} transition={{ duration: 0.7 }}
+      style={{ position: 'fixed', inset: 0, zIndex: 200, background: '#000', display: 'grid', placeItems: 'center', overflow: 'hidden' }}>
+
+      {/* power-on: black lifts into a breathing burgundy field */}
+      <motion.div style={{ position: 'absolute', inset: 0 }}
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.1, ease: ease.entrance }}>
+        <motion.div style={{ position: 'absolute', inset: '-20%', background: 'radial-gradient(60% 50% at 50% 38%, #7a1240 0%, #4d0a28 45%, #2c0114 100%)' }}
+          animate={{ scale: [1, 1.06, 1], opacity: [0.9, 1, 0.9] }} transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }} />
+        {/* drifting orbs */}
+        <motion.div style={{ position: 'absolute', width: 340, height: 340, borderRadius: '50%', left: '18%', top: '20%', background: 'radial-gradient(circle, rgba(211,97,143,.22), transparent 70%)', filter: 'blur(20px)' }}
+          animate={{ x: [0, 40, 0], y: [0, -24, 0] }} transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }} />
+        <motion.div style={{ position: 'absolute', width: 300, height: 300, borderRadius: '50%', right: '14%', bottom: '16%', background: 'radial-gradient(circle, rgba(136,25,70,.30), transparent 70%)', filter: 'blur(24px)' }}
+          animate={{ x: [0, -32, 0], y: [0, 26, 0] }} transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }} />
+        {/* vignette */}
+        <div style={{ position: 'absolute', inset: 0, boxShadow: 'inset 0 0 240px 60px rgba(20,0,10,.75)' }} />
+      </motion.div>
+
+      <div style={{ position: 'relative', textAlign: 'center', width: 380 }}>
+        <div style={{ height: 156, display: 'grid', placeItems: 'center', position: 'relative' }}>
           <AnimatePresence mode="wait">
-            {!done ? (
-              <motion.div key={step} initial={{ opacity: 0, scale: 0.86, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 1.08, y: -10 }}
+            {step === -1 ? (
+              <motion.div key="on" initial={{ scaleX: 0, opacity: 0 }} animate={{ scaleX: 1, opacity: 1 }} exit={{ opacity: 0 }}
+                transition={{ duration: 0.7, ease: ease.entrance }}
+                style={{ width: 120, height: 2, background: W, boxShadow: '0 0 18px ' + W }} />
+            ) : !done ? (
+              <motion.div key={step} style={{ position: 'relative', filter: 'drop-shadow(0 0 12px rgba(246,223,233,.35))' }}
+                initial={{ opacity: 0, scale: 0.9, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 1.08, y: -10 }}
                 transition={{ duration: 0.5, ease: ease.standard }}>
-                {(GLYPHS[Math.min(step, GLYPHS.length - 1)]).el}
+                {/* draw-on wipe */}
+                <motion.div initial={{ clipPath: 'inset(0 100% 0 0)' }} animate={{ clipPath: 'inset(0 0% 0 0)' }} transition={{ duration: 0.6, ease: ease.standard }}>
+                  {GLYPHS[gi].el}
+                </motion.div>
+                {/* light sweep */}
+                <motion.div style={{ position: 'absolute', top: 0, bottom: 0, width: 60, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,.5), transparent)', mixBlendMode: 'screen' }}
+                  initial={{ left: '-30%' }} animate={{ left: '120%' }} transition={{ duration: 0.9, ease: 'easeInOut', delay: 0.15 }} />
               </motion.div>
             ) : (
-              <motion.div key="mark" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={spring.hero} style={{ color: W }}>
-                <Notch style={{ transform: 'scale(2.4)', color: W }} />
+              <motion.div key="mark" initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }} transition={spring.hero} style={{ color: W, position: 'relative' }}>
+                <motion.div style={{ position: 'absolute', inset: -30, borderRadius: '50%', border: '1px solid rgba(246,223,233,.4)' }}
+                  initial={{ scale: 0.4, opacity: 0.8 }} animate={{ scale: 1.6, opacity: 0 }} transition={{ duration: 1.1, ease: ease.entrance }} />
+                <Notch style={{ transform: 'scale(2.6)', color: W }} />
               </motion.div>
             )}
           </AnimatePresence>
         </div>
 
-        <div style={{ height: 40 }}>
+        <div style={{ height: 42 }}>
           <AnimatePresence mode="wait">
-            {!done ? (
-              <motion.div key={'l' + step} initial={{ opacity: 0 }} animate={{ opacity: 0.9 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }}
-                style={{ color: W, fontSize: 17, letterSpacing: '.02em' }}>
-                {(GLYPHS[Math.min(step, GLYPHS.length - 1)]).label}
+            {step >= 0 && !done ? (
+              <motion.div key={'l' + step} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 0.92, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.35 }}
+                style={{ color: W, fontSize: 18, letterSpacing: '.02em' }}>
+                {GLYPHS[gi].label}
               </motion.div>
-            ) : (
-              <motion.div key="wm" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6, ease: ease.entrance }}
-                style={{ color: '#fff', fontFamily: 'var(--display)', fontSize: 40, letterSpacing: '-.02em' }}>Day 1 Craft</motion.div>
-            )}
+            ) : done ? (
+              <motion.div key="wm" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6, ease: ease.entrance }}
+                style={{ color: '#fff', fontFamily: 'var(--display)', fontSize: 44, letterSpacing: '-.02em' }}>Day 1 Craft</motion.div>
+            ) : null}
           </AnimatePresence>
         </div>
 
         {/* progress ticks */}
-        {!done && (
+        {!done && step >= 0 && (
           <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 28 }}>
-            {GLYPHS.map((_, i) => <div key={i} style={{ width: 16, height: 3, borderRadius: 2, background: i <= step ? W : 'rgba(246,223,233,0.25)', transition: 'background .3s' }} />)}
+            {GLYPHS.map((_, i) => <div key={i} style={{ width: 18, height: 3, borderRadius: 2, background: i <= step ? W : 'rgba(246,223,233,0.22)', transition: 'background .4s', boxShadow: i === step ? '0 0 8px ' + W : 'none' }} />)}
           </div>
         )}
 
         <AnimatePresence>
           {done && (
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.5 }} style={{ marginTop: 40 }}>
-              <div style={{ color: 'rgba(246,223,233,0.75)', fontSize: 15, marginBottom: 20 }}>The first day of a project, start to finish.</div>
-              <button onClick={onBegin} style={{ background: '#fff', color: 'var(--maroon)', fontSize: 16, fontWeight: 700, padding: '14px 34px', borderRadius: 30 }}>Begin</button>
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.5 }} style={{ marginTop: 42 }}>
+              <div style={{ color: 'rgba(246,223,233,0.75)', fontSize: 15, marginBottom: 22 }}>The first day of a project, start to finish.</div>
+              <motion.button onClick={onBegin} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
+                style={{ background: '#fff', color: 'var(--maroon)', fontSize: 16, fontWeight: 700, padding: '14px 36px', borderRadius: 30, boxShadow: '0 8px 30px rgba(0,0,0,.35)' }}>Begin</motion.button>
             </motion.div>
           )}
         </AnimatePresence>

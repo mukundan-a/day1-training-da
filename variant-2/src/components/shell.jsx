@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Notch, Icon, ArtefactFrame } from './ui.jsx';
-import { exportComments } from './comments.jsx';
 import { STAGES, SCENES, DOCS, stageOf } from '../data.js';
 import { spring, ease, dur } from '../motion.js';
 import { useStore } from '../store.jsx';
@@ -119,14 +118,15 @@ export function MapOverlay({ open, onClose, onJump }) {
   );
 }
 
-// Right-edge strip + drawer (Docs / Notes / Comments) — one open at a time
-export function RightRail({ mode, setMode, onOpenDoc, commentMode, setCommentMode, nav }) {
+// Right-edge strip + drawer (Docs / Notes) — one open at a time. These two
+// simulate what a real learner sees; reviewer commenting lives in its own dock.
+export function RightRail({ mode, setMode, onOpenDoc, nav }) {
   const { state, dispatch } = useStore();
   const [note, setNote] = useState('');
   return (
     <>
       <div className="railstrip">
-        {[['docs', 'doc', 'Docs', DOCS.length], ['notes', 'notes', 'Notes', state.notes.length], ['comments', 'chat', 'Comment', state.comments.length]].map(([k, ic, lbl, badge]) => (
+        {[['docs', 'doc', 'Docs', DOCS.length], ['notes', 'notes', 'Notes', state.notes.length]].map(([k, ic, lbl, badge]) => (
           <button key={k} onClick={() => setMode(mode === k ? null : k)} aria-pressed={mode === k}
             style={mode === k ? { color: 'var(--maroon)', background: 'var(--soft-wash)' } : null}>
             <Icon n={ic} size={18} />
@@ -139,7 +139,7 @@ export function RightRail({ mode, setMode, onOpenDoc, commentMode, setCommentMod
         {mode && (
           <motion.aside className="drawer" initial={{ x: 380 }} animate={{ x: 0 }} exit={{ x: 380 }} transition={spring.ui}>
             <div className="drawer__h">
-              <h3>{mode === 'docs' ? 'Docs' : mode === 'notes' ? 'Your notes' : 'Comments'}</h3>
+              <h3>{mode === 'docs' ? 'Docs' : 'Your notes'}</h3>
               <button className="drawer__x" onClick={() => setMode(null)}><Icon n="close" size={16} /></button>
             </div>
             <div className="drawer__b">
@@ -159,37 +159,6 @@ export function RightRail({ mode, setMode, onOpenDoc, commentMode, setCommentMod
                   <div style={{ marginTop: 16 }}>
                     {state.notes.length === 0 && <p className="muted" style={{ fontSize: 14, fontStyle: 'italic' }}>No notes yet.</p>}
                     {state.notes.map(n => <div key={n.id} className="notechip"><span>{n.text}</span></div>)}
-                  </div>
-                </>
-              )}
-              {mode === 'comments' && (
-                <>
-                  <p className="muted" style={{ fontSize: 14, marginBottom: 12 }}>Feedback goes on the storyline itself. Turn on comment mode, then click anywhere on any scene to drop a pin and pick a category.</p>
-                  <button className="continue" style={{ width: '100%', justifyContent: 'center', borderRadius: 10, background: commentMode ? 'var(--pink)' : 'var(--maroon)' }}
-                    onClick={() => setCommentMode(!commentMode)}>{commentMode ? 'Comment mode is on. Click a scene.' : 'Turn on comment mode'}</button>
-                  {state.comments.length > 0 && (
-                    <div style={{ display: 'flex', gap: 6, marginTop: 12 }}>
-                      <button className="chip" onClick={() => exportComments(state.comments, 'json')}><Icon n="download" size={13} /> JSON</button>
-                      <button className="chip" onClick={() => exportComments(state.comments, 'csv')}><Icon n="download" size={13} /> CSV</button>
-                      <span className="muted" style={{ fontSize: 12, alignSelf: 'center', marginLeft: 'auto' }}>{state.comments.length} total</span>
-                    </div>
-                  )}
-                  <div style={{ marginTop: 16 }}>
-                    {state.comments.length === 0 && <p className="muted" style={{ fontSize: 14, fontStyle: 'italic' }}>No comments yet.</p>}
-                    {STAGES.filter(st => state.comments.some(c => c.stageKey === st.key)).map(st => (
-                      <div key={st.key} style={{ marginBottom: 18 }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.05em', textTransform: 'uppercase', color: 'var(--grey-3)', marginBottom: 8 }}>{st.name}</div>
-                        {state.comments.filter(c => c.stageKey === st.key).map(c => (
-                          <button key={c.id} onClick={() => { const i = SCENES.findIndex(s => s.id === c.sceneId); if (i >= 0 && nav) nav(c.sceneId); }}
-                            style={{ display: 'block', textAlign: 'left', width: '100%', border: '1px solid var(--hair)', borderRadius: 8, padding: '10px 12px', marginBottom: 8, background: '#fff', opacity: c.resolved ? 0.55 : 1 }}>
-                            <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.04em', color: 'var(--pink)' }}>{c.category}</span>
-                            <span style={{ fontSize: 11, color: 'var(--grey-3)' }}> · {c.sceneId}</span>
-                            <div style={{ fontSize: 14, color: 'var(--grey)', marginTop: 3 }}>{c.text}</div>
-                            {c.anchor && <div style={{ fontSize: 11, color: 'var(--grey-3)', marginTop: 3, fontStyle: 'italic' }}>on: {c.anchor}</div>}
-                          </button>
-                        ))}
-                      </div>
-                    ))}
                   </div>
                 </>
               )}

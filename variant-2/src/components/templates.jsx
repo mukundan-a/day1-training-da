@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Reveal, StaggerGroup, StaggerItem, BeatHead, Icon, DownloadButton, ArtefactFrame } from './ui.jsx';
+import { HypTree } from './heroes.jsx';
 import { CHECKLISTS, ROLES } from '../data.js';
 import { spring, ease, dur } from '../motion.js';
 
@@ -124,19 +125,11 @@ export function ZoomOut({ heading, body, name, flag, cap }) {
       <Reveal className="mt32" style={{ maxWidth: 760, margin: '32px auto 0' }}>
         <motion.div initial={{ scale: 0.96, opacity: 0 }} whileInView={{ scale: 1, opacity: 1 }} viewport={{ once: true }} transition={{ duration: dur.slow, ease: ease.standard }}>
           <ArtefactFrame name={name} flag={flag} cap={cap}>
-            {/* placeholder tree slide */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '20px 0' }}>
-              <div style={{ background: 'var(--maroon)', color: '#fff', fontSize: 12, padding: '6px 16px', borderRadius: 6 }}>L1 hypothesis</div>
-              <div style={{ display: 'flex', gap: 24 }}>
-                {[0, 1, 2].map(i => (
-                  <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center' }}>
-                    <div style={{ border: '1px solid var(--hair)', fontSize: 11, padding: '4px 12px', borderRadius: 4 }}>L2</div>
-                    <div style={{ width: 60, height: 8, background: 'var(--hair-2)', borderRadius: 3 }} />
-                    <div style={{ width: 60, height: 8, background: 'var(--hair-2)', borderRadius: 3 }} />
-                  </div>
-                ))}
+            <div style={{ padding: '14px 6px 6px' }}>
+              <HypTree highlight={-1} />
+              <div style={{ textAlign: 'center', marginTop: 12 }}>
+                <span style={{ fontSize: 11, color: 'var(--maroon)', background: '#FBF0B8', padding: '3px 10px', borderRadius: 4 }}>left as a working draft</span>
               </div>
-              <div style={{ fontSize: 11, color: 'var(--maroon)', background: '#FBF0B8', padding: '3px 10px', borderRadius: 4, marginTop: 6 }}>left as a working draft</div>
             </div>
           </ArtefactFrame>
         </motion.div>

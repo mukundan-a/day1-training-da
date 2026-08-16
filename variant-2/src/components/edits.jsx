@@ -7,8 +7,11 @@
 import { useEffect, useRef } from 'react';
 import { useComments } from '../comments-store.jsx';
 
-const SKIP = '.coachdock,.coachchat,.reviewdock,.reviewbanner,.cpop,.clayer,.herostage,.hyptree,.wptable,.exlayout,.checkgroup,.checkstrip,.outputs,.rolefilter,.mapstage,button,input,textarea,[data-noedit]';
-const LEAF = 'h1,h2,h3,h4,p,li,blockquote';
+// Skip only the genuinely dynamic / animated zones and the reviewer chrome; the
+// rest of the narration is editable.
+const SKIP = '.coachdock,.coachchat,.reviewdock,.reviewbanner,.cpop,.clayer,.herostage,.hyptree,.wptable,.filmframe__screen,.exlayout,.branchex,.scqadd,.checkgroup,.checkstrip,.outputs,.rolefilter,.chip,button,input,textarea,select,[data-noedit]';
+// Editable text leaves: standard text tags plus the content divs that carry copy.
+const LEAF = 'h1,h2,h3,h4,h5,p,li,blockquote,.reason__claim,.reason__body,.overview__why,.foldnote,.flow__d,.norm p,.panel li';
 
 function hash(s) { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
 const norm = (s) => String(s || '').replace(/\s+/g, ' ').trim();

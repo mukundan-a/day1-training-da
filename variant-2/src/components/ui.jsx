@@ -108,6 +108,19 @@ export const ArtefactFrame = ({ name, flag, children, cap }) => (
   </div>
 );
 
+// A "screen" the shape-shifting film plays inside, so a viewer reads it as an
+// animation of the day rather than as static page furniture.
+export const FilmFrame = ({ label, caption, children }) => (
+  <div className="filmframe">
+    <div className="filmframe__bar">
+      <span className="filmframe__dots"><i /><i /><i /></span>
+      <span className="filmframe__label"><span className="filmframe__live" /> {label}</span>
+    </div>
+    <div className="filmframe__screen">{children}</div>
+    {caption && <div className="filmframe__cap">{caption}</div>}
+  </div>
+);
+
 export const DownloadButton = ({ label = 'Download' }) => (
   <button className="dlbtn"><Icon n="download" size={15} /> {label} <span className="hub">Lives on the Hub</span></button>
 );

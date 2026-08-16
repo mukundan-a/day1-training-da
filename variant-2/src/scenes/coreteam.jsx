@@ -69,22 +69,22 @@ export function C3() {
   const hasBranch = state.branch.subclaims.filter(Boolean).length > 0 && !state.branch.skipped;
   return (
     <Scene id="C3" variant="hero">
-      <Reveal><h2 className="lead center" style={{ margin: '24px auto 0', maxWidth: '26ch' }}>Turned on its side, the hypothesis tree becomes the week-1 workplan.</h2></Reveal>
-      <Reveal><p className="body center" style={{ margin: '16px auto 0', maxWidth: '58ch' }}>
-        In the sequence below, each branch of the tree lands as a row of the workplan. The PM then fills in who owns each workstream and where its evidence will come from, taking a workstream or two herself alongside running the team.
+      <Reveal><h2 className="lead" style={{ marginTop: 24 }}>Turned on its side, the hypothesis tree becomes the week-1 workplan.</h2></Reveal>
+      <Reveal><p className="body mt16">
+        Each branch of the tree lands as a row of the workplan. The PM then fills in who owns each workstream and where its evidence will come from, taking a workstream or two herself alongside running the team.
       </p></Reveal>
 
       <HeroA userBranchLabel={hasBranch ? 'Your branch' : null} />
 
-      <Reveal><p className="body center" style={{ margin: '0 auto', maxWidth: '58ch' }}>
+      <Reveal><p className="body">
         The same rows then read as the deliverable’s table of contents. Each workstream becomes a section, and what its evidence has to show becomes what that section has to say.
       </p></Reveal>
-      <Reveal className="center" style={{ maxWidth: 660, margin: '24px auto 0' }}>
-        <p className="body-lg" style={{ color: 'var(--maroon)', fontFamily: 'var(--display)' }}>
+      <Reveal style={{ marginTop: 24 }}>
+        <p className="body-lg" style={{ color: 'var(--maroon)', fontFamily: 'var(--display)', fontWeight: 700 }}>
           Tree, workplan and contents are the same thinking in three forms. The claim the team argued about in the kick-off is now a section heading in the report.
         </p>
       </Reveal>
-      <Reveal className="foldnote" style={{ margin: '24px auto 0' }}>
+      <Reveal className="foldnote" style={{ marginTop: 24 }}>
         The first week carries it one step further. The workplan becomes an executive summary, and then a set of slides, which is the shape of week one.
       </Reveal>
     </Scene>
@@ -110,8 +110,8 @@ export function C4() {
           ))}
         </StaggerGroup>
       </div>
-      <Reveal className="center" style={{ maxWidth: 660, margin: '0 auto' }}>
-        <p className="body-lg" style={{ color: 'var(--maroon)', fontFamily: 'var(--display)' }}>When the team names its norms on the first day, it can hold itself to them later. Norms that are never named tend not to hold.</p>
+      <Reveal style={{ marginTop: 8 }}>
+        <p className="body-lg" style={{ color: 'var(--maroon)', fontFamily: 'var(--display)', fontWeight: 700 }}>When the team names its norms on the first day, it can hold itself to them later. Norms that are never named tend not to hold.</p>
       </Reveal>
     </Scene>
   );
@@ -126,7 +126,7 @@ export function C5() {
         <BeatHead n="1" title="By the end of the session, Day 1 has become a plan the team could start on the next morning" maroon />
         <Reveal><p className="body">In a single session, the tree became a workplan with owners, the workplan became a table of contents, and the team agreed how it would work. Nobody leaves wondering what they own, what the deliverable is, or how the team runs, and each of those came from the same tree.</p></Reveal>
         <StaggerGroup className="panels" style={{ gridTemplateColumns: '1fr 1fr 1fr', marginTop: 24 }} s={0.1}>
-          {items.map(([h, s]) => <StaggerItem key={h} className="panel"><h3 style={{ fontSize: 18 }}>{h}</h3><p className="body" style={{ fontSize: 15 }}>{s}</p></StaggerItem>)}
+          {items.map(([h, s]) => <StaggerItem key={h} className="panel"><h3>{h}</h3><p className="body-sm">{s}</p></StaggerItem>)}
         </StaggerGroup>
       </div>
       <div className="beat">

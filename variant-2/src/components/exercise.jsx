@@ -91,8 +91,8 @@ export function SCQExercise({ onOpenSource }) {
 
   const setField = (f, arr) => dispatch({ type: 'scq', patch: { [f]: arr } });
   const say = (verdict, lines) => setLog(l => [...l, { verdict, lines }]);
-  const typeInto = async (f, text) => { setGlow(f); for (let i = 1; i <= text.length; i++) { setTyping({ f, t: text.slice(0, i) }); await wait(22); } await wait(160); };
-  const addBullet = async (f, cur, text) => { await typeInto(f, text); setField(f, [...cur, text]); setTyping({ f: null, t: '' }); await wait(180); };
+  const typeInto = async (f, text) => { setGlow(f); for (let i = 1; i <= text.length; i++) { setTyping({ f, t: text.slice(0, i) }); await wait(13); } await wait(90); };
+  const addBullet = async (f, cur, text) => { await typeInto(f, text); setField(f, [...cur, text]); setTyping({ f: null, t: '' }); await wait(100); };
 
   const demo = async () => {
     setPlaying(true); setLog([]); setThinking(false); setCoachOpen(true);
@@ -106,19 +106,19 @@ export function SCQExercise({ onOpenSource }) {
     // problem statement, written straight off the SCQ
     setGlow('P'); await wait(250);
     const P = 'How should the client respond to what has changed?';
-    for (let i = 1; i <= P.length; i++) { dispatch({ type: 'scq', patch: { problem: P.slice(0, i) } }); await wait(20); }
+    for (let i = 1; i <= P.length; i++) { dispatch({ type: 'scq', patch: { problem: P.slice(0, i) } }); await wait(12); }
     setGlow('check'); await wait(500); setGlow(null);
-    setThinking(true); await wait(1100); setThinking(false);
+    setThinking(true); await wait(650); setThinking(false);
     say('iterate', [
       'The situation and complication read well, and the problem statement follows from them.',
       'The question, though, is closer to a topic than a question. Phrase it so a decision would answer it, starting with a word like "Should", "How much", or "Which".',
     ]);
-    await wait(2800);
+    await wait(1400);
     setGlow('Q'); setField('Q', []); await wait(300);
     await addBullet('Q', [], 'Should the client change course?');
     await addBullet('Q', ['Should the client change course?'], 'If so, on what basis should it decide?');
     setGlow('check'); await wait(500); setGlow(null);
-    setThinking(true); await wait(1100); setThinking(false);
+    setThinking(true); await wait(650); setThinking(false);
     say('pass', [
       'The situation sets the ground, the complication names the tension, and the question now follows from both.',
       'This is a solid draft to bring into the kick-off.',
@@ -126,7 +126,15 @@ export function SCQExercise({ onOpenSource }) {
     dispatch({ type: 'scq', patch: { coachRead: 'The situation sets the ground, the complication names the tension, and the question follows from them.' } });
     await wait(500); setPlaying(false);
   };
-  useEffect(() => { if (inView && !ran.current) { ran.current = true; demo(); } }, [inView]);
+  // On revisit the draft is already made, so skip the slow demo and land on the
+  // finished state with the coach's verdict already shown.
+  useEffect(() => {
+    if (!inView || ran.current) return;
+    ran.current = true;
+    if (scq.coachRead && (scq.S.length || scq.problem)) {
+      setLog([{ verdict: 'pass', lines: ['The situation sets the ground, the complication names the tension, and the question follows from them.', 'This is a solid draft to bring into the kick-off.'] }]);
+    } else demo();
+  }, [inView]);
 
   const add = (f) => { const v = drafts[f].trim(); if (!v) return; setField(f, [...scq[f], v]); setDrafts(d => ({ ...d, [f]: '' })); };
   const del = (f, i) => setField(f, scq[f].filter((_, x) => x !== i));
@@ -201,24 +209,24 @@ export function BranchExercise({ onOpenSource }) {
 
   const setSubs = (arr) => dispatch({ type: 'branch', patch: { subclaims: arr } });
   const say = (verdict, lines) => setLog(l => [...l, { verdict, lines }]);
-  const typeSub = async (text) => { setGlow(true); for (let i = 1; i <= text.length; i++) { setTyping(text.slice(0, i)); await wait(22); } await wait(180); };
+  const typeSub = async (text) => { setGlow(true); for (let i = 1; i <= text.length; i++) { setTyping(text.slice(0, i)); await wait(13); } await wait(90); };
 
   const demo = async () => {
     setPlaying(true); setLog([]); setThinking(false); setCoachOpen(true);
     dispatch({ type: 'branch', patch: { subclaims: [], coachRead: '', checkCount: 0, skipped: false } });
     await wait(500);
     await typeSub('Build a model of the whole system'); setSubs(['Build a model of the whole system']); setTyping(''); setGlow(false); await wait(400);
-    setThinking(true); await wait(1100); setThinking(false);
+    setThinking(true); await wait(650); setThinking(false);
     say('iterate', [
       'That first one is a task, not a claim. A sub-claim should be something that is either true or false, so that evidence could test it.',
       'It also helps to have two or three, so that together they would make the branch hold.',
     ]);
-    await wait(2800);
+    await wait(1400);
     setSubs([]); await wait(300);
     await typeSub('Demand is large enough to matter'); setSubs(['Demand is large enough to matter']); setTyping(''); await wait(300);
     await typeSub('The economics hold at the scale required'); setSubs(['Demand is large enough to matter', 'The economics hold at the scale required']); setTyping(''); await wait(300);
     await typeSub('The plan is deliverable within the timeframe'); setSubs(['Demand is large enough to matter', 'The economics hold at the scale required', 'The plan is deliverable within the timeframe']); setTyping(''); setGlow(false); await wait(400);
-    setThinking(true); await wait(1100); setThinking(false);
+    setThinking(true); await wait(650); setThinking(false);
     say('pass', [
       'Each of these is a claim that could be proven wrong, and if all three held, the branch above would hold too.',
       'That is a testable branch.',
@@ -226,7 +234,13 @@ export function BranchExercise({ onOpenSource }) {
     dispatch({ type: 'branch', patch: { coachRead: 'The sub-claims are statements, not questions, and at least one could be proven wrong.' } });
     await wait(500); setPlaying(false);
   };
-  useEffect(() => { if (inView && !ran.current) { ran.current = true; demo(); } }, [inView]);
+  useEffect(() => {
+    if (!inView || ran.current) return;
+    ran.current = true;
+    if (br.coachRead && br.subclaims.length) {
+      setLog([{ verdict: 'pass', lines: ['Each of these is a claim that could be proven wrong, and if all three held, the branch above would hold too.', 'That is a testable branch.'] }]);
+    } else demo();
+  }, [inView]);
 
   const add = () => { const v = draft.trim(); if (!v) return; setSubs([...br.subclaims, v]); setDraft(''); };
   const del = (i) => setSubs(br.subclaims.filter((_, x) => x !== i));
@@ -241,24 +255,36 @@ export function BranchExercise({ onOpenSource }) {
     }, 900);
   };
 
+  const branches = ['Branch 1', 'Your branch', 'Branch 3'];
   return (
     <div ref={wrap} style={{ position: 'relative' }}>
       <Sticker playing={playing} onReplay={demo} />
-      <p className="body center" style={{ maxWidth: 620, margin: '0 auto 18px', color: 'var(--grey-2)', fontSize: 15 }}>
-        You take the highlighted branch and write the sub-claims that would have to hold for it to be true.
-      </p>
-      <div style={{ maxWidth: 720, margin: '0 auto 8px' }}><HypTree highlight={1} animate={false} /></div>
-      <ul className={'scqlist' + (glow ? ' glow' : '')} style={{ border: '1px solid var(--hair)', borderRadius: 10, padding: 12, minHeight: 60, maxWidth: 560, margin: '18px auto 0' }}>
-        <AnimatePresence>
-          {br.subclaims.length === 0 && !typing && <li className="seed">For the branch to be true, what has to be true underneath it?</li>}
-          {br.subclaims.map((t, i) => <motion.li key={t + i} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={spring.land}>{t}{!playing && <span className="del" onClick={() => del(i)}>×</span>}</motion.li>)}
-        </AnimatePresence>
-      </ul>
-      <div className="scqadd" style={{ maxWidth: 560, margin: '0 auto', padding: '10px 0' }}>
-        <input value={playing ? typing : draft} readOnly={playing} placeholder="Add a sub-claim" style={{ maxWidth: 420 }} onChange={e => setDraft(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} /><button onClick={() => !playing && add()}><Icon n="plus" size={16} /></button>
-      </div>
-      <div className="actionbar" style={{ justifyContent: 'center' }}>
-        <button className="continue" style={{ borderRadius: 26 }} onClick={() => !playing && check()}><Icon n="check" size={18} /> Check the branch</button>
+      <div className="branchex">
+        {/* left: which branch you own */}
+        <div className="branchex__tree">
+          <div className="branchex__root">L1 hypothesis</div>
+          <div className="branchex__stems">
+            {branches.map((b, i) => (
+              <div key={i} className={'branchex__chip' + (i === 1 ? ' mine' : '')}>
+                {b}{i === 1 && <span className="branchex__arrow"><Icon n="right" size={16} /></span>}
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* right: the sub-claims that make your branch hold — these are its leaves */}
+        <div className={'branchex__panel' + (glow ? ' glow' : '')}>
+          <div className="branchex__h">Sub-claims under your branch</div>
+          <p className="branchex__hint">For the branch to be true, what has to be true underneath it?</p>
+          <ul className="branchex__list">
+            <AnimatePresence>
+              {br.subclaims.map((t, i) => <motion.li key={t + i} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={spring.land}><span className="branchex__dot" />{t}{!playing && <span className="del" onClick={() => del(i)}>×</span>}</motion.li>)}
+            </AnimatePresence>
+          </ul>
+          <div className="scqadd" style={{ padding: '6px 0 0' }}>
+            <input value={playing ? typing : draft} readOnly={playing} placeholder="Add a sub-claim" onChange={e => setDraft(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} /><button onClick={() => !playing && add()}><Icon n="plus" size={16} /></button>
+          </div>
+          <button className="continue branchex__check" onClick={() => !playing && check()}><Icon n="check" size={17} /> Check the branch</button>
+        </div>
       </div>
       <CoachChat log={log} thinking={thinking} open={coachOpen} setOpen={setCoachOpen} />
     </div>

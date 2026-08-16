@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Reveal, StaggerGroup, StaggerItem, BeatHead, FenSlot, ArtefactFrame } from '../components/ui.jsx';
+import { Reveal, StaggerGroup, StaggerItem, BeatHead, FenSlot, FilmFrame } from '../components/ui.jsx';
 import { Scene } from '../components/frame.jsx';
 import { HeroA } from '../components/heroes.jsx';
 import { STAGES } from '../data.js';
@@ -10,32 +10,21 @@ import { spring, ease, dur } from '../motion.js';
 export function W1() {
   return (
     <Scene id="W1" variant="wide" hideHeader>
-      <div style={{ paddingTop: 48 }}>
-        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginBottom: 44, flexWrap: 'wrap' }}>
-          {['Proposal', 'Context brief', 'The question'].map((t, i) => (
-            <motion.div key={i} initial={{ y: -50, opacity: 0, rotate: (i - 1) * 3 }} animate={{ y: 0, opacity: 1, rotate: (i - 1) * 2 }}
-              transition={{ ...spring.land, delay: 0.2 + i * 0.18 }} style={{ width: 150 }}>
-              <ArtefactFrame name={t}><div style={{ height: 60 }}><div className="line" style={{ height: 8, background: 'var(--hair-2)', borderRadius: 3, marginBottom: 8 }} /><div className="line" style={{ height: 8, width: '70%', background: 'var(--hair-2)', borderRadius: 3 }} /></div></ArtefactFrame>
-            </motion.div>
-          ))}
-        </div>
-
-        <motion.h1 className="display center" style={{ margin: '12px auto 0', maxWidth: '22ch' }}
-          initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: dur.slow, ease: ease.entrance }}>
-          You are about to enter a guided simulation of a Dalberg project.
+      <div style={{ paddingTop: 40, maxWidth: 660 }}>
+        <motion.h1 className="display"
+          initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: dur.base, ease: ease.entrance }}>
+          You are about to enter a guided simulation of Day 1 of a project.
         </motion.h1>
-        <Reveal amount={0.2}><p className="body center" style={{ margin: '20px auto 0', maxWidth: '56ch' }}>
-          You will go through the first day of a real project from the analyst’s seat: the same documents, the same meetings, and the same thinking, in the order they actually happened. The project it is drawn from is named once you are staffed onto it.
+        <Reveal amount={0.2}><p className="body mt16" style={{ maxWidth: '60ch' }}>
+          You take the analyst’s seat and go through the first day as it actually happened: the same documents, the same meetings, the same thinking, in order. The project you are working on is named the moment you are staffed onto it.
         </p></Reveal>
-
-        <Reveal amount={0.2}><p className="body center" style={{ margin: '32px auto 0', maxWidth: '56ch' }}>
-          By the end of the day, one starting question will have become a claim, a plan, and a deliverable. The short sequence below shows the shape of what you will build, the same thinking taking several forms across the day.
-        </p></Reveal>
-
-        <div className="mt24">
-          <HeroA compact silent />
-        </div>
       </div>
+
+      <Reveal amount={0.15} style={{ marginTop: 28 }}>
+        <FilmFrame label="Day 1, in fast-forward" caption="Watch one starting question become a claim, then a plan, then the deliverable. You will build each of these yourself as the day goes on.">
+          <HeroA compact silent />
+        </FilmFrame>
+      </Reveal>
     </Scene>
   );
 }

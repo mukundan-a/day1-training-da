@@ -50,6 +50,14 @@ export function CommentsProvider({ children }) {
             mine: r.uid === Live.uid, ts: r.at ? Date.parse(r.at) : Date.now(),
           })));
         });
+        // move any comments made while offline up onto the shared board, once
+        try {
+          const localCs = JSON.parse(localStorage.getItem(LKEY) || '[]');
+          if (Array.isArray(localCs) && localCs.length) {
+            localCs.forEach(c => Live.add({ ...c, who: c.who || who, type: CAT_TO_TYPE[c.category] || 'flow' }).catch(() => {}));
+            localStorage.removeItem(LKEY);
+          }
+        } catch {}
         unsubE = Live.watchEdits((rows, err) => {
           if (err) return;
           const remote = {};

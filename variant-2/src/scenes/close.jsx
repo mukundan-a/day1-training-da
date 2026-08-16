@@ -11,7 +11,7 @@ export function X1() {
   const row = (what, kept, detail) => (
     <div className="trailcard">
       <span className="what">{what}</span>
-      <span className="body" style={{ fontSize: 15 }}>{kept ? detail : 'Not taken this time. You can return to it at any point.'}</span>
+      <span className="body-sm">{kept ? detail : 'Not taken this time. You can return to it at any point.'}</span>
       <span className={'stat ' + (kept ? 'kept' : 'skip')}>{kept ? 'kept' : 'skipped'}</span>
     </div>
   );

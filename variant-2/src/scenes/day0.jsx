@@ -48,7 +48,7 @@ export function D2() {
             <p className="muted" style={{ fontSize: 14, margin: '4px 0 14px' }}>The two Project Directors outline how each of them will distribute their responsibilities, so you know who to go to for what.</p>
             {[['Content lead', 'who leads content review'], ['Client lead', 'who leads the client relationship'], ['Coaching and development', 'how the PDs split coaching the team']].map(([h, s]) => (
               <div key={h} style={{ padding: '10px 0', borderTop: '1px solid var(--hair-2)' }}>
-                <div style={{ fontWeight: 700, color: 'var(--maroon)', fontSize: 15 }}>{h}</div>
+                <div style={{ fontWeight: 700, color: 'var(--maroon)' }}>{h}</div>
                 <FenSlot tag="FEN">{s}</FenSlot>
               </div>
             ))}
@@ -106,7 +106,7 @@ export function D3() {
         </StaggerGroup>
         <Reveal className="flow__eq" style={{ marginTop: 14 }}>
           <span className="lab">Problem statement</span>
-          <span className="body" style={{ fontSize: 15, margin: 0 }}>The three parts resolve into one or two sentences naming the problem the work exists to solve. Everything that follows points back to it.</span>
+          <span className="body-sm" style={{ margin: 0 }}>The three parts resolve into one or two sentences naming the problem the work exists to solve. Everything that follows points back to it.</span>
         </Reveal>
       </div>
     </Scene>
@@ -138,16 +138,16 @@ export function D5() {
         <BeatHead n="1" title="Your draft, beside the one the FEN team settled on" maroon />
         <div className="panels" style={{ marginTop: 8 }}>
           <Reveal className="panel">
-            <h3 style={{ fontSize: 19 }}>What you wrote</h3>
+            <h3>What you wrote</h3>
             {scq.skipped
               ? <p className="muted">You skipped the exercise, so a real teammate’s draft stands in its place.</p>
               : yours.length
-                ? <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>{yours.slice(0, 6).map((t, i) => <li key={i} className="body" style={{ fontSize: 15 }}>• {t}</li>)}
+                ? <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>{yours.slice(0, 6).map((t, i) => <li key={i} className="body-sm">• {t}</li>)}
                     <li style={{ marginTop: 6 }} className="body"><strong>Problem:</strong> {scq.problem || <FenSlot inline tag="yours">not written</FenSlot>}</li></ul>
                 : <FenSlot tag="yours">nothing drafted</FenSlot>}
           </Reveal>
           <Reveal className="panel panel--soft">
-            <h3 style={{ fontSize: 19 }}>What the FEN team landed on</h3>
+            <h3>What the FEN team landed on</h3>
             <ScaffoldSlot lines={['w100', 'w80', 'w90', 'w55']} />
           </Reveal>
         </div>

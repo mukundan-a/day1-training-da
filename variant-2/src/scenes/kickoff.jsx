@@ -36,12 +36,12 @@ export function F2() {
         <Reveal><p className="body">Everyone read the same proposal and brief, and each person framed the problem a little differently. The interesting part is where the framings disagree, because those gaps are what the meeting works through.</p></Reveal>
         <StaggerGroup className="panels" style={{ gridTemplateColumns: '1fr 1fr 1fr', marginTop: 24 }} s={0.12}>
           <StaggerItem className="panel" style={{ borderColor: 'var(--pink)', borderWidth: 2 }}>
-            <h3 style={{ fontSize: 17 }}>Yours</h3>
-            {mine.length ? <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>{mine.map((t, i) => <li key={i} className="body" style={{ fontSize: 14 }}>• {t}</li>)}</ul>
+            <h3>Yours</h3>
+            {mine.length ? <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>{mine.map((t, i) => <li key={i} className="body-sm">• {t}</li>)}</ul>
               : <FenSlot tag="yours">you skipped, so a real one stands in</FenSlot>}
           </StaggerItem>
-          <StaggerItem className="panel"><h3 style={{ fontSize: 17 }}>A teammate</h3><ScaffoldSlot lines={['w90', 'w70', 'w80']} /></StaggerItem>
-          <StaggerItem className="panel"><h3 style={{ fontSize: 17 }}>A teammate</h3><ScaffoldSlot lines={['w80', 'w90', 'w60']} /></StaggerItem>
+          <StaggerItem className="panel"><h3>A teammate</h3><ScaffoldSlot lines={['w90', 'w70', 'w80']} /></StaggerItem>
+          <StaggerItem className="panel"><h3>A teammate</h3><ScaffoldSlot lines={['w80', 'w90', 'w60']} /></StaggerItem>
         </StaggerGroup>
       </div>
 
@@ -63,8 +63,8 @@ export function F2() {
 export function F3() {
   return (
     <Scene id="F3" variant="hero">
-      <Reveal><h2 className="lead center" style={{ margin: '24px auto 0', maxWidth: '26ch' }}>The PD restates the shared problem as a top-level hypothesis.</h2></Reveal>
-      <Reveal><p className="body center" style={{ margin: '16px auto 0', maxWidth: '58ch' }}>In the sequence below, the problem statement becomes the hypothesis. It is stated as a flat claim, with no hedging, so that evidence could later prove it wrong.</p></Reveal>
+      <Reveal><h2 className="lead" style={{ marginTop: 24 }}>The PD restates the shared problem as a top-level hypothesis.</h2></Reveal>
+      <Reveal><p className="body mt16">The problem statement becomes the hypothesis, stated as a flat claim with no hedging, so that evidence could later prove it wrong. The tree then grows out beneath it.</p></Reveal>
       <HeroB />
     </Scene>
   );
@@ -112,7 +112,7 @@ export function F6() {
           <div className="def" style={{ maxWidth: '100%' }}>
             <h4>Your branch</h4>
             {br.skipped ? <p className="muted">You skipped the exercise. You can return to it at any time.</p>
-              : subs.length ? <ul style={{ margin: 0, paddingLeft: 18 }}>{subs.map((t, i) => <li key={i} className="body" style={{ fontSize: 15 }}>{t}</li>)}</ul>
+              : subs.length ? <ul style={{ margin: 0, paddingLeft: 18 }}>{subs.map((t, i) => <li key={i} className="body-sm">{t}</li>)}</ul>
                 : <FenSlot tag="yours">not built</FenSlot>}
           </div>
         </Reveal>

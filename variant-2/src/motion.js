@@ -1,5 +1,5 @@
 // Motion tokens (build spec §2.1). Single source; never inline a duration or spring.
-export const dur = { xfast: 0.18, fast: 0.32, base: 0.55, slow: 0.9, epic: 1.6 };
+export const dur = { xfast: 0.12, fast: 0.22, base: 0.38, slow: 0.58, epic: 1.0 };
 
 // bezier carries typography and camera (text, dividers, captions, push-in)
 export const ease = {
@@ -11,17 +11,17 @@ export const ease = {
 
 // springs carry physical landings only (rows/owners/stubs/chips)
 export const spring = {
-  hero: { type: 'spring', stiffness: 120, damping: 20, mass: 1 },
-  land: { type: 'spring', stiffness: 260, damping: 24, mass: 0.9 },
-  sprout: { type: 'spring', stiffness: 340, damping: 22 },
-  ui: { type: 'spring', stiffness: 420, damping: 34 },
+  hero: { type: 'spring', stiffness: 210, damping: 24, mass: 0.9 },
+  land: { type: 'spring', stiffness: 340, damping: 26, mass: 0.8 },
+  sprout: { type: 'spring', stiffness: 420, damping: 24 },
+  ui: { type: 'spring', stiffness: 500, damping: 38 },
 };
 
-export const stagger = { tight: 0.04, normal: 0.08, loose: 0.14 };
+export const stagger = { tight: 0.03, normal: 0.055, loose: 0.09 };
 
 // reusable variant sets
 export const fadeUp = {
-  hidden: { opacity: 0, y: 14 },
+  hidden: { opacity: 0, y: 10 },
   show: { opacity: 1, y: 0, transition: { duration: dur.base, ease: ease.entrance } },
 };
 export const staggerParent = (s = stagger.normal, delayChildren = 0.15) => ({
@@ -29,8 +29,8 @@ export const staggerParent = (s = stagger.normal, delayChildren = 0.15) => ({
   show: { transition: { staggerChildren: s, delayChildren } },
 });
 export const riseChild = {
-  hidden: { opacity: 0, y: 12 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.52, ease: ease.entrance } },
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.38, ease: ease.entrance } },
 };
 export const landChild = {
   hidden: { opacity: 0, y: -14 },

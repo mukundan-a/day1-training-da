@@ -102,7 +102,7 @@ export function HeroA({ compact = false, silent = false, userBranchLabel }) {
   const run = () => {
     timers.current.forEach(clearTimeout); timers.current = [];
     setPhase('tree'); setOwners(false);
-    const T = compact ? { plan: 1600, owners: 2200, toc: 3400 } : { plan: 2600, owners: 3600, toc: 5000 };
+    const T = compact ? { plan: 850, owners: 1350, toc: 2050 } : { plan: 1300, owners: 2000, toc: 2800 };
     const push = (fn, ms) => timers.current.push(setTimeout(fn, ms));
     push(() => setPhase('plan'), T.plan);
     push(() => setOwners(true), T.owners);
@@ -222,9 +222,9 @@ export function HeroB() {
     timers.current.forEach(clearTimeout); timers.current = [];
     setState('problem'); setShowDef(false);
     const push = (fn, ms) => timers.current.push(setTimeout(fn, ms));
-    push(() => setState('hyp'), 1400);
-    push(() => setShowDef(true), 2300);
-    push(() => setState('tree'), 3300);
+    push(() => setState('hyp'), 800);
+    push(() => setShowDef(true), 1500);
+    push(() => setState('tree'), 2100);
   };
   useEffect(() => { if (inView) run(); return () => timers.current.forEach(clearTimeout); }, [inView]);
 
@@ -232,15 +232,19 @@ export function HeroB() {
     <div className="herostage" ref={ref} style={{ minHeight: 480 }}>
       <button className="replay" onClick={run}><Icon n="replay" size={14} /> Replay</button>
 
-      <motion.div layout className={'claim' + (state !== 'problem' ? ' hyp' : '')} transition={reduce ? { duration: dur.fast } : spring.hero}
-        animate={{ scale: state === 'hyp' ? [1, 0.97, 1] : 1 }}>
-        <div className="k">{state !== 'problem' ? 'Top-level hypothesis' : 'Shared problem'}</div>
-        <div className="tx">
-          {state === 'problem'
-            ? <FenSlot inline tag="scaffold">the shared problem statement</FenSlot>
-            : <FenSlot inline tag="scaffold">the L1 hypothesis, stated as a flat claim</FenSlot>}
-        </div>
-      </motion.div>
+      <AnimatePresence>
+        {state !== 'tree' && (
+          <motion.div layout key="claim" className={'claim' + (state !== 'problem' ? ' hyp' : '')} transition={reduce ? { duration: dur.fast } : spring.hero}
+            animate={{ scale: state === 'hyp' ? [1, 0.97, 1] : 1 }} exit={{ opacity: 0, y: 12, scale: 0.9, transition: { duration: dur.fast } }}>
+            <div className="k">{state !== 'problem' ? 'Top-level hypothesis' : 'Shared problem'}</div>
+            <div className="tx">
+              {state === 'problem'
+                ? <FenSlot inline tag="scaffold">the shared problem statement</FenSlot>
+                : <FenSlot inline tag="scaffold">the L1 hypothesis, stated as a flat claim</FenSlot>}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {showDef && state === 'hyp' && (

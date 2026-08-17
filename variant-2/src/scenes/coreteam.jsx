@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Reveal, StaggerGroup, StaggerItem, BeatHead, FenSlot, ArtefactFrame, Icon } from '../components/ui.jsx';
 import { Scene } from '../components/frame.jsx';
 import { StageOverview, ChecklistStrip } from '../components/templates.jsx';
@@ -45,7 +45,7 @@ export function C2() {
       <Reveal><h2 className="lead">The team runs the session from a standard kick-off deck.</h2></Reveal>
       <Reveal><p className="body mt16">The deck sets out how the team will work together and how people will work with one another. This training shows the format rather than filling it in live, so that you recognise the deck when you see it on a project. It plays through below.</p></Reveal>
       <Reveal className="mt24" style={{ width: '100%' }}>
-        <div ref={ref} className="deckfilm">
+        <div className="deckfilm">
           <div className="deckfilm__bar"><span className="artefact__dots"><i /><i /><i /></span><span className="artefact__fn">Kick-off deck</span>
             <button className="replay" style={{ position: 'static', marginLeft: 'auto' }} onClick={() => { setPlaying(p => !p); }}>
               <Icon n={playing ? 'pause' : 'play'} size={13} /> {playing ? 'Pause' : 'Play'}

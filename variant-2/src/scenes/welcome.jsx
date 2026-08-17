@@ -20,11 +20,11 @@ export function W1() {
         </p></Reveal>
       </div>
 
-      <Reveal amount={0.15} style={{ marginTop: 28 }}>
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25, duration: dur.base, ease: ease.entrance }} style={{ marginTop: 28 }}>
         <FilmFrame label="Day 1, in fast-forward" caption="These are the things the day produces, in the order you build them. You will make each one yourself as you go.">
           <PipelineFilm />
         </FilmFrame>
-      </Reveal>
+      </motion.div>
     </Scene>
   );
 }

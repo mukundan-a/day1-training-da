@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Reveal, StaggerGroup, StaggerItem, BeatHead, FenSlot, ArtefactFrame, Icon } from '../components/ui.jsx';
 import { Scene } from '../components/frame.jsx';
 import { StageOverview, ChecklistStrip } from '../components/templates.jsx';
@@ -25,8 +25,6 @@ export function C1() {
 export function C2() {
   const [i, setI] = useState(0);
   const [playing, setPlaying] = useState(true);
-  const ref = React.useRef(null);
-  const inView = useInView(ref, { once: false, amount: 0.4 });
   const slides = [
     { t: 'Agenda', rows: ['w80', 'w60', 'w70', 'w50'] },
     { t: 'Why norms', rows: ['w90', 'w70'] },
@@ -36,10 +34,10 @@ export function C2() {
     { t: 'Next steps', rows: ['w60', 'w45'] },
   ];
   React.useEffect(() => {
-    if (!playing || !inView) return;
+    if (!playing) return;
     const id = setTimeout(() => setI(k => (k + 1) % slides.length), i === 0 ? 1400 : 1900);
     return () => clearTimeout(id);
-  }, [i, playing, inView]);
+  }, [i, playing]);
   const wpct = { w45: '45%', w50: '50%', w55: '55%', w60: '60%', w65: '65%', w70: '70%', w75: '75%', w80: '80%', w85: '85%', w90: '90%' };
 
   return (
@@ -47,7 +45,7 @@ export function C2() {
       <Reveal><h2 className="lead">The team runs the session from a standard kick-off deck.</h2></Reveal>
       <Reveal><p className="body mt16">The deck sets out how the team will work together and how people will work with one another. This training shows the format rather than filling it in live, so that you recognise the deck when you see it on a project. It plays through below.</p></Reveal>
       <Reveal className="mt24" style={{ width: '100%' }}>
-        <div ref={ref} className="deckfilm">
+        <div className="deckfilm">
           <div className="deckfilm__bar"><span className="artefact__dots"><i /><i /><i /></span><span className="artefact__fn">Kick-off deck</span>
             <button className="replay" style={{ position: 'static', marginLeft: 'auto' }} onClick={() => { setPlaying(p => !p); }}>
               <Icon n={playing ? 'pause' : 'play'} size={13} /> {playing ? 'Pause' : 'Play'}

@@ -177,18 +177,18 @@ const ARTS = [
 ];
 
 export function PipelineFilm() {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: false, amount: 0.3 });
   const reduce = useReducedMotion();
   const [i, setI] = useState(0);
+  // It is the opening hero, so it plays as soon as it mounts — no scroll gate,
+  // which previously left it frozen when it sat below the fold.
   useEffect(() => {
-    if (!inView || reduce) return;
+    if (reduce) return;
     const t = setTimeout(() => setI(k => (k + 1) % ARTS.length), i === 0 ? 1500 : 1900);
     return () => clearTimeout(t);
-  }, [i, inView, reduce]);
+  }, [i, reduce]);
 
   return (
-    <div className="pf" ref={ref}>
+    <div className="pf">
       <div className="pf__stage">
         <AnimatePresence mode="wait">
           <motion.div key={ARTS[i].key} className="pf__frame"

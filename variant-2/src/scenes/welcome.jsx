@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Reveal, StaggerGroup, StaggerItem, BeatHead, FenSlot, FilmFrame } from '../components/ui.jsx';
 import { Scene } from '../components/frame.jsx';
-import { HeroA } from '../components/heroes.jsx';
+import { PipelineFilm } from '../components/heroes.jsx';
 import { STAGES } from '../data.js';
 import { spring, ease, dur } from '../motion.js';
 
@@ -21,8 +21,8 @@ export function W1() {
       </div>
 
       <Reveal amount={0.15} style={{ marginTop: 28 }}>
-        <FilmFrame label="Day 1, in fast-forward" caption="Watch one starting question become a claim, then a plan, then the deliverable. You will build each of these yourself as the day goes on.">
-          <HeroA compact silent />
+        <FilmFrame label="Day 1, in fast-forward" caption="These are the things the day produces, in the order you build them. You will make each one yourself as you go.">
+          <PipelineFilm />
         </FilmFrame>
       </Reveal>
     </Scene>
@@ -38,7 +38,7 @@ export function W2() {
   ];
   return (
     <Scene id="W2" variant="read">
-      <Reveal><h2 className="lead" style={{ maxWidth: '22ch', marginTop: 24 }}>A well-run first day sets up the whole project, so the training treats it as its own piece of craft.</h2></Reveal>
+      <Reveal><h2 className="lead" style={{ maxWidth: '22ch', marginTop: 24 }}>A well-run first day sets up the whole project, so it is worth treating as a skill in its own right.</h2></Reveal>
 
       <div className="beat">
         <BeatHead n="1" title="Why the first day matters" />
@@ -75,9 +75,9 @@ export function W2() {
         <StaggerGroup>
           <ol className="objectives">
             {[
-              'Experience the Day 1 process from end to end, and see how it sets a project up for success.',
-              'Understand what is expected of you at each stage of the first day.',
-              'Understand what you should expect from your PDs and PMs at each stage.',
+              'See the Day 1 process from end to end, and how it shapes the weeks that follow.',
+              'Know what is expected of you at each stage of the first day.',
+              'Know what to expect from your PDs and PMs at each stage.',
             ].map((t, i) => <StaggerItem as="li" key={i}>{t}</StaggerItem>)}
           </ol>
         </StaggerGroup>
@@ -92,7 +92,7 @@ export function W3() {
     <Scene id="W3" variant="wide">
       <Reveal><h2 className="lead" style={{ maxWidth: '24ch', marginTop: 24 }}>The training runs across five stages, and takes about half an hour at your own pace.</h2></Reveal>
       <Reveal><p className="body mt16" style={{ maxWidth: '62ch' }}>
-        You can stop and return to any stage. If you are running it live with your team, it is worth slowing down on the two exercises, which is where most of the value sits.
+        You can stop and return to any stage. If you are running it live with your team, it is worth slowing down on the two exercises, which is where the actual thinking happens.
       </p></Reveal>
       <StaggerGroup className="mt32" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12 }} s={0.09}>
         {STAGES.map((s, i) => (

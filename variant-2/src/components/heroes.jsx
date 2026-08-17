@@ -88,6 +88,126 @@ export function HypTree({ highlight = 1, compact = false, animate = true, leafLa
   );
 }
 
+/* ------------------------------------------------------------ PIPELINE FILM
+   The opening loop: the day's artefacts, stylised the way they really look, one
+   after another — SCQ, the hypothesis tree (a tree, not a table), the workplan,
+   the deck, the executive summary. Auto-plays and loops inside the FilmFrame. */
+const Bar = ({ w = '80%', c = 'var(--hair-2)', h = 8 }) => <div style={{ height: h, width: w, borderRadius: 4, background: c }} />;
+
+const SCQMini = () => (
+  <div className="pf__art" style={{ gap: 12 }}>
+    {[['S', 'Situation'], ['C', 'Complication'], ['Q', 'Question']].map(([l, n], i) => (
+      <motion.div key={l} style={{ display: 'flex', alignItems: 'center', gap: 12 }}
+        initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ ...spring.land, delay: 0.1 + i * 0.12 }}>
+        <span style={{ width: 34, height: 34, borderRadius: 8, background: 'var(--soft)', color: 'var(--maroon)', fontFamily: 'var(--display)', fontWeight: 700, fontSize: 17, display: 'grid', placeItems: 'center', flexShrink: 0 }}>{l}</span>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}><Bar w="90%" /><Bar w={i === 2 ? '55%' : '70%'} /></div>
+      </motion.div>
+    ))}
+  </div>
+);
+
+const TreeMini = () => (
+  <div className="pf__art" style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 0 }}>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <motion.div style={{ background: 'var(--maroon)', color: '#fff', fontFamily: 'var(--display)', fontWeight: 700, fontSize: 12, padding: '8px 12px', borderRadius: 8, whiteSpace: 'nowrap' }}
+        initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={spring.land}>L1 hypothesis</motion.div>
+      <Fork n={3} width={40} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {[0, 1, 2].map(i => (
+          <motion.div key={i} style={{ background: '#fff', border: '1px solid ' + (i === 1 ? 'var(--pink)' : 'var(--hair)'), borderRadius: 8, padding: '8px 12px', minWidth: 120, boxShadow: 'var(--shadow-card)' }}
+            initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ ...spring.land, delay: 0.25 + i * 0.12 }}>
+            <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.04em', color: i === 1 ? 'var(--maroon)' : 'var(--pink)', marginBottom: 5 }}>{i === 1 ? 'your branch' : 'sub-hypothesis'}</div>
+            <Bar w="80%" c="var(--soft)" h={7} />
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+const PlanMini = () => (
+  <div className="pf__art" style={{ gap: 0 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1.2fr', gap: 12, padding: '0 4px 8px', fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.05em', color: 'var(--grey-3)' }}>
+      <span>Workstream</span><span>Owner</span><span>Source</span>
+    </div>
+    {[0, 1, 2].map(i => (
+      <motion.div key={i} style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1.2fr', gap: 12, alignItems: 'center', padding: '10px 4px', borderTop: '1px solid var(--hair-2)' }}
+        initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring.land, delay: 0.1 + i * 0.1 }}>
+        <span style={{ fontWeight: 700, color: 'var(--maroon)', fontSize: 12 }}>{i === 1 ? 'Your branch' : 'Branch ' + (i + 1)}</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ width: 18, height: 18, borderRadius: '50%', background: i === 2 ? 'var(--maroon)' : 'var(--soft)', color: i === 2 ? '#fff' : 'var(--maroon)', fontSize: 8, fontWeight: 700, display: 'grid', placeItems: 'center' }}>{i === 2 ? 'PM' : '?'}</span></span>
+        <Bar w="70%" />
+      </motion.div>
+    ))}
+  </div>
+);
+
+const DeckMini = () => (
+  <div className="pf__art" style={{ alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ position: 'relative', width: 200, height: 130 }}>
+      {[0, 1, 2].map(i => (
+        <motion.div key={i} style={{ position: 'absolute', left: i * 16, top: i * 12, width: 170, height: 106, background: '#fff', border: '1px solid var(--hair)', borderRadius: 8, boxShadow: 'var(--shadow-lift)', padding: 14 }}
+          initial={{ opacity: 0, y: 14, rotate: (i - 1) * 2 }} animate={{ opacity: 1, y: 0, rotate: (i - 1) * 2 }} transition={{ ...spring.land, delay: 0.1 + i * 0.12 }}>
+          {i === 2 && <><div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', color: 'var(--pink)', letterSpacing: '.06em' }}>Deck</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginTop: 10 }}><Bar w="80%" c="var(--soft)" /><Bar w="60%" /><Bar w="70%" /></div></>}
+        </motion.div>
+      ))}
+    </div>
+  </div>
+);
+
+const SummaryMini = () => (
+  <div className="pf__art" style={{ alignItems: 'center', justifyContent: 'center' }}>
+    <motion.div style={{ width: 180, background: '#fff', border: '1px solid var(--hair)', borderRadius: 8, boxShadow: 'var(--shadow-lift)', padding: 16 }}
+      initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} transition={spring.hero}>
+      <div style={{ fontFamily: 'var(--display)', fontWeight: 700, fontSize: 12, color: 'var(--maroon)' }}>Executive summary</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, margin: '10px 0' }}>{['90%', '75%', '82%'].map((w, k) => <Bar key={k} w={w} />)}</div>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 5, height: 34 }}>
+        {[16, 26, 20, 32, 24].map((h, k) => <motion.div key={k} style={{ width: 14, borderRadius: 3, background: k === 3 ? 'var(--pink)' : 'var(--soft)' }} initial={{ height: 0 }} animate={{ height: h }} transition={{ ...spring.land, delay: 0.2 + k * 0.06 }} />)}
+      </div>
+    </motion.div>
+  </div>
+);
+
+const ARTS = [
+  { key: 'scq', label: 'Situation · Complication · Question', el: <SCQMini /> },
+  { key: 'tree', label: 'The hypothesis tree', el: <TreeMini /> },
+  { key: 'plan', label: 'The week-1 workplan', el: <PlanMini /> },
+  { key: 'deck', label: 'The deck', el: <DeckMini /> },
+  { key: 'summary', label: 'The executive summary', el: <SummaryMini /> },
+];
+
+export function PipelineFilm() {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: false, amount: 0.3 });
+  const reduce = useReducedMotion();
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    if (!inView || reduce) return;
+    const t = setTimeout(() => setI(k => (k + 1) % ARTS.length), i === 0 ? 1500 : 1900);
+    return () => clearTimeout(t);
+  }, [i, inView, reduce]);
+
+  return (
+    <div className="pf" ref={ref}>
+      <div className="pf__stage">
+        <AnimatePresence mode="wait">
+          <motion.div key={ARTS[i].key} className="pf__frame"
+            initial={{ opacity: 0, y: 16, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -16, scale: 0.96 }}
+            transition={reduce ? { duration: 0.3 } : spring.hero}>
+            {ARTS[i].el}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+      <div className="pf__meta">
+        <AnimatePresence mode="wait">
+          <motion.span key={ARTS[i].key} className="pf__label" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: dur.fast }}>{ARTS[i].label}</motion.span>
+        </AnimatePresence>
+        <div className="pf__dots">{ARTS.map((_, k) => <button key={k} className={k === i ? 'on' : ''} onClick={() => setI(k)} aria-label={ARTS[k].label} />)}</div>
+      </div>
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------ HERO A
    The tree becomes the workplan becomes the table of contents. The three
    branch labels keep their identity across the morph (shared layoutId). */

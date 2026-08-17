@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { Reveal, StaggerGroup, StaggerItem, BeatHead, FenSlot, ArtefactFrame, Icon } from '../components/ui.jsx';
 import { Scene } from '../components/frame.jsx';
 import { StageOverview, ChecklistStrip } from '../components/templates.jsx';
@@ -21,44 +21,69 @@ export function C1() {
   );
 }
 
-/* C2 — the kick-off deck */
+/* C2 — the kick-off deck, playing itself through */
 export function C2() {
   const [i, setI] = useState(0);
-  const slides = ['Agenda', 'Why norms', 'Ways of working', 'Review and feedback', 'Work-life balance', 'Next steps'];
+  const [playing, setPlaying] = useState(true);
+  const ref = React.useRef(null);
+  const inView = useInView(ref, { once: false, amount: 0.4 });
+  const slides = [
+    { t: 'Agenda', rows: ['w80', 'w60', 'w70', 'w50'] },
+    { t: 'Why norms', rows: ['w90', 'w70'] },
+    { t: 'Ways of working', rows: ['w60', 'w80', 'w55'] },
+    { t: 'Review and feedback', rows: ['w75', 'w65'] },
+    { t: 'Work-life balance', rows: ['w70', 'w85', 'w50'] },
+    { t: 'Next steps', rows: ['w60', 'w45'] },
+  ];
+  React.useEffect(() => {
+    if (!playing || !inView) return;
+    const id = setTimeout(() => setI(k => (k + 1) % slides.length), i === 0 ? 1400 : 1900);
+    return () => clearTimeout(id);
+  }, [i, playing, inView]);
+  const wpct = { w45: '45%', w50: '50%', w55: '55%', w60: '60%', w65: '65%', w70: '70%', w75: '75%', w80: '80%', w85: '85%', w90: '90%' };
+
   return (
     <Scene id="C2">
-      <div className="vcenter">
-      <Reveal><h2 className="lead" style={{ maxWidth: '26ch' }}>The team runs the session from a standard kick-off deck.</h2></Reveal>
-      <Reveal><p className="body mt16">The deck sets out how the team will work together and how people will work with one another. This training keeps it simple and shows the format rather than filling it in live, so that you recognise the deck when you see it on a project.</p></Reveal>
-      <Reveal className="mt32" style={{ maxWidth: 760, margin: '32px auto 0', width: '100%' }}>
-        <ArtefactFrame name="Kick-off deck" cap="Placeholder: the Dalberg kick-off norms deck, with a filled-in example.">
-          <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr', gap: 16, minHeight: 220 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <Reveal><h2 className="lead">The team runs the session from a standard kick-off deck.</h2></Reveal>
+      <Reveal><p className="body mt16">The deck sets out how the team will work together and how people will work with one another. This training shows the format rather than filling it in live, so that you recognise the deck when you see it on a project. It plays through below.</p></Reveal>
+      <Reveal className="mt24" style={{ width: '100%' }}>
+        <div ref={ref} className="deckfilm">
+          <div className="deckfilm__bar"><span className="artefact__dots"><i /><i /><i /></span><span className="artefact__fn">Kick-off deck</span>
+            <button className="replay" style={{ position: 'static', marginLeft: 'auto' }} onClick={() => { setPlaying(p => !p); }}>
+              <Icon n={playing ? 'pause' : 'play'} size={13} /> {playing ? 'Pause' : 'Play'}
+            </button>
+          </div>
+          <div className="deckfilm__body">
+            <div className="deckfilm__strip">
               {slides.map((s, k) => (
-                <button key={k} onClick={() => setI(k)} style={{ aspectRatio: '16/9', border: '1.5px solid ' + (k === i ? 'var(--maroon)' : 'var(--hair)'), borderRadius: 4, background: '#fff', fontSize: 8, color: 'var(--grey-3)', position: 'relative' }}>
-                  <span style={{ position: 'absolute', top: 2, left: 4 }}>{k + 1}</span>
+                <button key={k} className={'deckfilm__thumb' + (k === i ? ' on' : '')} onClick={() => { setI(k); setPlaying(false); }}>
+                  <span className="deckfilm__n">{k + 1}</span>
+                  <span className="deckfilm__tbar" />
                 </button>
               ))}
             </div>
-            <div style={{ background: 'var(--soft-wash)', borderRadius: 8, display: 'grid', placeItems: 'center', padding: 20 }}>
+            <div className="deckfilm__stage">
               <AnimatePresence mode="wait">
-                <motion.div key={i} initial={{ opacity: 0, x: 20, rotateY: 6 }} animate={{ opacity: 1, x: 0, rotateY: 0 }} exit={{ opacity: 0, x: -20 }} transition={spring.ui}
-                  style={{ width: '100%', maxWidth: 420, aspectRatio: '16/9', background: '#fff', borderRadius: 6, boxShadow: 'var(--shadow-lift)', padding: 24, display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--pink)' }}>Kick-off deck</div>
-                  <div style={{ fontFamily: 'var(--display)', fontSize: 18, color: 'var(--maroon)', marginTop: 6 }}>{slides[i]}</div>
-                  <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>{[90, 70, 80].map((w, k) => <div key={k} style={{ height: 8, width: w + '%', background: 'var(--hair-2)', borderRadius: 3 }} />)}</div>
+                <motion.div key={i} className="deckfilm__slide"
+                  initial={{ opacity: 0, x: 26, scale: 0.98 }} animate={{ opacity: 1, x: 0, scale: 1 }} exit={{ opacity: 0, x: -26, scale: 0.98 }} transition={spring.ui}>
+                  <div className="deckfilm__eyebrow">Kick-off deck · {i + 1} of {slides.length}</div>
+                  <div className="deckfilm__title">{slides[i].t}</div>
+                  <div className="deckfilm__rows">
+                    {slides[i].rows.map((w, k) => (
+                      <motion.div key={k} className="deckfilm__row" style={{ width: wpct[w] }}
+                        initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ ...spring.land, delay: 0.12 + k * 0.08 }} />
+                    ))}
+                  </div>
+                  <div className="deckfilm__foot"><FenSlot inline tag="example">a filled-in example</FenSlot></div>
                 </motion.div>
               </AnimatePresence>
+              <div className="deckfilm__dots">
+                {slides.map((_, k) => <span key={k} className={k === i ? 'on' : ''} />)}
+              </div>
             </div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 12 }}>
-            <button className="back" onClick={() => setI(Math.max(0, i - 1))}><Icon n="left" size={16} /></button>
-            <span className="muted" style={{ fontSize: 13 }}>{i + 1} / {slides.length}</span>
-            <button className="back" onClick={() => setI(Math.min(slides.length - 1, i + 1))}><Icon n="right" size={16} /></button>
-          </div>
-        </ArtefactFrame>
+        </div>
       </Reveal>
-      </div>
     </Scene>
   );
 }
